@@ -138,4 +138,53 @@ class ProductController extends Controller
         }
     }
 
+
+    public function editProductForm($id)
+    {
+        // Replace 'https://api.gsutil.xyz/product/{id}' with your actual API URL
+        $response = Http::get("https://api.gsutil.xyz/product/{$id}");
+
+        if ($response->successful()) {
+            $product = $response->json();
+            return view('pages.product.edit-product', ['product' => (object) $product]);
+        } else {
+            // Handle errors or redirect if the product is not found
+            return redirect()->route('product.manage')->withErrors('Product not found.');
+        }
+    }
+
+
+    public function updateProduct(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|min:2|max:50',
+            'measurement_unit' => 'required|in:kg,pcs,g',
+            'description' => 'nullable|string',
+            'product_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()]);
+        }
+
+        $data = $request->except(['_token', '_method', 'product_image']);
+        if ($request->hasFile('product_image')) {
+            $image = $request->file('product_image');
+            $response = Http::attach('image', $image->get(), $image->getClientOriginalName())->post('http://api.gsutil.xyz/images/upload');
+            if ($response->successful()) {
+                $image_path = $response->json()['url']; // Retrieve the image URL from the response
+                $data['product_image'] = 'http://api.gsutil.xyz/uploads/' . $image_path; // Assign the full image path to data array
+            } else {
+                return response()->json(['success' => false, 'message' => 'Failed to upload image']);
+            }
+        }
+
+        $response = Http::put("https://api.gsutil.xyz/product/{$id}", $data);
+        if ($response->successful()) {
+            return response()->json(['success' => true, 'message' => 'Product successfully updated']);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Failed to update product']);
+        }
+    }
+
 }

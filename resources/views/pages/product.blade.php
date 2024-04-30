@@ -66,9 +66,10 @@
                                                     </td>
                                                     <td>
                                                         <div class="d-flex">
-                                                            <button type="button" class="btn btn-secondary btn-sm mr-2">
+                                                            <a href="{{ route('product.edit', $product['id']) }}"
+                                                                class="btn btn-secondary btn-sm mr-2">
                                                                 <i class="fas fa-pencil-alt"></i>
-                                                            </button>
+                                                            </a>
                                                             <button type="button"
                                                                 class="btn btn-danger btn-sm delete-product"
                                                                 data-id="{{ $product['id'] }}">

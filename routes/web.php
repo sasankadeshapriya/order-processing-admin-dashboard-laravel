@@ -14,6 +14,7 @@ Route::get('/error', function () {
 
 Route::get('/product', [ProductController::class, 'showData'])->name('product.manage');
 Route::delete('/product/{id}', [ProductController::class, 'deleteProduct'])->name('product.delete');
-
 Route::get('/add-product', [ProductController::class, 'addProductForm'])->name('product.add');
 Route::post('/add-product', [ProductController::class, 'submitProduct'])->name('product.submit');
+Route::get('/product/edit/{id}', [ProductController::class, 'editProductForm'])->name('product.edit');
+Route::put('/product/update/{id}', [ProductController::class, 'updateProduct'])->name('product.update');
