@@ -70,4 +70,73 @@
             popupWindow.focus();
         }
     });
+
+    $(document).ready(function() {
+        // Define all colors and skins
+        var navbar_dark_skins = [
+            'navbar-primary', 'navbar-secondary', 'navbar-info', 'navbar-success', 'navbar-danger',
+            'navbar-indigo', 'navbar-purple', 'navbar-pink', 'navbar-navy', 'navbar-lightblue',
+            'navbar-teal', 'navbar-cyan', 'navbar-dark', 'navbar-gray-dark', 'navbar-gray'
+        ];
+        var navbar_light_skins = [
+            'navbar-light', 'navbar-warning', 'navbar-white', 'navbar-orange'
+        ];
+        var navbar_all_colors = navbar_dark_skins.concat(navbar_light_skins);
+
+        // Function to update the navbar color
+        function updateNavbarColor(color) {
+            var $main_header = $('.main-header');
+            $main_header.removeClass('navbar-dark navbar-light').removeClass(navbar_all_colors.join(' '));
+
+            if (navbar_dark_skins.includes(color)) {
+                $main_header.addClass('navbar-dark').addClass(color);
+            } else {
+                $main_header.addClass('navbar-light').addClass(color);
+            }
+        }
+
+        // Function to preload the preloader images
+        function preloadImages() {
+            var preloaderImages = [
+                '{{ asset('dist/img/app_logo.svg') }}',
+                '{{ asset('dist/img/app_logo_dark.svg') }}'
+            ];
+            $(preloaderImages).each(function() {
+                $('<img/>')[0].src = this;
+            });
+        }
+
+        // Initialize preloader logo and dark mode from localStorage immediately on page load
+        var isDarkMode = localStorage.getItem('darkMode') === 'true';
+        var preloaderImgSrc = isDarkMode ? '{{ asset('dist/img/app_logo.svg') }}' :
+            '{{ asset('dist/img/app_logo.svg') }}';
+        $('#preloaderImg').attr('src', preloaderImgSrc); // Set the correct preloader image before anything else
+
+        // Preload images
+        preloadImages();
+
+        // Set body class for dark mode
+        $('body').toggleClass('dark-mode', isDarkMode);
+        updateNavbarColor(isDarkMode ? 'navbar-gray-dark' : 'navbar-white');
+
+        // Toggle dark mode
+        $('#darkModeToggle').click(function(e) {
+            e.preventDefault();
+            isDarkMode = $('body').toggleClass('dark-mode').hasClass('dark-mode');
+
+            // Set the dark mode status in localStorage
+            localStorage.setItem('darkMode', isDarkMode);
+
+            // Update Navbar color based on dark mode
+            updateNavbarColor(isDarkMode ? 'navbar-gray-dark' : 'navbar-white');
+
+            // Update preloader logo
+            preloaderImgSrc = isDarkMode ? '{{ asset('dist/img/app_logo.svg') }}' :
+                '{{ asset('dist/img/app_logo.svg') }}';
+            $('#preloaderImg').attr('src', preloaderImgSrc);
+
+            // Optionally change the icon for the toggle
+            $(this).find('i').toggleClass('fa-sun fa-moon');
+        });
+    });
 </script>
