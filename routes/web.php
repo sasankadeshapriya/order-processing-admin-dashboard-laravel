@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 
-
 Route::get('/', function () {
     return view('pages.home');
 });
@@ -11,6 +10,7 @@ Route::get('/', function () {
 Route::get('/error', function () {
     return view('pages.error');
 });
+
 
 Route::get('/product', [ProductController::class, 'showData'])->name('product.manage');
 Route::delete('/product/{id}', [ProductController::class, 'deleteProduct'])->name('product.delete');
