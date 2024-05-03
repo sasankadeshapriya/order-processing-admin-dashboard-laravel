@@ -35,7 +35,6 @@
                     </a>
                 </li>
 
-                <!-- Modification to include product.edit in the check -->
                 <li
                     class="nav-item has-treeview {{ request()->is('product*') || request()->is('add-product') ? 'menu-open' : '' }}">
                     <a href="#"

@@ -83,6 +83,8 @@
                                 <input type="hidden" name="added_by_admin_id" value="1">
                                 <div class="card-footer">
                                     <button type="submit" class="btn btn-primary" id="submitBtn">Submit Product</button>
+                                    <a href="{{ route('product.manage') }}" class="btn btn-secondary">Back to
+                                        Products</a>
                                 </div>
                             </form>
                             <!-- /.card-body -->
@@ -113,7 +115,7 @@
                 // Clear all previous validation errors
                 $('.invalid-feedback').addClass('d-none').text('');
                 $('.form-control, .custom-file-input').removeClass(
-                'is-invalid'); // Ensure to include file input
+                    'is-invalid'); // Ensure to include file input
 
                 var formData = new FormData(this);
 
@@ -129,16 +131,18 @@
                             toastr.success(response.message);
                             $('#productForm')[0].reset(); // Clear form fields on success
                             $('.custom-file-label').html(
-                            'Choose Image'); // Reset the custom file label
+                                'Choose Image'); // Reset the custom file label
                         } else {
                             if (response.errors) {
                                 $.each(response.errors, function(key, value) {
                                     if (key ===
-                                        'product_image') { // Specific case for file input
+                                        'product_image'
+                                    ) { // Specific case for file input
                                         $('#error-' + key).removeClass('d-none').text(
                                             value[0]);
                                         $('#customFile').addClass(
-                                        'is-invalid'); // Add is-invalid class to file input
+                                            'is-invalid'
+                                        ); // Add is-invalid class to file input
                                     } else {
                                         $('#error-' + key).removeClass('d-none').text(
                                             value[0]);
