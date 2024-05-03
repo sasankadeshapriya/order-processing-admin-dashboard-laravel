@@ -22,7 +22,7 @@ class ProductController extends Controller
             // Check if the response was successful (status code 2xx)
             if ($response->successful()) {
                 $products = $response->json();
-                return view('pages.product', compact('products'));
+                return view('pages.product.product', compact('products'));
             } else {
                 // Log the error
                 \Log::error('API Error: ' . $response->status());
@@ -186,5 +186,4 @@ class ProductController extends Controller
             return response()->json(['success' => false, 'message' => 'Failed to update product']);
         }
     }
-
 }
