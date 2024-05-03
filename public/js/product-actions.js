@@ -26,7 +26,7 @@ $(document).ready(function() {
                     success: function(response) {
                         if (response.success) {
                             toastr.success('Product deleted successfully');
-                            $('button[data-id="' + id + '"]').closest('tr').remove();
+                            $('#example1').DataTable().row($('button[data-id="' + id + '"]').closest('tr')).remove().draw();
                         } else {
                             toastr.error(response.message || 'Failed to delete product');
                         }

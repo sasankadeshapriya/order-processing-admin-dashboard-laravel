@@ -1,7 +1,6 @@
 $(document).ready(function() {
     $('.delete-batch').click(function() {
         var id = $(this).data('id');
-
         Swal.fire({
             title: 'Are you sure?',
             text: "You won't be able to revert this!",
@@ -26,7 +25,7 @@ $(document).ready(function() {
                     success: function(response) {
                         if (response.success) {
                             toastr.success('Batch deleted successfully');
-                            $('button[data-id="' + id + '"]').closest('tr').remove();
+                            $('#example1').DataTable().row($('button[data-id="' + id + '"]').closest('tr')).remove().draw();
                         } else {
                             toastr.error(response.message || 'Failed to delete batch');
                         }
@@ -38,4 +37,5 @@ $(document).ready(function() {
             }
         });
     });
+
 });
