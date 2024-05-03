@@ -64,6 +64,33 @@
                         </li>
                     </ul>
                 </li>
+                 <!-- Vehicle Section -->
+                 <li
+                    class="nav-item has-treeview {{ request()->is('vehicle*') || request()->is('add-vehicle') ? 'menu-open' : '' }}">
+                    <a href="#"
+                        class="nav-link {{ request()->is('vehicle*') || request()->is('add-vehicle') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-truck"></i>
+                        <p>
+                            Vehicle
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview"
+                        style="{{ request()->is('vehicle*') || request()->is('add-vehicle') ? 'display: block;' : 'display: none;' }}">
+                        <li class="nav-item">
+                            <a href="{{ route('vehicle.add') }}"
+                                class="nav-link {{ request()->is('add-vehicle') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Add Vehicle</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('vehicle.manage') }}"
+                                class="nav-link {{ request()->is('vehicle') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Manage Vehicle</p>
+                            </a>
+                        </li>
             </ul>
         </nav>
         <!-- /.sidebar-menu -->
