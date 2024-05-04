@@ -131,12 +131,18 @@
                             if (response.success) {
                                 toastr.success(response.message);
                                 initialFormData =
-                                currentFormData; // Update the stored form data
+                                    currentFormData; // Update the stored form data
                                 initialFile = currentFile; // Update the stored file input value
-                                // Update the image on the page if a new image was uploaded
-                                if (formData.get('product_image')) {
+                                // Only change the image if a new image file was actually uploaded
+                                if (formData.has('product_image') && formData.get(
+                                        'product_image').size > 0) {
+                                    // Update the image preview to the newly uploaded image
                                     $('img[alt="Product Image"]').attr('src', URL
                                         .createObjectURL(formData.get('product_image')));
+                                } else {
+                                    var imageUrl = "{{ $product->product_image }}?t=" +
+                                        new Date().getTime();
+                                    $('img[alt="Product Image"]').attr('src', imageUrl);
                                 }
                             } else {
                                 if (response.errors) {
@@ -148,7 +154,7 @@
                                     });
                                 } else {
                                     toastr.error(response.message ||
-                                    'Failed to update product');
+                                        'Failed to update product');
                                 }
                             }
                         },
