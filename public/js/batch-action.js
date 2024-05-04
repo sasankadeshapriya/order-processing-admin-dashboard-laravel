@@ -1,33 +1,33 @@
 $(document).ready(function() {
-    // Use delegated events to attach handlers to present and future elements
-    $(document).on('click', '.delete-vehicle', function() {
+    $('.delete-batch').click(function() {
         var id = $(this).data('id');
         Swal.fire({
             title: 'Are you sure?',
             text: "You won't be able to revert this!",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#3085d6',
+            confirmButtonColor: '#C8B400',
             cancelButtonColor: '#d33',
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
                 if (!navigator.onLine) {
-                    toastr.error('No internet connection. Unable to delete vehicle.');
-                    return;
+                    toastr.error('No internet connection. Unable to delete batch.');
+                    return; // Stop further execution
                 }
+
                 $.ajax({
-                    url: '/vehicle/' + id,
+                    url: '/batch/' + id,
                     type: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
                         if (response.success) {
-                            toastr.success('Vehicle deleted successfully');
+                            toastr.success('Batch deleted successfully');
                             $('#example1').DataTable().row($('button[data-id="' + id + '"]').closest('tr')).remove().draw();
                         } else {
-                            toastr.error(response.message || 'Failed to delete vehicle');
+                            toastr.error(response.message || 'Failed to delete batch');
                         }
                     },
                     error: function(xhr) {
@@ -37,4 +37,5 @@ $(document).ready(function() {
             }
         });
     });
+
 });

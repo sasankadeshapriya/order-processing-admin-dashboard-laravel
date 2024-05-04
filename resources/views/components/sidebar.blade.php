@@ -34,9 +34,11 @@
                     </a>
                 </li>
 
-                <!-- Product Section -->
-                <li class="nav-item has-treeview {{ request()->is('product*') || request()->is('add-product') ? 'menu-open' : '' }}">
-                    <a href="#" class="nav-link {{ request()->is('product*') || request()->is('add-product') ? 'active' : '' }}">
+                <!--product-->
+                <li
+                    class="nav-item has-treeview {{ request()->is('product*') || request()->is('add-product') ? 'menu-open' : '' }}">
+                    <a href="#"
+                        class="nav-link {{ request()->is('product*') || request()->is('add-product') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-boxes"></i>
                         <p>Product <i class="right fas fa-angle-left"></i></p>
                     </a>
@@ -56,9 +58,41 @@
                     </ul>
                 </li>
 
+                <!--batch-->
+                <li
+                    class="nav-item has-treeview {{ request()->is('batch*') || request()->is('add-batch') ? 'menu-open' : '' }}">
+                    <a href="#"
+                        class="nav-link {{ request()->is('batch*') || request()->is('add-batch') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-box"></i>
+                        <p>
+                            Batch
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview"
+                        style="{{ request()->is('batch*') || request()->is('add-batch') ? 'display: block;' : 'display: none;' }}">
+                        <li class="nav-item">
+                            <a href="{{ route('batch.add') }}"
+                                class="nav-link {{ request()->is('add-batch') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Add Batch</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('batch.manage') }}"
+                                class="nav-link {{ request()->is('batch') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Manage Batches</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
                 <!-- Vehicle Section -->
-                <li class="nav-item has-treeview {{ request()->is('vehicle*') || request()->is('add-vehicle') ? 'menu-open' : '' }}">
-                    <a href="#" class="nav-link {{ request()->is('vehicle*') || request()->is('add-vehicle') ? 'active' : '' }}">
+                <li
+                    class="nav-item has-treeview {{ request()->is('vehicle*') || request()->is('add-vehicle') ? 'menu-open' : '' }}">
+                    <a href="#"
+                        class="nav-link {{ request()->is('vehicle*') || request()->is('add-vehicle') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-truck"></i>
                         <p>Vehicle <i class="right fas fa-angle-left"></i></p>
                     </a>
