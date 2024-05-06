@@ -6,6 +6,7 @@ use App\Http\Controllers\BatchController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\MapController;
 use App\Http\Controllers\VehicleInventoryController;
+use App\Http\Controllers\AssignmentController;
 
 Route::get('/', function () {
     return view('pages.home');
@@ -41,14 +42,13 @@ Route::get('/vehicle/edit/{id}', [VehicleController::class, 'editVehicleForm'])-
 Route::put('/vehicle/update/{id}', [VehicleController::class, 'updateVehicle'])->name('vehicle.update');
 
 
-// Web routes in Laravel typically found in routes/web.php
+//Routes for managing routes
 Route::view('/map', 'pages.maps.index')->name('map');
-Route::post('/submit.route', [MapController::class, 'submitRoute'])->name('submit.route');
+Route::post('/route/store', [MapController::class, 'submitRoute'])->name('route.store');
 Route::get('/route', [MapController::class, 'showData'])->name('route.manage');
 Route::get('/route/edit/{id}', [MapController::class, 'editRouteForm'])->name('route.edit');
 Route::put('/route/update/{id}', [MapController::class, 'updateRoute'])->name('route.update');
 Route::delete('/route/{id}', [MapController::class, 'deleteRoute'])->name('route.delete');
-
 
 //vehicle inventory
 Route::get('/vehicle-inventory', [VehicleInventoryController::class, 'showVehicleInventory'])->name('vehicle.inventory');
@@ -57,3 +57,12 @@ Route::get('/add-vehicle-inventory', [VehicleInventoryController::class, 'addVeh
 Route::post('/add-vehicle-inventory', [VehicleInventoryController::class, 'submitVehicleInventory'])->name('vehicle-inventory.submit');
 Route::get('/vehicle-inventory/{id}', [VehicleInventoryController::class, 'editVehicleInventoryForm'])->name('vehicle-inventory.edit');
 Route::put('/vehicle-inventory/{id}', [VehicleInventoryController::class, 'updateVehicleInventory'])->name('vehicle-inventory.update');
+
+//Routes for managing Assignments
+Route::get('/assignment', [AssignmentController::class, 'showAssignments'])->name('assignment.manage');
+Route::get('/add-assignment', [AssignmentController::class, 'addAssignmentForm'])->name('assignment.add');
+Route::post('/add-assignment', [AssignmentController::class, 'submitAssignment'])->name('assignment.submit');
+Route::get('/assignment/edit/{id}', [AssignmentController::class, 'editAssignmentForm'])->name('assignment.edit');
+Route::put('/assignment/edit/{id}', [AssignmentController::class, 'updateAssignment'])->name('assignment.update');
+Route::delete('/assignment/{id}', [AssignmentController::class, 'deleteAssignment'])->name('assignment.delete');
+
