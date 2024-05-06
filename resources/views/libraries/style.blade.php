@@ -132,4 +132,5 @@
     .card-primary:not(.card-outline)>.card-header {
         background-color: #f7f7f7;
     }
+
 </style>

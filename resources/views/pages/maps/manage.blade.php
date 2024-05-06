@@ -45,7 +45,9 @@
                                     <tr>
                                         <td>{{ ++$key }}</td>
                                         <td>{{ $route['name'] }}</td>
-                                        <td data-waypoints='{{ $route["waypoints"] }}'><font color="blue"><u>View Map</u></font></td>
+                                        <td data-waypoints='{{ $route["waypoints"] }}'>
+                                            <button type="button" class="btn btn-info btn-sm view-map-btn">View Map</button>
+                                        </td>
                                         <td>
                                             <div class="d-flex">
                                                 <a href="{{ route('route.edit', $route['id']) }}" class="btn btn-secondary btn-sm mr-2">
@@ -86,7 +88,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div id="popupMap" style="height: 400px;"></div> <!-- Map will be loaded here -->
+                <div id="popupMap" style="height: 400px;"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -99,8 +101,7 @@
 
 @section('scripts')
 
-    <script src="{{ asset('js/vehicle-action.js') }}"></script>
-    @section('scripts')
+    <script src="{{ asset('js/route-action.js') }}"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}" async defer></script>
     <script>
@@ -121,7 +122,7 @@
 
         var directionsService = new google.maps.DirectionsService();
         var directionsRenderer = new google.maps.DirectionsRenderer({
-            draggable: true,
+            draggable: false,
             map: map,
             panel: document.getElementById('directionsPanel')
         });
@@ -151,21 +152,9 @@
             }
         });
     }
-
     </script>
-
-    <!-- Other DataTables and Bootstrap scripts -->
-    <script src="{{ asset('plugins/datatables/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
-    <!-- Include Bootstrap for modal functionality -->
-    <script src="{{ asset('plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=&v=weekly" async defer></script>
     <script src="{{ asset('plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('plugins/datatables/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
-
-@endsection
 
     <!-- DataTables  & Plugins -->
     <script src="../../plugins/datatables/jquery.dataTables.min.js"></script>

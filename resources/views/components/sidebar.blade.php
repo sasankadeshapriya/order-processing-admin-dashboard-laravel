@@ -87,7 +87,28 @@
                         </li>
                     </ul>
                 </li>
-
+                <!-- Assignments Section -->
+                <li class="nav-item has-treeview {{ request()->is('assignment*') || request()->is('add-assignment') ? 'menu-open' : '' }}">
+                    <a href="#"
+                    class="nav-link {{ request()->is('assignment*') || request()->is('add-assignment') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-tasks"></i>
+                        <p>Assignments <i class="right fas fa-angle-left"></i></p>
+                    </a>
+                    <ul class="nav nav-treeview" style="{{ request()->is('assignment*') || request()->is('add-assignment') ? 'display: block;' : 'display: none;' }}">
+                        <li class="nav-item">
+                            <a href="{{ route('assignment.add') }}" class="nav-link {{ request()->is('add-assignment') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Add Assignment</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('assignment.manage') }}" class="nav-link {{ request()->is('assignment') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Manage Assignments</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
                 <!-- Vehicle Section -->
                 <li
                     class="nav-item has-treeview {{ request()->is('vehicle*') || request()->is('add-vehicle') ? 'menu-open' : '' }}">
@@ -113,14 +134,14 @@
                 </li>
 
                 <!-- Routes Section -->
-                <li class="nav-item has-treeview {{ request()->is('route*') || request()->is('add-route') ? 'menu-open' : '' }}">
-                    <a href="#" class="nav-link {{ request()->is('route*') || request()->is('add-route') ? 'active' : '' }}">
+                <li class="nav-item has-treeview {{ request()->is('route*') || request()->is('map') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ request()->is('route*') || request()->is('map') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-route"></i>
                         <p>Routes <i class="right fas fa-angle-left"></i></p>
                     </a>
-                    <ul class="nav nav-treeview" style="{{ request()->is('route*') || request()->is('add-route') ? 'display: block;' : 'display: none;' }}">
+                    <ul class="nav nav-treeview" style="{{ request()->is('route*') || request()->is('map') ? 'display: block;' : 'display: none;' }}">
                         <li class="nav-item">
-                            <a href="{{ route('map') }}" class="nav-link {{ request()->is('add-route') ? 'active' : '' }}">
+                            <a href="{{ route('map') }}" class="nav-link {{ request()->is('map') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Add Route</p>
                             </a>

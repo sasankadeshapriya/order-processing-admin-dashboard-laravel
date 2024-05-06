@@ -33,20 +33,25 @@ class MapController extends Controller
         ];
 
         try {
-            // Sending data to the Node.js API
             $response = Http::post($apiUrl, $apiData);
 
             if ($response->successful()) {
                 Log::info('Map details added successfully via external API.', ['response' => $response->body()]);
                 return response()->json(['success' => true, 'message' => 'Map details added successfully', 'data' => $response->json()]);
             } else {
-                Log::error('Failed to add map details via external API.', ['response' => $response->body()]);
-                return response()->json(['success' => false, 'message' => 'Failed to add map details', 'errorDetail' => $response->json()]);
+                $responseBody = $response->json();
+                Log::error('Failed to add map details via external API.', ['response' => $responseBody]);
+                return response()->json([
+                    'success' => false,
+                    'message' => $responseBody['message'] ?? 'Failed to add map details',
+                    'errorDetail' => $responseBody
+                ]);
             }
         } catch (\Exception $e) {
             Log::error('Server error while communicating with external API.', ['error' => $e->getMessage()]);
             return response()->json(['success' => false, 'message' => 'Server error: Unable to add map details', 'errorDetail' => $e->getMessage()]);
         }
+
     }
 
     public function showData()
@@ -83,6 +88,78 @@ class MapController extends Controller
             ]);
         }
     }
+
+    public function editRouteForm($id)
+    {
+        $response = Http::get("https://api.gsutil.xyz/route/{$id}");
+
+        if ($response->successful()) {
+            $route = $response->json();
+            return view('pages.maps.edit-route', ['route' => (object) $route]);
+        } else {
+            return redirect()->route('route.manage')->withErrors('Route not found.');
+        }
+    }
+
+    public function updateRoute(Request $request, $id)
+{
+    Log::info('Request Data:', $request->all());
+
+    $validator = Validator::make($request->all(), [
+        'route_name' => 'required|string|max:100',
+        'waypoints' => 'required|json',
+        'added_by_admin_id' => 'required|integer'
+    ]);
+
+    if ($validator->fails()) {
+        Log::error('Validation errors on route submission.', $validator->errors()->toArray());
+        return response()->json(['success' => false, 'errors' => $validator->errors()]);
+    }
+
+    $data = [
+        'name' => $request->input('route_name'),
+        'waypoints' => $request->input('waypoints'),
+        'added_by_admin_id' => (int) $request->input('added_by_admin_id'),
+    ];
+
+    Log::info('Sending Data to API:', ['data' => $data]);
+
+    try {
+        $response = Http::put("https://api.gsutil.xyz/route/{$id}", $data);
+
+        Log::info('Response Status Code:', ['status' => $response->status()]);
+        Log::info('Response Body:', ['body' => $response->body()]);
+
+        if ($response->successful()) {
+            Log::info('Route updated successfully via external API.');
+            return response()->json(['success' => true, 'message' => 'Route successfully updated']);
+        } else {
+            $errorDetails = $response->json();
+            Log::error('Failed to update route:', ['response' => $errorDetails]);
+            return response()->json(['success' => false, 'message' => $errorDetails['message'] ?? 'Failed to update route']);
+        }
+    } catch (\Exception $e) {
+        Log::error('Exception:', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+        return response()->json(['success' => false, 'message' => 'An unexpected error occurred: ' . $e->getMessage()]);
+    }
+}
+
+
+    public function deleteRoute($id)
+{
+    try {
+        $response = Http::delete("https://api.gsutil.xyz/route/$id");
+
+        if ($response->successful()) {
+            return response()->json(['success' => true, 'message' => 'Route deleted successfully']);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Failed to delete route']);
+        }
+    } catch (\Exception $e) {
+        \Log::error('General Exception: ' . $e->getMessage());
+        return response()->json(['success' => false, 'message' => 'Server error: Unable to delete route']);
+    }
+}
 
 
 }
