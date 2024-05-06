@@ -1,154 +1,197 @@
-@include('libraries.style')
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Route Planner</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet"> <!-- Assuming you are using Laravel Mix for Tailwind CSS -->
-    <style>
-        #map {
-            height: 83%; /* Use viewport height for better responsiveness */
-            width: 100%;
-        }
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            position: relative;
-        }
+@extends('layouts.app')
 
-        .button-container {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            display: flex;
-            justify-content: flex-start;
-            align-items: flex-end;
-        }
+@section('title', 'Add Route')
 
-        .button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            display: inline-block;
-            margin-left: 10px;
-            cursor: pointer;
-            border-radius: 8px;
-        }
-
-        /* Adjustments for the route name input */
-        .route-name-input {
-            margin-bottom: 10px;
-        }
-    </style>
-</head>
-<body class="antialiased d-flex flex-column">
-    <div class="container-fluid flex-grow-1">
-        <div id="map"></div>
-    </div>
-    <div class="button-container">
-        <form id="routeForm">
-            <div class="col-sm-6">
-                <div class="form-group" style="width: 380">
-                    <input type="text" id="routeName" class="form-control" placeholder="Enter route name" name="route_name" required>
-                <div class="invalid-feedback d-none" id="error-name"></div>
+@section('content')
+<div class="content-wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Add New Route</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item active">Create Route</li>
+                    </ol>
                 </div>
             </div>
-            <button type="button" class="button undo-button" onclick="undoLastWaypoint()" id="undoButton" style="background-color: #c8b400">
-                <i class="bi bi-arrow-counterclockwise"></i> Undo
-            </button>
-            <button type="button" class="button custom-button" onclick="clearWaypoints()" id="clearButton" style="background-color: #dc3545">
-                <i class="bi bi-x-lg"></i> Clear All
-            </button>
-            <button type="submit" class="button custom-button" id="saveButton" style="background-color: #28a745">
-                <i class="bi bi-save"></i> Save Route
-            </button>
-        </form>
-    </div>
+        </div>
+    </section>
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <form id="addRouteForm" action="{{ route('route.store') }}" method="post">
+                                @csrf
+                                <div class="form-group">
+                                    <label for="routeName">Route Name:</label>
+                                    <input type="text" class="form-control" id="routeName" name="route_name" placeholder="Enter route name" required>
+                                </div>
+                                <div id="map" style="height: 58vh;"></div>
+                                <input type="hidden" name="waypoints" id="waypointsField" />
+                                <input type="hidden" name="added_by_admin_id" value="1">
+                                <button type="submit" class="btn btn-primary mt-3">Save Route</button>
+                                <button type="button" class="btn btn-secondary mt-3" id="undoButton">Undo</button>
+                                <button type="button" class="btn btn-danger mt-3" id="clearButton">Clear All</button>
+                                <button type="button" class="btn btn-secondary mt-3" onclick="window.location.href='{{ route('route.manage') }}'">Back to Routes</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+@endsection
 
-    <!-- Include jQuery first -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+@section('scripts')
+<script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&callback=initMap" async defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
-    <!-- Then include your scripts that use jQuery -->
-    <script src="{{ asset('js/map-init.js') }}"></script>
+<script>
+    let map, startMarker, directionsService, directionsRenderer;
+    let routePoints = [];
+    let lastClickTime = 0;
 
-    <script>
-$(document).ready(function() {
-    $('#routeForm').on('submit', function(e) {
-        e.preventDefault();  // Prevents the default form submission
-        console.log("Form submission intercepted.");
-
-        const routeName = $('#routeName').val().trim();
-        if (!routeName) {
-            alert('Please enter a route name.');
-            $('#routeName').focus();
-            return false;
-        }
-
-        if (routePoints.length === 0) {
-            alert('No waypoints selected. Please select waypoints on the map.');
-            return false;
-        }
-
-        // Transform waypoints from {lat, lng} to {latitude, longitude}
-        const transformedWaypoints = routePoints.map(point => {
-            return { latitude: point.lat(), longitude: point.lng() };  // Call the functions to get values
+    function initMap() {
+        const sriLankaCenter = { lat: 7.8731, lng: 80.7718 };
+        const mapOptions = {
+            zoom: 8,
+            center: sriLankaCenter,
+            minZoom: 6,
+            restriction: {
+                latLngBounds: {
+                    north: 10.2,
+                    south: 5.7,
+                    east: 82.0,
+                    west: 79.5,
+                },
+                strictBounds: true
+            }
+        };
+        map = new google.maps.Map(document.getElementById('map'), mapOptions);
+        directionsService = new google.maps.DirectionsService();
+        directionsRenderer = new google.maps.DirectionsRenderer({
+            map: map,
+            draggable: true
         });
 
-        console.log("Transformed Waypoints:", transformedWaypoints);
+        map.addListener('click', function(event) {
+            addRoutePoint(event.latLng);
+        });
+    }
 
-        const formData = new FormData(this);
-        formData.append('waypoints', JSON.stringify(transformedWaypoints));
-        formData.append('added_by_admin_id', '1');  // Assuming admin ID 1 for example
-
-        $.ajax({
-            url: '/submit.route', // Make sure this URL matches your routes in Laravel
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // CSRF token for security
-            },
-            success: function(response) {
-                if (response.success) {
-                    alert('Route saved successfully!');
-                    $('#routeForm')[0].reset(); // Reset the form fields
-                    clearWaypoints(); // Assuming clearWaypoints() is already implemented to handle this
-                } else {
-                    alert('Failed to save route: ' + response.message);
+    function addRoutePoint(location) {
+        console.log("Clicked location: ", location.toString());
+        routePoints.push(location);
+        if (routePoints.length === 1) {
+            if (startMarker) {
+                startMarker.setMap(null);
+            }
+            startMarker = new google.maps.Marker({
+                position: location,
+                map: map,
+                title: 'Start Point',
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    fillColor: '#FF0000',
+                    fillOpacity: 1,
+                    strokeWeight: 0,
+                    scale: 10
                 }
-            },
-            error: function(xhr, status, error) {
-                console.error("AJAX request failed.", xhr.responseText);
-                alert('Error: ' + xhr.responseText);
-            },
-            complete: function() {
-                $('#saveButton').prop('disabled', false).html('<i class="bi bi-save"></i> Save Route');
+            });
+        } else {
+            calculateAndDisplayRoute();
+        }
+    }
+
+    function calculateAndDisplayRoute() {
+        if (routePoints.length < 2) return;
+        const waypoints = routePoints.slice(1, -1).map(location => ({ location: location, stopover: true }));
+        const origin = routePoints[0];
+        const destination = routePoints[routePoints.length - 1];
+
+        directionsService.route({
+            origin: origin,
+            destination: destination,
+            waypoints: waypoints,
+            travelMode: google.maps.TravelMode.DRIVING,
+        }, function(response, status) {
+            if (status === 'OK') {
+                directionsRenderer.setDirections(response);
+            } else {
+                console.error('Directions request failed due to:', status);
             }
         });
+    }
+
+    function undoLastWaypoint() {
+        const now = Date.now();
+        if (now - lastClickTime < 250) return; // Ignore clicks that are too close
+        lastClickTime = now;
+        if (routePoints.length > 0) {
+            routePoints.pop();
+            if (routePoints.length === 0) {
+                if (startMarker) {
+                    startMarker.setMap(null);
+                }
+                directionsRenderer.setDirections({ routes: [] });
+            } else {
+                calculateAndDisplayRoute();
+            }
+        }
+    }
+
+    function clearWaypoints() {
+        routePoints = [];
+        if (startMarker) {
+            startMarker.setMap(null);
+        }
+        directionsRenderer.setDirections({ routes: [] });
+    }
+
+    $('#addRouteForm').submit(function(e) {
+    e.preventDefault();
+
+    // Check if there are less than 2 waypoints
+    if (routePoints.length < 2) {
+        toastr.error('Please add at least two waypoints to create a route.');
+        return; // Prevent form submission
+    }
+
+    var formData = new FormData(this);
+    formData.append('waypoints', JSON.stringify(routePoints.map(p => ({ latitude: p.lat(), longitude: p.lng() }))));
+    $.ajax({
+        url: this.action,
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(data) {
+            if (data.success) {
+                toastr.success(data.message || 'Route successfully created.');
+            } else {
+                toastr.error(data.message || 'Failed to create route.');
+            }
+        },
+        error: function(xhr) {
+            var errMsg = xhr.status + ': ' + xhr.statusText;
+            toastr.error('Error - ' + errMsg);
+        }
     });
 });
 
+document.getElementById('undoButton').addEventListener('click', undoLastWaypoint);
+document.getElementById('clearButton').addEventListener('click', clearWaypoints);
 
-
-
-    </script>
-
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&callback=initMap"></script>
-
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-</body>
-</html>
+</script>
+@endsection
