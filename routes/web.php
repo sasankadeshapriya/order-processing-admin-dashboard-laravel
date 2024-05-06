@@ -5,6 +5,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\BatchController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\MapController;
+use App\Http\Controllers\VehicleInventoryController;
 use App\Http\Controllers\AssignmentController;
 
 Route::get('/', function () {
@@ -48,6 +49,14 @@ Route::get('/route', [MapController::class, 'showData'])->name('route.manage');
 Route::get('/route/edit/{id}', [MapController::class, 'editRouteForm'])->name('route.edit');
 Route::put('/route/update/{id}', [MapController::class, 'updateRoute'])->name('route.update');
 Route::delete('/route/{id}', [MapController::class, 'deleteRoute'])->name('route.delete');
+
+//vehicle inventory
+Route::get('/vehicle-inventory', [VehicleInventoryController::class, 'showVehicleInventory'])->name('vehicle.inventory');
+Route::delete('/vehicle-inventory/{id}', [VehicleInventoryController::class, 'delete'])->name('vehicle-inventory.delete');
+Route::get('/add-vehicle-inventory', [VehicleInventoryController::class, 'addVehicleInventoryForm'])->name('vehicle-inventory.add');
+Route::post('/add-vehicle-inventory', [VehicleInventoryController::class, 'submitVehicleInventory'])->name('vehicle-inventory.submit');
+Route::get('/vehicle-inventory/{id}', [VehicleInventoryController::class, 'editVehicleInventoryForm'])->name('vehicle-inventory.edit');
+Route::put('/vehicle-inventory/{id}', [VehicleInventoryController::class, 'updateVehicleInventory'])->name('vehicle-inventory.update');
 
 //Routes for managing Assignments
 Route::get('/assignment', [AssignmentController::class, 'showAssignments'])->name('assignment.manage');
