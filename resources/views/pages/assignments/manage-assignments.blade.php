@@ -3,75 +3,88 @@
 @section('title', 'Assignments')
 
 @section('content')
-<div class="content-wrapper">
-    <section class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1>Assignments</h1>
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="/">Home</a></li>
-                        <li class="breadcrumb-item active">Manage Assignments</li>
-                    </ol>
+    <div class="content-wrapper">
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Assignments</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="/">Home</a></li>
+                            <li class="breadcrumb-item active">Manage Assignments</li>
+                        </ol>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <section class="content">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <a href="{{ route('assignment.add') }}" class="btn btn-primary">
-                                Add Assignment <i class="bi bi-plus-circle-dotted"></i>
-                            </a>
-                        </div>
-                        <div class="card-body">
-                            <table id="example1" class="table table-bordered table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Employee Name</th>
-                                        <th>Vehicle Number</th>
-                                        <th>Route Name</th>
-                                        <th>Assign Date</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($assignments as $key => $assignment)
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <a href="{{ route('assignment.add') }}" class="btn btn-primary">
+                                    Add Assignment <i class="bi bi-plus-circle-dotted"></i>
+                                </a>
+                            </div>
+                            <div class="card-body">
+                                <table id="example1" class="table table-bordered table-striped">
+                                    <thead>
                                         <tr>
-                                            <td>{{ ++$key }}</td>
-                                            <td>{{ $assignment['employee_name'] }}</td>
-                                            <td>{{ $assignment['vehicle_number'] }}</td>
-                                            <td>{{ $assignment['route_name'] }}</td>
-                                            <td>{{ $assignment['assign_date'] }}</td>
-                                            <td>
-                                                <div class="d-flex">
-                                                    <a href="{{ route('assignment.edit', $assignment['id']) }}" class="btn btn-secondary btn-sm mr-2">
-                                                        <i class="fas fa-pencil-alt"></i>
-                                                    </a>
-                                                    <button type="button" class="btn btn-danger btn-sm delete-assignment" data-id="{{ $assignment['id'] }}">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
+                                            <th>#</th>
+                                            <th>Employee Name</th>
+                                            <th>Vehicle Number</th>
+                                            <th>Route Name</th>
+                                            <th>Assign Date</th>
+                                            <th>Action</th>
                                         </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($assignments as $key => $assignment)
+                                            <tr>
+                                                <td>{{ ++$key }}</td>
+                                                <td>{{ $assignment['employee_name'] }}</td>
+                                                <td>{{ $assignment['vehicle_number'] }}</td>
+                                                <td>{{ $assignment['route_name'] }}</td>
+                                                <td>{{ $assignment['assign_date'] }}</td>
+                                                <td>
+                                                    <div class="d-flex">
+                                                        <a href="{{ route('assignment.edit', $assignment['id']) }}"
+                                                            class="btn btn-secondary btn-sm mr-2">
+                                                            <i class="fas fa-pencil-alt"></i>
+                                                        </a>
+                                                        <button type="button"
+                                                            class="btn btn-danger btn-sm delete-assignment"
+                                                            data-id="{{ $assignment['id'] }}">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Employee Name</th>
+                                            <th>Vehicle Number</th>
+                                            <th>Route Name</th>
+                                            <th>Assign Date</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
 
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-</div>
+        </section>
+    </div>
 @endsection
 
 @section('scripts')
@@ -98,10 +111,17 @@
                     lengthChange: false,
                     autoWidth: false,
                     buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"],
-                    order: [[4, 'desc']], // Default sorting on the Assign Date column
-                    columnDefs: [
-                        { targets: 1, type: 'string' },  // Employee Name
-                        { targets: 4, type: 'date' }     // Assign Date
+                    order: [
+                        [4, 'desc']
+                    ], // Default sorting on the Assign Date column
+                    columnDefs: [{
+                            targets: 1,
+                            type: 'string'
+                        }, // Employee Name
+                        {
+                            targets: 4,
+                            type: 'date'
+                        } // Assign Date
                     ]
                 });
 
@@ -110,4 +130,3 @@
         });
     </script>
 @endsection
-

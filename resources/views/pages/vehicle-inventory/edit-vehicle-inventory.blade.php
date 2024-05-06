@@ -90,13 +90,25 @@
 @section('scripts')
     <script>
         $(document).ready(function() {
+            var initialData = {
+                assignment_id: $('#assignment_id').val(),
+                product_id: $('#productSelect').val(),
+                quantity: $('#quantityInput').val()
+            };
+
             $('#productSelect').change(updateProductDetails);
 
             $('#vehicleInventoryForm').submit(function(event) {
                 event.preventDefault();
+
+                if (!dataHasChanged()) {
+                    toastr.info('No changes detected. Please update before submit.');
+                    return;
+                }
+
                 $('#submitBtn').prop('disabled', true).html(
                     '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Updating...'
-                    );
+                );
                 clearValidation();
 
                 let formData = new FormData(this);
@@ -113,6 +125,7 @@
                             .availableQuantity).show();
                         $('#quantityInput').attr('max', response.maxQuantity);
                         $('#submitBtn').prop('disabled', false).html('Update');
+                        updateInitialData();
                         clearValidation();
                     },
                     error: function(xhr) {
@@ -140,6 +153,18 @@
             function clearValidation() {
                 $('.form-control').removeClass('is-invalid');
                 $('.invalid-feedback').addClass('d-none').empty();
+            }
+
+            function updateInitialData() {
+                initialData.assignment_id = $('#assignment_id').val();
+                initialData.product_id = $('#productSelect').val();
+                initialData.quantity = $('#quantityInput').val();
+            }
+
+            function dataHasChanged() {
+                return $('#assignment_id').val() !== initialData.assignment_id ||
+                    $('#productSelect').val() !== initialData.product_id ||
+                    $('#quantityInput').val() !== initialData.quantity;
             }
 
             updateProductDetails(); // Set initial values

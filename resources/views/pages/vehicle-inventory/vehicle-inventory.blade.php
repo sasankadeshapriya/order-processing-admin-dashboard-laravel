@@ -26,7 +26,9 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                <a href="#" class="btn btn-primary">Add Vehicle Inventory</a>
+                                <a href="{{ route('product.add') }}" class="btn btn-primary">
+                                    Add Vehicle Inventory
+                                </a>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
@@ -103,6 +105,17 @@
                                                 @endforeach
                                             @endforeach
                                         </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th>Vehicle No</th>
+                                                <th>Vehicle Name</th>
+                                                <th>Assign Date</th>
+                                                <th>Employee Name</th>
+                                                <th>Route Name</th>
+                                                <th>Products</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </tfoot>
                                     </table>
                                 </div>
                             </div>
