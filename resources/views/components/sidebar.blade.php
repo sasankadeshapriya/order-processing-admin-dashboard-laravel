@@ -26,7 +26,8 @@
 
         <!-- Sidebar Menu -->
         <nav class="mt-2">
-            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
+                data-accordion="false">
                 <li class="nav-item {{ request()->is('/') ? 'active' : '' }}">
                     <a href="/" class="nav-link">
                         <i class="nav-icon fas fa-th"></i>
@@ -42,15 +43,18 @@
                         <i class="nav-icon fas fa-boxes"></i>
                         <p>Product <i class="right fas fa-angle-left"></i></p>
                     </a>
-                    <ul class="nav nav-treeview" style="{{ request()->is('product*') || request()->is('add-product') ? 'display: block;' : 'display: none;' }}">
+                    <ul class="nav nav-treeview"
+                        style="{{ request()->is('product*') || request()->is('add-product') ? 'display: block;' : 'display: none;' }}">
                         <li class="nav-item">
-                            <a href="{{ route('product.add') }}" class="nav-link {{ request()->is('add-product') ? 'active' : '' }}">
+                            <a href="{{ route('product.add') }}"
+                                class="nav-link {{ request()->is('add-product') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Add Product</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('product.manage') }}" class="nav-link {{ request()->is('product') ? 'active' : '' }}">
+                            <a href="{{ route('product.manage') }}"
+                                class="nav-link {{ request()->is('product') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Manage Product</p>
                             </a>
@@ -87,67 +91,109 @@
                         </li>
                     </ul>
                 </li>
-                <!-- Assignments Section -->
-                <li class="nav-item has-treeview {{ request()->is('assignment*') || request()->is('add-assignment') ? 'menu-open' : '' }}">
+
+                <!-- Vehicle Inventory -->
+                <li
+                    class="nav-item has-treeview {{ request()->is('vehicle-inventory') || request()->is('vehicle-inventory/*') || request()->is('add-vehicle-inventory') ? 'menu-open' : '' }}">
                     <a href="#"
-                    class="nav-link {{ request()->is('assignment*') || request()->is('add-assignment') ? 'active' : '' }}">
+                        class="nav-link {{ request()->is('vehicle-inventory') || request()->is('vehicle-inventory/*') || request()->is('add-vehicle-inventory') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-truck"></i>
+                        <p>Vehicle Inventory <i class="right fas fa-angle-left"></i></p>
+                    </a>
+                    <ul class="nav nav-treeview"
+                        style="{{ request()->is('vehicle-inventory') || request()->is('vehicle-inventory/*') || request()->is('add-vehicle-inventory') ? 'display: block;' : 'display: none;' }}">
+                        <li class="nav-item">
+                            <a href="{{ route('vehicle-inventory.add') }}"
+                                class="nav-link {{ request()->is('add-vehicle-inventory') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Add to Inventory</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('vehicle.inventory') }}"
+                                class="nav-link {{ request()->is('vehicle-inventory') && !request()->is('vehicle-inventory/*') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Manage Inventory</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- Vehicle Section -->
+                <li
+                    class="nav-item has-treeview {{ request()->is('vehicle') || request()->is('vehicle/*') || request()->is('add-vehicle') ? 'menu-open' : '' }}">
+                    <a href="#"
+                        class="nav-link {{ request()->is('vehicle') || request()->is('vehicle/*') || request()->is('add-vehicle') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-car"></i>
+                        <p>Vehicle <i class="right fas fa-angle-left"></i></p>
+                    </a>
+                    <ul class="nav nav-treeview"
+                        style="{{ request()->is('vehicle') || request()->is('vehicle/*') || request()->is('add-vehicle') ? 'display: block;' : 'display: none;' }}">
+                        <li class="nav-item">
+                            <a href="{{ route('vehicle.add') }}"
+                                class="nav-link {{ request()->is('add-vehicle') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Add Vehicle</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('vehicle.manage') }}"
+                                class="nav-link {{ request()->is('vehicle') && !request()->is('vehicle/*') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Manage Vehicles</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+
+                <!-- Assignments Section -->
+                <li
+                    class="nav-item has-treeview {{ request()->is('assignment*') || request()->is('add-assignment') ? 'menu-open' : '' }}">
+                    <a href="#"
+                        class="nav-link {{ request()->is('assignment*') || request()->is('add-assignment') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-tasks"></i>
                         <p>Assignments <i class="right fas fa-angle-left"></i></p>
                     </a>
-                    <ul class="nav nav-treeview" style="{{ request()->is('assignment*') || request()->is('add-assignment') ? 'display: block;' : 'display: none;' }}">
+                    <ul class="nav nav-treeview"
+                        style="{{ request()->is('assignment*') || request()->is('add-assignment') ? 'display: block;' : 'display: none;' }}">
                         <li class="nav-item">
-                            <a href="{{ route('assignment.add') }}" class="nav-link {{ request()->is('add-assignment') ? 'active' : '' }}">
+                            <a href="{{ route('assignment.add') }}"
+                                class="nav-link {{ request()->is('add-assignment') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Add Assignment</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('assignment.manage') }}" class="nav-link {{ request()->is('assignment') ? 'active' : '' }}">
+                            <a href="{{ route('assignment.manage') }}"
+                                class="nav-link {{ request()->is('assignment') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Manage Assignments</p>
                             </a>
                         </li>
                     </ul>
                 </li>
-                <!-- Vehicle Section -->
-                <li
-                    class="nav-item has-treeview {{ request()->is('vehicle*') || request()->is('add-vehicle') ? 'menu-open' : '' }}">
-                    <a href="#"
-                        class="nav-link {{ request()->is('vehicle*') || request()->is('add-vehicle') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-truck"></i>
-                        <p>Vehicle <i class="right fas fa-angle-left"></i></p>
-                    </a>
-                    <ul class="nav nav-treeview" style="{{ request()->is('vehicle*') || request()->is('add-vehicle') ? 'display: block;' : 'display: none;' }}">
-                        <li class="nav-item">
-                            <a href="{{ route('vehicle.add') }}" class="nav-link {{ request()->is('add-vehicle') ? 'active' : '' }}">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Add Vehicle</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('vehicle.manage') }}" class="nav-link {{ request()->is('vehicle') ? 'active' : '' }}">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Manage Vehicle</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
 
                 <!-- Routes Section -->
-                <li class="nav-item has-treeview {{ request()->is('route*') || request()->is('map') ? 'menu-open' : '' }}">
-                    <a href="#" class="nav-link {{ request()->is('route*') || request()->is('map') ? 'active' : '' }}">
+                <li
+                    class="nav-item has-treeview {{ request()->is('route*') || request()->is('map') ? 'menu-open' : '' }}">
+                    <a href="#"
+                        class="nav-link {{ request()->is('route*') || request()->is('map') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-route"></i>
                         <p>Routes <i class="right fas fa-angle-left"></i></p>
                     </a>
-                    <ul class="nav nav-treeview" style="{{ request()->is('route*') || request()->is('map') ? 'display: block;' : 'display: none;' }}">
+                    <ul class="nav nav-treeview"
+                        style="{{ request()->is('route*') || request()->is('map') ? 'display: block;' : 'display: none;' }}">
                         <li class="nav-item">
-                            <a href="{{ route('map') }}" class="nav-link {{ request()->is('map') ? 'active' : '' }}">
+                            <a href="{{ route('map') }}"
+                                class="nav-link {{ request()->is('map') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Add Route</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('route.manage') }}" class="nav-link {{ request()->is('route') ? 'active' : '' }}">
+                            <a href="{{ route('route.manage') }}"
+                                class="nav-link {{ request()->is('route') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Manage Routes</p>
                             </a>
