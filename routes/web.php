@@ -8,12 +8,23 @@ use App\Http\Controllers\MapController;
 use App\Http\Controllers\VehicleInventoryController;
 use App\Http\Controllers\AssignmentController;
 
+use Illuminate\Support\Facades\Http;
+use Illuminate\Http\Request;
+
 Route::get('/', function () {
     return view('pages.home');
 });
 
 Route::get('/error', function () {
     return view('pages.error');
+});
+
+Route::get('/login', function () {
+    return view('pages.auth.login');
+});
+
+Route::get('/forgot-password', function () {
+    return view('pages.auth.forgotpassword');
 });
 
 
@@ -66,3 +77,53 @@ Route::get('/assignment/edit/{id}', [AssignmentController::class, 'editAssignmen
 Route::put('/assignment/edit/{id}', [AssignmentController::class, 'updateAssignment'])->name('assignment.update');
 Route::delete('/assignment/{id}', [AssignmentController::class, 'deleteAssignment'])->name('assignment.delete');
 
+Route::post('/login', function (Request $request) {
+    $validatedData = $request->validate([
+        'email' => 'required|email',
+        'password' => 'required'
+    ]);
+
+    $response = Http::post('https://api.gsutil.xyz/admin/login', [
+        'email' => $validatedData['email'],
+        'password' => $validatedData['password'],
+    ]);
+
+    if ($response->successful()) {
+        $apiResponse = $response->json();
+        session(['email' => $validatedData['email']]);  // Save the email in the session
+        return response()->json([
+            'message' => $apiResponse['message'] ?? 'Logged in successfully',
+            'success' => true,
+        ]);
+    } else {
+        return response()->json([
+            'message' => 'Invalid credentials',
+            'success' => false,
+        ], 401);
+    }
+});
+
+Route::get('/otp-verification', function () {
+    // Check if there's an email in the session
+    if (!session()->has('email')) {
+        return redirect('/login')->withErrors('No session email available.');
+    }
+
+    $email = session('email'); // Get the email from the session
+    return view('pages.auth.otp', ['email' => $email]); // Pass it to the view
+});
+
+Route::post('/api/proxy/verify-otp', function (Request $request) {
+    // Forward the request to the external API
+    $response = Http::withHeaders([
+        'Content-Type' => 'application/json',
+        'Accept' => 'application/json',
+    ])->post('http://api.gsutil.xyz/admin/verify-otp', $request->all());
+
+    // Set CORS headers for the response to the frontend
+    return response($response->body(), $response->status())
+        ->header('Content-Type', 'application/json')
+        ->header('Access-Control-Allow-Origin', '*')  // Adjust as necessary for security
+        ->header('Access-Control-Allow-Methods', 'POST')
+        ->header('Access-Control-Allow-Headers', 'Content-Type');
+});
