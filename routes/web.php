@@ -11,7 +11,6 @@ use App\Http\Controllers\AssignmentController;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 
-
 Route::post('/store-token', function (Request $request) {
     session(['auth_token' => $request->token]);  // Save the token in the session
     return response()->json(['message' => 'Token stored successfully']);
@@ -25,11 +24,6 @@ Route::get('/test-token', function () {
     } else {
         return response()->json(['message' => 'No token found in session.']);
     }
-});
-
-Route::get('/logout', function () {
-    session()->forget('auth_token');
-    return redirect('/login')->with('message', 'You have been logged out successfully.');
 });
 
 Route::get('/', function () {
@@ -100,6 +94,7 @@ Route::post('/api/proxy/verify-otp', function (Request $request) {
 });
 
 
+
 // Protected routes
 Route::middleware(['web'])->group(function () {
     Route::get('/', function () {
@@ -157,4 +152,9 @@ Route::middleware(['web'])->group(function () {
 
 });
 
+//logout
+Route::get('/logout', function () {
+    session()->forget('auth_token');
+    return redirect('/login')->with('message', 'Successfully logged out');
+})->name('logout');
 
