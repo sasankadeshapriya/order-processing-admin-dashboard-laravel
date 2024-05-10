@@ -67,17 +67,38 @@
                     contentType: 'application/json',
                     data: JSON.stringify(postData),
                     success: function(response) {
-                        if (response.message === "OTP verified successfully!") {
-                            toastr.success('OTP Verification Successful');
-                            window.location.href =
-                                '/'; // Redirect on successful verification
+                        if (response.message === "OTP verified successfully!" && response
+                            .token) {
+                            // Call another AJAX to store the token in Laravel session
+                            $.ajax({
+                                url: '/store-token',
+                                type: 'POST',
+                                data: {
+                                    token: response.token
+                                },
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr(
+                                        'content')
+                                },
+                                success: function() {
+                                    toastr.success(
+                                        'Token stored and OTP Verification Successful'
+                                    );
+                                    window.location.href = '/';
+                                },
+                                error: function() {
+                                    toastr.error(
+                                        'Failed to store token. Please try again.'
+                                    );
+                                }
+                            });
                         } else {
                             toastr.error(response.message || 'Invalid OTP! Please try again.');
                         }
                     },
                     error: function(xhr) {
                         toastr.error('Error: ' + (xhr.responseJSON.message || xhr.statusText));
-                        window.location.href = '/login'; // Redirect to login on error
+                        window.location.href = '/login';
                     }
                 });
             });

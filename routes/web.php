@@ -11,6 +11,25 @@ use App\Http\Controllers\AssignmentController;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 
+Route::post('/store-token', function (Request $request) {
+    session(['auth_token' => $request->token]);  // Save the token in the session
+    return response()->json(['message' => 'Token stored successfully']);
+});
+
+Route::get('/test-token', function () {
+    $token = session('auth_token');
+    if ($token) {
+        return response()->json(['auth_token' => $token]);
+    } else {
+        return response()->json(['message' => 'No token found in session.']);
+    }
+});
+
+Route::get('/logout', function () {
+    session()->forget('auth_token');
+    return redirect('/login')->with('message', 'You have been logged out successfully.');
+});
+
 Route::get('/', function () {
     return view('pages.home');
 });
@@ -26,56 +45,6 @@ Route::get('/login', function () {
 Route::get('/forgot-password', function () {
     return view('pages.auth.forgotpassword');
 });
-
-
-//product route
-Route::get('/product', [ProductController::class, 'showData'])->name('product.manage');
-Route::delete('/product/{id}', [ProductController::class, 'deleteProduct'])->name('product.delete');
-Route::get('/add-product', [ProductController::class, 'addProductForm'])->name('product.add');
-Route::post('/add-product', [ProductController::class, 'submitProduct'])->name('product.submit');
-Route::get('/product/edit/{id}', [ProductController::class, 'editProductForm'])->name('product.edit');
-Route::put('/product/update/{id}', [ProductController::class, 'updateProduct'])->name('product.update');
-
-//batch route
-Route::get('/batch', [BatchController::class, 'showData'])->name('batch.manage');
-Route::delete('/batch/{id}', [BatchController::class, 'deleteBatch'])->name('batch.delete');
-Route::get('/add-batch', [BatchController::class, 'addBatchForm'])->name('batch.add');
-Route::post('/add-batch', [BatchController::class, 'submitBatch'])->name('batch.submit');
-Route::get('/batch/edit/{id}', [BatchController::class, 'editBatchForm'])->name('batch.edit');
-Route::put('/batch/update/{id}', [BatchController::class, 'updateBatch'])->name('batch.update');
-
-// Routes for managing vehicles
-Route::get('/vehicle', [VehicleController::class, 'showData'])->name('vehicle.manage');
-Route::delete('/vehicle/{id}', [VehicleController::class, 'deleteVehicle'])->name('vehicle.delete');
-Route::get('/add-vehicle', [VehicleController::class, 'addVehicleForm'])->name('vehicle.add');
-Route::post('/add-vehicle', [VehicleController::class, 'submitVehicle'])->name('vehicle.submit');
-Route::get('/vehicle/edit/{id}', [VehicleController::class, 'editVehicleForm'])->name('vehicle.edit');
-Route::put('/vehicle/update/{id}', [VehicleController::class, 'updateVehicle'])->name('vehicle.update');
-
-
-//Routes for managing routes
-Route::view('/map', 'pages.maps.index')->name('map');
-Route::post('/route/store', [MapController::class, 'submitRoute'])->name('route.store');
-Route::get('/route', [MapController::class, 'showData'])->name('route.manage');
-Route::get('/route/edit/{id}', [MapController::class, 'editRouteForm'])->name('route.edit');
-Route::put('/route/update/{id}', [MapController::class, 'updateRoute'])->name('route.update');
-Route::delete('/route/{id}', [MapController::class, 'deleteRoute'])->name('route.delete');
-
-//vehicle inventory
-Route::get('/vehicle-inventory', [VehicleInventoryController::class, 'showVehicleInventory'])->name('vehicle.inventory');
-Route::delete('/vehicle-inventory/{id}', [VehicleInventoryController::class, 'delete'])->name('vehicle-inventory.delete');
-Route::get('/add-vehicle-inventory', [VehicleInventoryController::class, 'addVehicleInventoryForm'])->name('vehicle-inventory.add');
-Route::post('/add-vehicle-inventory', [VehicleInventoryController::class, 'submitVehicleInventory'])->name('vehicle-inventory.submit');
-Route::get('/vehicle-inventory/{id}', [VehicleInventoryController::class, 'editVehicleInventoryForm'])->name('vehicle-inventory.edit');
-Route::put('/vehicle-inventory/{id}', [VehicleInventoryController::class, 'updateVehicleInventory'])->name('vehicle-inventory.update');
-
-//Routes for managing Assignments
-Route::get('/assignment', [AssignmentController::class, 'showAssignments'])->name('assignment.manage');
-Route::get('/add-assignment', [AssignmentController::class, 'addAssignmentForm'])->name('assignment.add');
-Route::post('/add-assignment', [AssignmentController::class, 'submitAssignment'])->name('assignment.submit');
-Route::get('/assignment/edit/{id}', [AssignmentController::class, 'editAssignmentForm'])->name('assignment.edit');
-Route::put('/assignment/edit/{id}', [AssignmentController::class, 'updateAssignment'])->name('assignment.update');
-Route::delete('/assignment/{id}', [AssignmentController::class, 'deleteAssignment'])->name('assignment.delete');
 
 Route::post('/login', function (Request $request) {
     $validatedData = $request->validate([
@@ -127,3 +96,53 @@ Route::post('/api/proxy/verify-otp', function (Request $request) {
         ->header('Access-Control-Allow-Methods', 'POST')
         ->header('Access-Control-Allow-Headers', 'Content-Type');
 });
+
+//product route
+Route::get('/product', [ProductController::class, 'showData'])->name('product.manage');
+Route::delete('/product/{id}', [ProductController::class, 'deleteProduct'])->name('product.delete');
+Route::get('/add-product', [ProductController::class, 'addProductForm'])->name('product.add');
+Route::post('/add-product', [ProductController::class, 'submitProduct'])->name('product.submit');
+Route::get('/product/edit/{id}', [ProductController::class, 'editProductForm'])->name('product.edit');
+Route::put('/product/update/{id}', [ProductController::class, 'updateProduct'])->name('product.update');
+
+//batch route
+Route::get('/batch', [BatchController::class, 'showData'])->name('batch.manage');
+Route::delete('/batch/{id}', [BatchController::class, 'deleteBatch'])->name('batch.delete');
+Route::get('/add-batch', [BatchController::class, 'addBatchForm'])->name('batch.add');
+Route::post('/add-batch', [BatchController::class, 'submitBatch'])->name('batch.submit');
+Route::get('/batch/edit/{id}', [BatchController::class, 'editBatchForm'])->name('batch.edit');
+Route::put('/batch/update/{id}', [BatchController::class, 'updateBatch'])->name('batch.update');
+
+// Routes for managing vehicles
+Route::get('/vehicle', [VehicleController::class, 'showData'])->name('vehicle.manage');
+Route::delete('/vehicle/{id}', [VehicleController::class, 'deleteVehicle'])->name('vehicle.delete');
+Route::get('/add-vehicle', [VehicleController::class, 'addVehicleForm'])->name('vehicle.add');
+Route::post('/add-vehicle', [VehicleController::class, 'submitVehicle'])->name('vehicle.submit');
+Route::get('/vehicle/edit/{id}', [VehicleController::class, 'editVehicleForm'])->name('vehicle.edit');
+Route::put('/vehicle/update/{id}', [VehicleController::class, 'updateVehicle'])->name('vehicle.update');
+
+
+//Routes for managing routes
+Route::view('/map', 'pages.maps.index')->name('map');
+Route::post('/route/store', [MapController::class, 'submitRoute'])->name('route.store');
+Route::get('/route', [MapController::class, 'showData'])->name('route.manage');
+Route::get('/route/edit/{id}', [MapController::class, 'editRouteForm'])->name('route.edit');
+Route::put('/route/update/{id}', [MapController::class, 'updateRoute'])->name('route.update');
+Route::delete('/route/{id}', [MapController::class, 'deleteRoute'])->name('route.delete');
+
+//vehicle inventory
+Route::get('/vehicle-inventory', [VehicleInventoryController::class, 'showVehicleInventory'])->name('vehicle.inventory');
+Route::delete('/vehicle-inventory/{id}', [VehicleInventoryController::class, 'delete'])->name('vehicle-inventory.delete');
+Route::get('/add-vehicle-inventory', [VehicleInventoryController::class, 'addVehicleInventoryForm'])->name('vehicle-inventory.add');
+Route::post('/add-vehicle-inventory', [VehicleInventoryController::class, 'submitVehicleInventory'])->name('vehicle-inventory.submit');
+Route::get('/vehicle-inventory/{id}', [VehicleInventoryController::class, 'editVehicleInventoryForm'])->name('vehicle-inventory.edit');
+Route::put('/vehicle-inventory/{id}', [VehicleInventoryController::class, 'updateVehicleInventory'])->name('vehicle-inventory.update');
+
+//Routes for managing Assignments
+Route::get('/assignment', [AssignmentController::class, 'showAssignments'])->name('assignment.manage');
+Route::get('/add-assignment', [AssignmentController::class, 'addAssignmentForm'])->name('assignment.add');
+Route::post('/add-assignment', [AssignmentController::class, 'submitAssignment'])->name('assignment.submit');
+Route::get('/assignment/edit/{id}', [AssignmentController::class, 'editAssignmentForm'])->name('assignment.edit');
+Route::put('/assignment/edit/{id}', [AssignmentController::class, 'updateAssignment'])->name('assignment.update');
+Route::delete('/assignment/{id}', [AssignmentController::class, 'deleteAssignment'])->name('assignment.delete');
+
