@@ -31,53 +31,54 @@
                                 </a>
                             </div>
                             <div class="card-body">
-                                <table id="example1" class="table table-bordered table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Employee Name</th>
-                                            <th>Vehicle Number</th>
-                                            <th>Route Name</th>
-                                            <th>Assign Date</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($assignments as $key => $assignment)
+                                <div class="table-responsive">
+                                    <table id="example1" class="table table-bordered table-striped">
+                                        <thead>
                                             <tr>
-                                                <td>{{ ++$key }}</td>
-                                                <td>{{ $assignment['employee_name'] }}</td>
-                                                <td>{{ $assignment['vehicle_number'] }}</td>
-                                                <td>{{ $assignment['route_name'] }}</td>
-                                                <td>{{ $assignment['assign_date'] }}</td>
-                                                <td>
-                                                    <div class="d-flex">
-                                                        <a href="{{ route('assignment.edit', $assignment['id']) }}"
-                                                            class="btn btn-secondary btn-sm mr-2">
-                                                            <i class="fas fa-pencil-alt"></i>
-                                                        </a>
-                                                        <button type="button"
-                                                            class="btn btn-danger btn-sm delete-assignment"
-                                                            data-id="{{ $assignment['id'] }}">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </div>
-                                                </td>
+                                                <th>#</th>
+                                                <th>Employee Name</th>
+                                                <th>Vehicle Number</th>
+                                                <th>Route Name</th>
+                                                <th>Assign Date</th>
+                                                <th>Action</th>
                                             </tr>
-                                        @endforeach
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Employee Name</th>
-                                            <th>Vehicle Number</th>
-                                            <th>Route Name</th>
-                                            <th>Assign Date</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </tfoot>
-                                </table>
-
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($assignments as $key => $assignment)
+                                                <tr>
+                                                    <td>{{ ++$key }}</td>
+                                                    <td>{{ $assignment['employee_name'] }}</td>
+                                                    <td>{{ $assignment['vehicle_number'] }}</td>
+                                                    <td>{{ $assignment['route_name'] }}</td>
+                                                    <td>{{ $assignment['assign_date'] }}</td>
+                                                    <td>
+                                                        <div class="d-flex">
+                                                            <a href="{{ route('assignment.edit', $assignment['id']) }}"
+                                                                class="btn btn-secondary btn-sm mr-2">
+                                                                <i class="fas fa-pencil-alt"></i>
+                                                            </a>
+                                                            <button type="button"
+                                                                class="btn btn-danger btn-sm delete-assignment"
+                                                                data-id="{{ $assignment['id'] }}">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Employee Name</th>
+                                                <th>Vehicle Number</th>
+                                                <th>Route Name</th>
+                                                <th>Assign Date</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
