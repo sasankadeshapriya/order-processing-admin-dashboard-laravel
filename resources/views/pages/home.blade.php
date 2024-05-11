@@ -3,6 +3,19 @@
 @section('title', 'Dashboard')
 
 @section('content')
+    <style>
+        @media (max-width: 767px) {
+            .small-box .inner h3 {
+                font-size: 1.25em;
+                /* Adjust size as needed to match <h4> */
+                margin-top: 0.5em;
+                /* Adjust top margin as needed */
+                margin-bottom: 0.5em;
+                /* Adjust bottom margin as needed */
+            }
+        }
+    </style>
+
     <div class="content-wrapper">
         <!-- Content Header (Page header) -->
         <div class="content-header">
@@ -28,6 +41,7 @@
                 <!-- Small boxes (Stat box) -->
                 <div class="row">
                     <div class="col-lg-3 col-6">
+                        <!-- small box -->
                         <div class="small-box custom-bg-color-small-box">
                             <div class="inner">
                                 <h3>Invoices</h3>
@@ -46,7 +60,6 @@
                         <div class="small-box custom-bg-color-small-box">
                             <div class="inner">
                                 <h3>Payments</h3>
-
                                 <p>LKR215,500.50</p>
                             </div>
                             <div class="icon">
@@ -62,7 +75,6 @@
                         <div class="small-box custom-bg-color-small-box">
                             <div class="inner">
                                 <h3>Profit & Loss</h3>
-
                                 <p>LKR250,500.50</p>
                             </div>
                             <div class="icon">
@@ -78,7 +90,6 @@
                         <div class="small-box custom-bg-color-small-box">
                             <div class="inner">
                                 <h3>Route</h3>
-
                                 <p>4 Routes</p>
                             </div>
                             <div class="icon">
