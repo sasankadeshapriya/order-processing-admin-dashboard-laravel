@@ -88,13 +88,12 @@
                     </ul>
                 </li>
                 <!-- Assignments Section -->
-                <li class="nav-item has-treeview {{ request()->is('assignment*') || request()->is('add-assignment') ? 'menu-open' : '' }}">
-                    <a href="#"
-                    class="nav-link {{ request()->is('assignment*') || request()->is('add-assignment') ? 'active' : '' }}">
+                <li class="nav-item has-treeview {{ request()->is('assignment*') || request()->is('add-assignment') || request()->is('tracking') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ request()->is('assignment*') || request()->is('add-assignment') || request()->is('tracking') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-tasks"></i>
                         <p>Assignments <i class="right fas fa-angle-left"></i></p>
                     </a>
-                    <ul class="nav nav-treeview" style="{{ request()->is('assignment*') || request()->is('add-assignment') ? 'display: block;' : 'display: none;' }}">
+                    <ul class="nav nav-treeview" style="{{ request()->is('assignment*') || request()->is('add-assignment') || request()->is('tracking') ? 'display: block;' : 'display: none;' }}">
                         <li class="nav-item">
                             <a href="{{ route('assignment.add') }}" class="nav-link {{ request()->is('add-assignment') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
@@ -105,6 +104,12 @@
                             <a href="{{ route('assignment.manage') }}" class="nav-link {{ request()->is('assignment') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Manage Assignments</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('emp.tracking') }}" class="nav-link {{ request()->is('tracking') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Employee Tracking</p>
                             </a>
                         </li>
                     </ul>
