@@ -54,7 +54,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="assign_date">Assign Date</label>
-                                        <input type="date" class="form-control" name="assign_date" value="{{ old('assign_date', $assignment['assign_date']) }}">
+                                        <input type="date" class="form-control" name="assign_date" value="{{ old('assign_date', $assignment['assign_date']) }}" style="width: 200px;">
                                     </div>
                                 </div>
                                 <div class="card-footer">

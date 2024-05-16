@@ -92,6 +92,7 @@
                     </ul>
                 </li>
 
+
                 <!-- Vehicle Inventory -->
                 <li
                     class="nav-item has-treeview {{ request()->is('vehicle-inventory') || request()->is('vehicle-inventory/*') || request()->is('add-vehicle-inventory') ? 'menu-open' : '' }}">
@@ -114,6 +115,12 @@
                                 class="nav-link {{ request()->is('vehicle-inventory') && !request()->is('vehicle-inventory/*') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Manage Inventory</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('emp.tracking') }}" class="nav-link {{ request()->is('tracking') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Employee Tracking</p>
                             </a>
                         </li>
                     </ul>

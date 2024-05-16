@@ -152,6 +152,7 @@ Route::middleware(['web'])->group(function () {
 
 });
 
+
 //logout
 Route::get('/logout', function () {
     session()->forget('auth_token');
