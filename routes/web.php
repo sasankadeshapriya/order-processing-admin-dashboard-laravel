@@ -147,6 +147,8 @@ Route::middleware(['web'])->group(function () {
     Route::get('/assignment/edit/{id}', [AssignmentController::class, 'editAssignmentForm'])->name('assignment.edit');
     Route::put('/assignment/edit/{id}', [AssignmentController::class, 'updateAssignment'])->name('assignment.update');
     Route::delete('/assignment/{id}', [AssignmentController::class, 'deleteAssignment'])->name('assignment.delete');
+    Route::get('/tracking', [AssignmentController::class, 'showTodayAssignments'])->name('emp.tracking');
+    Route::get('/employee/{employeeId}/location', [AssignmentController::class, 'getEmployeeLocation']);
 
 });
 
