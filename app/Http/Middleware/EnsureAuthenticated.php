@@ -28,7 +28,7 @@ class EnsureAuthenticated
 
     public function handle(Request $request, Closure $next)
     {
-        if ($request->path() === 'login' || $request->path() === 'otp-verification' || $request->path() === 'api/proxy/verify-otp' || $request->path() === 'store-token' || $request->path() === 'test-token') {
+        if ($request->path() === 'login' || $request->path() === 'otp-verification' || $request->path() === 'api/proxy/verify-otp' || $request->path() === 'store-token' || $request->path() === 'test-token' || $request->path() === 'forgot-password' || $request->path() === 'api/proxy/forgot-password' || $request->path() === 'api/proxy/verify-otp' || $request->path() === 'api/proxy/change-password') {
             return $next($request);
         }
 

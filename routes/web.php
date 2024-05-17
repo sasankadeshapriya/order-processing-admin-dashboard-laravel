@@ -93,8 +93,6 @@ Route::post('/api/proxy/verify-otp', function (Request $request) {
         ->header('Access-Control-Allow-Headers', 'Content-Type');
 });
 
-
-
 // Protected routes
 Route::middleware(['web'])->group(function () {
     Route::get('/', function () {
@@ -159,3 +157,56 @@ Route::get('/logout', function () {
     return redirect('/login')->with('message', 'Successfully logged out');
 })->name('logout');
 
+Route::post('/api/proxy/forgot-password', function (Request $request) {
+    // Debugging: Log the request
+    \Log::info('Forgot password request received', $request->all());
+
+    $response = Http::withHeaders([
+        'Content-Type' => 'application/json',
+        'Accept' => 'application/json',
+    ])->post('http://api.gsutil.xyz/admin/forgot-password', $request->all());
+
+    \Log::info('Forgot password response', $response->json());
+
+    return response($response->body(), $response->status())
+        ->header('Content-Type', 'application/json')
+        ->header('Access-Control-Allow-Origin', '*')
+        ->header('Access-Control-Allow-Methods', 'POST')
+        ->header('Access-Control-Allow-Headers', 'Content-Type');
+});
+
+Route::post('/api/proxy/verify-otp', function (Request $request) {
+    // Debugging: Log the request
+    \Log::info('Verify OTP request received', $request->all());
+
+    $response = Http::withHeaders([
+        'Content-Type' => 'application/json',
+        'Accept' => 'application/json',
+    ])->post('http://api.gsutil.xyz/admin/verify-otp', $request->all());
+
+    \Log::info('Verify OTP response', $response->json());
+
+    return response($response->body(), $response->status())
+        ->header('Content-Type', 'application/json')
+        ->header('Access-Control-Allow-Origin', '*')
+        ->header('Access-Control-Allow-Methods', 'POST')
+        ->header('Access-Control-Allow-Headers', 'Content-Type');
+});
+
+Route::post('/api/proxy/change-password', function (Request $request) {
+    // Debugging: Log the request
+    \Log::info('Change password request received', $request->all());
+
+    $response = Http::withHeaders([
+        'Content-Type' => 'application/json',
+        'Accept' => 'application/json',
+    ])->post('http://api.gsutil.xyz/admin/password-change', $request->all());
+
+    \Log::info('Change password response', $response->json());
+
+    return response($response->body(), $response->status())
+        ->header('Content-Type', 'application/json')
+        ->header('Access-Control-Allow-Origin', '*')
+        ->header('Access-Control-Allow-Methods', 'POST')
+        ->header('Access-Control-Allow-Headers', 'Content-Type');
+});
