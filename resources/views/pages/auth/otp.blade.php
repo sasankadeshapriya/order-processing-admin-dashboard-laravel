@@ -33,7 +33,7 @@
                         <input type="text" id="otp" name="otp" class="form-control" maxlength="4"
                             placeholder="Enter OTP" required>
                         <div class="input-group-append">
-                            <button type="submit" class="btn btn-primary">Verify OTP</button>
+                            <button type="submit" class="btn custom-signin-btn">Verify OTP</button>
                         </div>
                     </div>
                 </form>

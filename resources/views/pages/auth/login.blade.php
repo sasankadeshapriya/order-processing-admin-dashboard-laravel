@@ -41,9 +41,9 @@
                             <div class="input-group-text"><span class="fas fa-lock"></span></div>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+                    <button type="submit" class="btn btn-block custom-signin-btn">Sign In</button>
                 </form>
-                <p class="mb-1 mt-2"><a href="/forgot-password">Forgot password?</a></p>
+                <p class="mb-1 mt-2"><a href="/forgot-password" class="custom-text-color">Forgot password?</a></p>
             </div>
         </div>
     </div>
@@ -60,7 +60,7 @@
                 var submitBtn = form.find('button[type="submit"]');
                 submitBtn.prop('disabled', true).html(
                     '<span class="spinner-border spinner-border-sm" id="button-spinner"></span> Loading...'
-                    );
+                );
                 $.ajax({
                     url: '/login',
                     type: 'POST',
