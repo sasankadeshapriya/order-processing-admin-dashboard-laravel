@@ -76,7 +76,7 @@
                     </div>
                     <div class="row">
                         <div class="col-12">
-                            <button type="submit" class="btn btn-primary btn-block" id="submit-button">
+                            <button type="submit" class="btn custom-signin-btn btn-block" id="submit-button">
                                 <span id="button-text">Request new password</span>
                                 <span class="spinner-border spinner-border-sm" id="button-spinner"
                                     style="display: none;"></span>
@@ -87,7 +87,7 @@
                 </form>
 
                 <p class="mt-3 mb-1">
-                    <a href="/login">Login</a>
+                    <a href="/login" class="custom-text-color">Login</a>
                 </p>
             </div>
             <!-- /.login-card-body -->
@@ -177,7 +177,7 @@
                                 if (response.message === 'Invalid OTP!') {
                                     toastr.error(response.message);
                                     window.location.href =
-                                    '/login'; // Redirect to login page on invalid OTP
+                                        '/login'; // Redirect to login page on invalid OTP
                                 } else if (response.message === 'OTP verified successfully!') {
                                     toastr.success(response.message);
                                     $('#otp-field').hide();
@@ -193,11 +193,11 @@
                                 if (xhr.responseJSON && xhr.responseJSON.message) {
                                     toastr.error(xhr.responseJSON.message);
                                     window.location.href =
-                                    '/login'; // Redirect to login page on error
+                                        '/login'; // Redirect to login page on error
                                 } else {
                                     toastr.error('Error: ' + status + ' ' + error);
                                     window.location.href =
-                                    '/login'; // Redirect to login page on error
+                                        '/login'; // Redirect to login page on error
                                 }
                             },
                             complete: function() {
