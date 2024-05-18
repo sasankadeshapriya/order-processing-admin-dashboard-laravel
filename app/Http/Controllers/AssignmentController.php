@@ -184,5 +184,69 @@ public function deleteAssignment($id)
     }
 }
 
+public function showTodayAssignments()
+{
+    $today = Carbon::today()->toDateString();
+
+    $assignmentsResponse = Http::get('https://api.gsutil.xyz/assignment');
+    $employeesResponse = Http::get('https://api.gsutil.xyz/employee/all');
+    $vehiclesResponse = Http::get('https://api.gsutil.xyz/vehicle');
+    $routesResponse = Http::get('https://api.gsutil.xyz/route');
+
+    // Log the responses for debugging.
+    Log::info('Assignments Response:', $assignmentsResponse->json());
+    Log::info('Employees Response:', $employeesResponse->json());
+    Log::info('Vehicles Response:', $vehiclesResponse->json());
+    Log::info('Routes Response:', $routesResponse->json());
+    Log::info('Processing assignments for date:');
+
+    if ($assignmentsResponse->successful() && $employeesResponse->successful() &&
+        $vehiclesResponse->successful() && $routesResponse->successful()) {
+
+        $assignments = array_filter($assignmentsResponse->json(), function ($assignment) use ($today) {
+            return Carbon::parse($assignment['assign_date'])->toDateString() === $today;
+        });
+
+        $employees = collect($employeesResponse->json()['employees'] ?? []);
+        $vehicles = collect($vehiclesResponse->json());
+        $routes = collect($routesResponse->json());
+
+        $employeeMap = $employees->pluck('name', 'id');
+        $vehicleMap = $vehicles->pluck('vehicle_no', 'id');
+        $routeMap = $routes->pluck('name', 'id');
+        $waypointMap = $routes->pluck('waypoints', 'id');
+
+        foreach ($assignments as &$assignment) {
+            $assignment['employee_name'] = $employeeMap->get($assignment['employee_id'], 'Unknown');
+            $assignment['vehicle_number'] = $vehicleMap->get($assignment['vehicle_id'], 'Unknown');
+            $assignment['route_name'] = $routeMap->get($assignment['route_id'], 'Unknown');
+            $assignment['assign_date'] = Carbon::parse($assignment['assign_date'])->toDateString();
+            $assignment['waypoints'] = json_decode($waypointMap->get($assignment['route_id'], '[]'), true);
+        }
+
+        return view('pages.assignments.emp-tracking', compact('assignments'));
+
+    } else {
+        return back()->withErrors('Failed to fetch data from external APIs.');
+    }
+}
+
+public function getEmployeeLocation($employeeId)
+{
+    try {
+        // Fetch the current location of the employee from the external API
+        $response = Http::get("https://api.gsutil.xyz/employee/{$employeeId}/location");
+
+        if ($response->successful()) {
+            $locationData = $response->json()['location'];
+            return response()->json(['location' => $locationData]);
+        } else {
+            return response()->json(['message' => 'Failed to retrieve employee location'], 500);
+        }
+    } catch (\Exception $e) {
+        Log::error("Error retrieving employee location for ID {$employeeId}: {$e->getMessage()}");
+        return response()->json(['message' => 'Failed to retrieve employee location'], 500);
+    }
+}
 
 }
