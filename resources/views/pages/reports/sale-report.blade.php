@@ -24,7 +24,7 @@
             <div class="container-fluid">
                 <!-- Report Filter -->
                 <div class="row mb-2">
-                    <div class="col-sm-12">
+                    <div class="col-sm-3">
                         <div class="form-group">
                             <label for="filter">Filter by:</label>
                             <select class="form-control" id="filter">
@@ -65,7 +65,10 @@
                             <div class="inner">
                                 <h4>Total Sales</h4>
                                 <h3 id="totalSalesSum">0.00</h3>
-                                <p id="salesComparison">Comparison</p>
+                                <div
+                                    style="display: inline-block; background-color: #d9d9d9; padding: 2px 5px; border-radius: 2px; margin-left: 0px; margin-bottom: 10px;">
+                                    <p id="salesComparison" style="margin: 0;">Comparison text</p>
+                                </div>
                             </div>
                             <div class="icon">
                                 <i class="custom-icon-three"></i>
@@ -79,7 +82,10 @@
                             <div class="inner">
                                 <h4>Total Paid</h4>
                                 <h3 id="totalPaidSum">0.00</h3>
-                                <p id="paidComparison">Comparison</p>
+                                <div
+                                    style="display: inline-block; background-color: #d9d9d9; padding: 2px 5px; border-radius: 2px; margin-left: 0px; margin-bottom: 10px;">
+                                    <p id="paidComparison" style="margin: 0;">Comparison text</p>
+                                </div>
                             </div>
                             <div class="icon">
                                 <i class="custom-icon-two"></i>
@@ -93,7 +99,10 @@
                             <div class="inner">
                                 <h4>Total Balance</h4>
                                 <h3 id="totalBalanceSum">0.00</h3>
-                                <p id="balanceComparison">Comparison</p>
+                                <div
+                                    style="display: inline-block; background-color: #d9d9d9; padding: 2px 5px; border-radius: 2px; margin-left: 0px; margin-bottom: 10px;">
+                                    <p id="balanceComparison" style="margin: 0;">Comparison text</p>
+                                </div>
                             </div>
                             <div class="icon">
                                 <i class="custom-icon-one"></i>
@@ -197,6 +206,8 @@
 @endsection
 
 @section('scripts')
+    <!-- Include Bootstrap Icons CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
     <script>
@@ -239,11 +250,25 @@
 
             function updateReport(data, filter) {
                 $('#totalSalesSum').text(data.totalSalesSum.toFixed(2));
-                $('#salesComparison').text(`Sales Change: ${data.salesComparison}%`);
+                const salesComparison = parseFloat(data.salesComparison);
+                const salesComparisonHtml = salesComparison > 0 ?
+                    `<i class="bi bi-caret-up-fill" style="color: green;"></i> <b><span style="color: green;">${salesComparison.toFixed(2)}%</span></b>` :
+                    `<i class="bi bi-caret-down-fill" style="color: red;"></i> <b><span style="color: red;">${salesComparison.toFixed(2)}%</span></b>`;
+                $('#salesComparison').html(salesComparisonHtml);
+
                 $('#totalPaidSum').text(data.totalPaidSum.toFixed(2));
-                $('#paidComparison').text(`Paid Change: ${data.paidComparison}%`);
+                const paidComparison = parseFloat(data.paidComparison);
+                const paidComparisonHtml = paidComparison > 0 ?
+                    `<i class="bi bi-caret-up-fill" style="color: green;"></i> <b><span style="color: green;">${paidComparison.toFixed(2)}%</span></b>` :
+                    `<i class="bi bi-caret-down-fill" style="color: red;"></i> <b><span style="color: red;">${paidComparison.toFixed(2)}%</span></b>`;
+                $('#paidComparison').html(paidComparisonHtml);
+
                 $('#totalBalanceSum').text(data.totalBalanceSum.toFixed(2));
-                $('#balanceComparison').text(`Balance Change: ${data.balanceComparison}%`);
+                const balanceComparison = parseFloat(data.balanceComparison);
+                const balanceComparisonHtml = balanceComparison > 0 ?
+                    `<i class="bi bi-caret-up-fill" style="color: green;"></i> <b><span style="color: green;">${balanceComparison.toFixed(2)}%</span></b>` :
+                    `<i class="bi bi-caret-down-fill" style="color: red;"></i> <b><span style="color: red;">${balanceComparison.toFixed(2)}%</span></b>`;
+                $('#balanceComparison').html(balanceComparisonHtml);
 
                 let salesTable = $('#example3').DataTable();
                 salesTable.clear();
