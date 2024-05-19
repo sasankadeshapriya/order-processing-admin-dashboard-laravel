@@ -151,11 +151,12 @@ Route::middleware(['web'])->group(function () {
 
     //Route for sales report
     Route::get('/sales-report', [ReportController::class, 'showSales'])->name('sales.show');
+    Route::get('/api/sales/report', [ReportController::class, 'getSalesReport']);
 
     //tracking..
     Route::get('/tracking', [AssignmentController::class, 'showTodayAssignments'])->name('emp.tracking');
     Route::get('/employee/{employeeId}/location', [AssignmentController::class, 'getEmployeeLocation']);
-    
+
 });
 
 
