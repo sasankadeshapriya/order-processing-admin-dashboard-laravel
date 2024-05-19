@@ -104,6 +104,55 @@
                 </div>
                 <!-- /.row -->
 
+                <div class="row">
+                    <div class="col-md-6">
+                        <!-- Pie CHART -->
+                        <div class="card">
+                            <div class="card-header custom-bg-color-small-box">
+                                <h3 class="card-title">Distribution of Payment Options</h3>
+
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart">
+                                    <canvas id="paymentOptionsChart"
+                                        style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <!-- Line CHART -->
+                        <div class="card">
+                            <div class="card-header custom-bg-color-small-box">
+                                <h3 class="card-title">Sales Over Time</h3>
+
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart">
+                                    <canvas id="salesLineChart"
+                                        style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="row mb-2">
                     <div class="col-sm-12">
                         <div class="card">
@@ -140,15 +189,6 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <canvas id="paymentOptionsChart"></canvas>
-                    </div>
-                    <div class="col-sm-6">
-                        <canvas id="salesLineChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -283,7 +323,7 @@
                         for (let i = 1; i <= daysInMonth; i++) {
                             labels.push(
                                 `${(now.getMonth() + 1).toString().padStart(2, '0')}-${i.toString().padStart(2, '0')}`
-                                );
+                            );
                         }
                         break;
                     case 'year':
