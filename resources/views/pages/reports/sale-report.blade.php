@@ -3,7 +3,14 @@
 @section('title', 'Sales Report')
 
 @section('content')
-    <div class="content-wrapper">
+    <div class="content-wrapper" id="loading-indicator" style="display: none;">
+        <div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
+            <div class="spinner-border" style="width: 3rem; height: 3rem; color: #C8B400;" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </div>
+    <div class="content-wrapper" id="content-section" style="display: none;">
         <section class="content-header">
             <div class="container-fluid">
                 <div class="row mb-2">
@@ -22,7 +29,6 @@
 
         <section class="content">
             <div class="container-fluid">
-
                 <!-- Button group for all screen sizes -->
                 <div class="row mb-2">
                     <div class="col-12">
@@ -308,6 +314,8 @@
             }
 
             function fetchReport(filter, startDate = null, endDate = null) {
+                showLoadingIndicator();
+
                 let url = `/api/sales/report?filter=${filter}`;
                 if (filter === 'custom' && startDate && endDate) {
                     url = `/api/sales/report?start_date=${startDate}&end_date=${endDate}`;
@@ -317,16 +325,23 @@
                     url: url,
                     method: 'GET',
                     success: function(data) {
-                        // Sort the sales data by date to ensure correct plotting
-                        if (data.sales && data.sales.length) {
-                            data.sales.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-                        }
+                        hideLoadingIndicator();
                         updateReport(data, filter);
                     },
                     error: function() {
-                        alert('Failed to fetch sales report');
+                        window.location.href = '/report-error';
                     }
                 });
+            }
+
+            function showLoadingIndicator() {
+                $('#loading-indicator').show();
+                $('#content-section').hide();
+            }
+
+            function hideLoadingIndicator() {
+                $('#loading-indicator').hide();
+                $('#content-section').show();
             }
 
             function updateReport(data, filter) {

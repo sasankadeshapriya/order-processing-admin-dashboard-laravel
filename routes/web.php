@@ -35,6 +35,10 @@ Route::get('/error', function () {
     return view('pages.error');
 });
 
+Route::get('/report-error', function () {
+    return view('pages.report-error');
+});
+
 Route::get('/login', function () {
     return view('pages.auth.login');
 })->name('login');
