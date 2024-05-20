@@ -4,11 +4,11 @@
 
 @section('content')
     <div class="content-wrapper">
-        <div class="content-header">
+        <section class="content-header">
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1 class="m-0">Report</h1>
+                        <h1>Report</h1>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
@@ -18,45 +18,48 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
         <section class="content">
             <div class="container-fluid">
-                <!-- Report Filter -->
+
+                <!-- Button group for all screen sizes -->
                 <div class="row mb-2">
-                    <div class="col-sm-3">
-                        <div class="form-group">
-                            <label for="filter">Filter by:</label>
-                            <select class="form-control" id="filter">
-                                <option value="week">Week</option>
-                                <option value="day">Day</option>
-                                <option value="month">Month</option>
-                                <option value="year">Year</option>
-                                <option value="all">All Time</option>
-                                <option value="custom">Custom Date Range</option>
-                            </select>
+                    <div class="col-12">
+                        <div class="btn-group" role="group" style="display: inline-flex; flex-wrap: nowrap;">
+                            <button type="button" class="btn filter-btn active" data-filter="week"
+                                style="font-size: 0.875rem; padding: 0.375rem 0.75rem;">Week</button>
+                            <button type="button" class="btn filter-btn" data-filter="day"
+                                style="font-size: 0.875rem; padding: 0.375rem 0.75rem;">Day</button>
+                            <button type="button" class="btn filter-btn" data-filter="month"
+                                style="font-size: 0.875rem; padding: 0.375rem 0.75rem;">Month</button>
+                            <button type="button" class="btn filter-btn" data-filter="year"
+                                style="font-size: 0.875rem; padding: 0.375rem 0.75rem;">Year</button>
+                            <button type="button" class="btn filter-btn" data-filter="all"
+                                style="font-size: 0.875rem; padding: 0.375rem 0.75rem;">Life Time</button>
+                            <button type="button" class="btn filter-btn" data-filter="custom"
+                                style="font-size: 0.875rem; padding: 0.375rem 0.75rem;">Custom Range</button>
                         </div>
                     </div>
                 </div>
 
                 <div class="row mb-2" id="custom-date-range" style="display: none;">
-                    <div class="col-sm-6">
+                    <div class="col-12 col-sm-auto">
                         <div class="form-group">
-                            <label for="start-date">Start Date:</label>
                             <input type="date" class="form-control" id="start-date">
                         </div>
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-12 col-sm-auto">
                         <div class="form-group">
-                            <label for="end-date">End Date:</label>
                             <input type="date" class="form-control" id="end-date">
                         </div>
                     </div>
-                    <div class="col-sm-12">
-                        <button id="apply-custom-filter" class="btn btn-primary">Apply</button>
+                    <div class="col-12 col-sm-auto align-self-end">
+                        <div class="form-group">
+                            <button id="apply-custom-filter" class="btn filter-btn" style="width: 100%;">Apply</button>
+                        </div>
                     </div>
                 </div>
-
                 <!-- Small boxes (Stat box) -->
                 <div class="row mb-2">
                     <div class="col-lg-4 col-6">
@@ -162,7 +165,66 @@
                     </div>
                 </div>
 
-                <div class="row mb-2">
+                <div class="row">
+                    <div class="col-md-6">
+                        <!-- Most Sold Products CHART -->
+                        <div class="card">
+                            <div class="card-header custom-bg-color-small-box">
+                                <h3 class="card-title">Most Sold Products</h3>
+
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart">
+                                    <canvas id="mostSoldProductsChart"
+                                        style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <!-- Previous Period Sums and Top Clients -->
+                        <div class="card">
+                            <div class="card-header custom-bg-color-small-box">
+                                <h3 class="card-title">Previous Period Sums & Top Clients</h3>
+
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart">
+                                    <p><strong>Previous Total Sales Sum:</strong> <span
+                                            id="previousTotalSalesSum">0.00</span></p>
+                                    <p><strong>Previous Total Paid Sum:</strong> <span
+                                            id="previousTotalPaidSum">0.00</span></p>
+                                    <p><strong>Previous Total Balance Sum:</strong> <span
+                                            id="previousTotalBalanceSum">0.00</span></p>
+                                    <p><strong>Top Clients:</strong></p>
+                                    <ul id="topClientsList">
+                                        <li id="topClient1">N/A</li>
+                                        <li id="topClient2">N/A</li>
+                                        <li id="topClient3">N/A</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
                     <div class="col-sm-12">
                         <div class="card">
                             <div class="card-body">
@@ -210,10 +272,29 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <style>
+        .filter-btn {
+            border-radius: 0px;
+            background-color: #6C757D;
+            border: 1px solid #6C757D;
+            color: white;
+        }
+
+        .filter-btn.active,
+        .filter-btn:focus,
+        .filter-btn:hover {
+            background-color: #343A40;
+            color: white;
+        }
+    </style>
     <script>
         $(document).ready(function() {
             let paymentOptionsChart;
             let salesLineChart;
+            let mostSoldProductsChart;
+            let currentFilter = 'week';
+            let currentStartDate = null;
+            let currentEndDate = null;
 
             function initializeDataTable() {
                 if (!$.fn.DataTable.isDataTable('#example3')) {
@@ -270,6 +351,10 @@
                     `<i class="bi bi-caret-down-fill" style="color: red;"></i> <b><span style="color: red;">${balanceComparison.toFixed(2)}%</span></b>`;
                 $('#balanceComparison').html(balanceComparisonHtml);
 
+                $('#previousTotalSalesSum').text(data.previousPeriodSums.previousTotalSalesSum.toFixed(2));
+                $('#previousTotalPaidSum').text(data.previousPeriodSums.previousTotalPaidSum.toFixed(2));
+                $('#previousTotalBalanceSum').text(data.previousPeriodSums.previousTotalBalanceSum.toFixed(2));
+
                 let salesTable = $('#example3').DataTable();
                 salesTable.clear();
 
@@ -290,7 +375,10 @@
                 }
 
                 updatePaymentOptionsChart(data.paymentOptionPercentages);
-                updateSalesLineChart(data.sales || [], filter);
+                updateSalesLineChart(data.sales || [], filter, currentStartDate, currentEndDate);
+                updateMostSoldProductsChart(data.mostSoldProducts || []);
+
+                updateTopClients(data.sales || []);
             }
 
             function updatePaymentOptionsChart(paymentOptionPercentages) {
@@ -308,7 +396,7 @@
                     labels: hasData ? paymentOptionPercentages.map(option => option.option) : ['No Data'],
                     datasets: [{
                         data: hasData ? processedData : [1],
-                        backgroundColor: hasData ? ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'] : [
+                        backgroundColor: hasData ? ['#DBF2F2', '#b6e4e4', '#c8ebeb', '#eef9f9'] : [
                             '#343A40'
                         ],
                     }]
@@ -323,7 +411,7 @@
                             legend: {
                                 display: true,
                                 labels: {
-                                    color: hasData ? 'black' : 'grey'
+                                    color: hasData ? 'grey' : 'grey'
                                 }
                             }
                         }
@@ -534,12 +622,103 @@
                 });
             }
 
-            $('#filter').change(function() {
-                if ($(this).val() === 'custom') {
+            function updateMostSoldProductsChart(mostSoldProducts) {
+                const ctx = document.getElementById('mostSoldProductsChart').getContext('2d');
+
+                if (mostSoldProductsChart) {
+                    mostSoldProductsChart.destroy();
+                }
+
+                const data = {
+                    labels: mostSoldProducts.map(product => product.productName),
+                    datasets: [{
+                        label: 'Quantity Sold',
+                        data: mostSoldProducts.map(product => parseFloat(product.totalQuantity)),
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                };
+
+                mostSoldProductsChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: data,
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Product Name'
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Quantity Sold'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            }
+
+            function updateTopClients(sales) {
+                const clientTotals = {};
+
+                sales.forEach(sale => {
+                    const clientId = sale.Client.id;
+                    const clientName = sale.Client.name;
+                    const totalAmount = parseFloat(sale.total_amount);
+
+                    if (!clientTotals[clientId]) {
+                        clientTotals[clientId] = {
+                            name: clientName,
+                            total: 0
+                        };
+                    }
+
+                    clientTotals[clientId].total += totalAmount;
+                });
+
+                const sortedClients = Object.entries(clientTotals)
+                    .sort(([, a], [, b]) => b.total - a.total)
+                    .slice(0, 3);
+
+                $('#topClient1').text(sortedClients[0] ?
+                    `${sortedClients[0][1].name} (ID: ${sortedClients[0][0]})` : 'N/A');
+                $('#topClient2').text(sortedClients[1] ?
+                    `${sortedClients[1][1].name} (ID: ${sortedClients[1][0]})` : 'N/A');
+                $('#topClient3').text(sortedClients[2] ?
+                    `${sortedClients[2][1].name} (ID: ${sortedClients[2][0]})` : 'N/A');
+            }
+
+            function isValidDateRange(startDate, endDate) {
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                return start <= end;
+            }
+
+            $('.filter-btn').click(function() {
+                const filter = $(this).data('filter');
+                currentFilter = filter;
+                currentStartDate = null;
+                currentEndDate = null;
+
+                $('.filter-btn').removeClass('active');
+                $(this).addClass('active');
+
+                if (filter === 'custom') {
                     $('#custom-date-range').show();
                 } else {
                     $('#custom-date-range').hide();
-                    fetchReport($(this).val());
+                    fetchReport(filter);
                 }
             });
 
@@ -548,6 +727,12 @@
                 const endDate = $('#end-date').val();
 
                 if (startDate && endDate) {
+                    if (!isValidDateRange(startDate, endDate)) {
+                        alert('Start date should be before end date.');
+                        return;
+                    }
+                    currentStartDate = startDate;
+                    currentEndDate = endDate;
                     fetchReport('custom', startDate, endDate);
                 } else {
                     alert('Please select both start and end dates.');
