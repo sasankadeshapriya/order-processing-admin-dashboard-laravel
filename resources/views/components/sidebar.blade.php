@@ -117,13 +117,6 @@
                                 <p>Manage Inventory</p>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a href="{{ route('emp.tracking') }}"
-                                class="nav-link {{ request()->is('tracking') ? 'active' : '' }}">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Employee Tracking</p>
-                            </a>
-                        </li>
                     </ul>
                 </li>
 
