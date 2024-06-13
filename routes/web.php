@@ -7,6 +7,7 @@ use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\MapController;
 use App\Http\Controllers\VehicleInventoryController;
 use App\Http\Controllers\AssignmentController;
+use App\Http\Controllers\ReportController;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
@@ -32,6 +33,10 @@ Route::get('/', function () {
 
 Route::get('/error', function () {
     return view('pages.error');
+});
+
+Route::get('/report-error', function () {
+    return view('pages.report-error');
 });
 
 Route::get('/login', function () {
@@ -93,8 +98,6 @@ Route::post('/api/proxy/verify-otp', function (Request $request) {
         ->header('Access-Control-Allow-Headers', 'Content-Type');
 });
 
-
-
 // Protected routes
 Route::middleware(['web'])->group(function () {
     Route::get('/', function () {
@@ -153,6 +156,9 @@ Route::middleware(['web'])->group(function () {
     Route::get('/employee/{employeeId}/location', [AssignmentController::class, 'getEmployeeLocation']);
     Route::get('/clients/route/{routeId}', [AssignmentController::class, 'getClientsByRoute']);
 
+    //Route for sales report
+    Route::get('/sales-report', [ReportController::class, 'showSales'])->name('sales.show');
+    Route::get('/api/sales/report', [ReportController::class, 'getSalesReport']);
 });
 
 
@@ -162,3 +168,56 @@ Route::get('/logout', function () {
     return redirect('/login')->with('message', 'Successfully logged out');
 })->name('logout');
 
+Route::post('/api/proxy/forgot-password', function (Request $request) {
+    // Debugging: Log the request
+    \Log::info('Forgot password request received', $request->all());
+
+    $response = Http::withHeaders([
+        'Content-Type' => 'application/json',
+        'Accept' => 'application/json',
+    ])->post('http://api.gsutil.xyz/admin/forgot-password', $request->all());
+
+    \Log::info('Forgot password response', $response->json());
+
+    return response($response->body(), $response->status())
+        ->header('Content-Type', 'application/json')
+        ->header('Access-Control-Allow-Origin', '*')
+        ->header('Access-Control-Allow-Methods', 'POST')
+        ->header('Access-Control-Allow-Headers', 'Content-Type');
+});
+
+Route::post('/api/proxy/verify-otp', function (Request $request) {
+    // Debugging: Log the request
+    \Log::info('Verify OTP request received', $request->all());
+
+    $response = Http::withHeaders([
+        'Content-Type' => 'application/json',
+        'Accept' => 'application/json',
+    ])->post('http://api.gsutil.xyz/admin/verify-otp', $request->all());
+
+    \Log::info('Verify OTP response', $response->json());
+
+    return response($response->body(), $response->status())
+        ->header('Content-Type', 'application/json')
+        ->header('Access-Control-Allow-Origin', '*')
+        ->header('Access-Control-Allow-Methods', 'POST')
+        ->header('Access-Control-Allow-Headers', 'Content-Type');
+});
+
+Route::post('/api/proxy/change-password', function (Request $request) {
+    // Debugging: Log the request
+    \Log::info('Change password request received', $request->all());
+
+    $response = Http::withHeaders([
+        'Content-Type' => 'application/json',
+        'Accept' => 'application/json',
+    ])->post('http://api.gsutil.xyz/admin/password-change', $request->all());
+
+    \Log::info('Change password response', $response->json());
+
+    return response($response->body(), $response->status())
+        ->header('Content-Type', 'application/json')
+        ->header('Access-Control-Allow-Origin', '*')
+        ->header('Access-Control-Allow-Methods', 'POST')
+        ->header('Access-Control-Allow-Headers', 'Content-Type');
+});
