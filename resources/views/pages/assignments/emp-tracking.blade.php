@@ -69,16 +69,13 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="mapModalLabel">Route Map</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <h5 class="modal-title" id="mapModalLabel">Employee Last known Location</h5>
             </div>
             <div class="modal-body">
                 <div id="popupMap" style="height: 400px;"></div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -98,30 +95,12 @@ $(document).ready(function() {
     let routeMarkers = [];
     let clientMarkers = [];
 
-    $('.track-location').click(function() {
-        const waypointsJson = $(this).attr('data-waypoints');
-        const employeeId = $(this).attr('data-id');
-        const routeId = $(this).attr('data-route-id');
-        try {
-            const waypoints = JSON.parse(waypointsJson);
-            if (waypoints && waypoints.length > 0) {
-                $('#mapModal').modal('show');
-                $('#mapModal').on('shown.bs.modal', function() {
-                    initMapModal(waypoints, employeeId, routeId);
-                });
-            } else {
-                console.error('No waypoints found for this assignment.');
-            }
-        } catch (e) {
-            console.error('Error parsing JSON:', e);
-        }
-    });
-
-    $('#mapModal').on('hidden.bs.modal', function() {
+    function clearMapData() {
         clearInterval(locationInterval);
-        if (map) {
-            map = null;
-        }
+        routeMarkers.forEach(marker => marker.setMap(null));
+        routeMarkers = [];
+        clientMarkers.forEach(marker => marker.setMap(null));
+        clientMarkers = [];
         if (marker) {
             marker.setMap(null);
             marker = null;
@@ -130,18 +109,28 @@ $(document).ready(function() {
             directionsRenderer.setMap(null);
             directionsRenderer = null;
         }
-        routeMarkers.forEach(marker => marker.setMap(null));
-        routeMarkers = [];
-        clientMarkers.forEach(marker => marker.setMap(null));
-        clientMarkers = [];
-        console.log('Stopped fetching location updates.');
+    }
+
+    // Bind click event to buttons
+    $(document).on('click', '.track-location', function() {
+        const waypointsJson = $(this).attr('data-waypoints');
+        const employeeId = $(this).attr('data-id');
+        const routeId = $(this).attr('data-route-id');
+        try {
+            const waypoints = JSON.parse(waypointsJson);
+            if (waypoints && waypoints.length > 0) {
+                clearMapData(); // Clear old data before setting new
+                initMapModal(waypoints, employeeId, routeId);
+                $('#mapModal').modal('show'); // Explicitly show the modal
+            } else {
+                console.error('No waypoints found for this assignment.');
+            }
+        } catch (e) {
+            console.error('Error parsing JSON:', e);
+        }
     });
 
     function initMapModal(waypoints, employeeId, routeId) {
-        if (locationInterval) {
-            clearInterval(locationInterval);
-        }
-
         const mapOptions = {
             zoom: 12,
             center: new google.maps.LatLng(waypoints[0].latitude, waypoints[0].longitude),
@@ -150,7 +139,7 @@ $(document).ready(function() {
         map = new google.maps.Map(document.getElementById('popupMap'), mapOptions);
         marker = new google.maps.Marker({
             map: map,
-            title: 'Last Known Location', // Default title
+            title: 'Last Known Location',
             icon: {
                 url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent('<svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg"><circle opacity="0.30496" cx="19" cy="19" r="19" fill="#EC8E37"/><circle cx="19" cy="19" r="15" fill="#EC3737"/><path fill-rule="evenodd" clip-rule="evenodd" d="M25 17.7273C25 22.1818 19 26 19 26C19 26 13 22.1818 13 17.7273C13 14.5642 15.6863 12 19 12C22.3137 12 25 14.5642 25 17.7273V17.7273Z" fill="white" stroke="white" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="19" cy="17.7274" rx="2" ry="1.90909" fill="#EC3737" stroke="#EC8E37" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>')
             }
@@ -163,14 +152,19 @@ $(document).ready(function() {
             suppressMarkers: true
         });
         calculateAndDisplayRoute(directionsService, directionsRenderer, waypoints);
-
         updateEmployeeLocation(employeeId);
         fetchAndDisplayClients(routeId);
-
         locationInterval = setInterval(function() {
             updateEmployeeLocation(employeeId);
         }, 10000);
     }
+
+    function clearMarkers() {
+    routeMarkers.forEach(marker => marker.setMap(null));
+    routeMarkers = [];
+    clientMarkers.forEach(marker => marker.setMap(null));
+    clientMarkers = [];
+}
 
     function calculateAndDisplayRoute(directionsService, directionsRenderer, waypoints) {
         const waypts = waypoints.map(waypoint => ({
@@ -227,8 +221,10 @@ $(document).ready(function() {
                             map: map,
                             title: client.organization_name,
                             icon: {
-                                url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent('<svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg"><circle opacity="0.30496" cx="19" cy="19" r="19" fill="#3778EC"/><circle cx="19" cy="19" r="15" fill="#3778EC"/><path fill-rule="evenodd" clip-rule="evenodd" d="M25 17.7273C25 22.1818 19 26 19 26C19 26 13 22.1818 13 17.7273C13 14.5642 15.6863 12 19 12C22.3137 12 25 14.5642 25 17.7273V17.7273Z" fill="white" stroke="white" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="19" cy="17.7274" rx="2" ry="1.90909" fill="#3778EC" stroke="#8E8EEC" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>')
-                            }
+    url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent('<svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg"><circle opacity="0.30496" cx="19" cy="19" r="19" fill="#B8860B"/><circle cx="19" cy="19" r="15" fill="#B8860B"/><path d="M25.5 14H12.5C11.9477 14 11.5 14.4477 11.5 15V23C11.5 23.5523 11.9477 24 12.5 24H25.5C26.0523 24 26.5 23.5523 26.5 23V15C26.5 14.4477 26.0523 14 25.5 14Z" fill="white" stroke="white" stroke-width="1.3"/><path d="M14 14V11C14 10.4477 14.4477 10 15 10H23C23.5523 10 24 10.4477 24 11V14" stroke="white" stroke-width="1.3"/><path d="M18 20H20V22H18V20Z" fill="#B8860B"/><path d="M22 16H24V18H22V16ZM14 16H16V18H14V16ZM18 16H20V18H18V16ZM14 20H16V22H14V20ZM22 20H24V22H22V20Z" fill="#B8860B"/></svg>')
+}
+
+
                         });
                         clientMarkers.push(clientMarker);
                     }
