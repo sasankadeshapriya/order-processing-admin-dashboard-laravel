@@ -7,6 +7,7 @@ use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\MapController;
 use App\Http\Controllers\VehicleInventoryController;
 use App\Http\Controllers\AssignmentController;
+use App\Http\Controllers\ReportController;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
@@ -32,6 +33,10 @@ Route::get('/', function () {
 
 Route::get('/error', function () {
     return view('pages.error');
+});
+
+Route::get('/report-error', function () {
+    return view('pages.report-error');
 });
 
 Route::get('/login', function () {
@@ -149,7 +154,11 @@ Route::middleware(['web'])->group(function () {
     Route::delete('/assignment/{id}', [AssignmentController::class, 'deleteAssignment'])->name('assignment.delete');
     Route::get('/tracking', [AssignmentController::class, 'showTodayAssignments'])->name('emp.tracking');
     Route::get('/employee/{employeeId}/location', [AssignmentController::class, 'getEmployeeLocation']);
+    Route::get('/clients/route/{routeId}', [AssignmentController::class, 'getClientsByRoute']);
 
+    //Route for sales report
+    Route::get('/sales-report', [ReportController::class, 'showSales'])->name('sales.show');
+    Route::get('/api/sales/report', [ReportController::class, 'getSalesReport']);
 });
 
 

@@ -105,54 +105,55 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}" async defer></script>
     <script>
-    $('#example1 tbody').on('click', 'td:nth-child(3)', function() {
-        var waypoints = $(this).data('waypoints');
+        // Event handler for clicking the third column of a table row
+        $('#example1 tbody').on('click', 'td:nth-child(3)', function() {
+            var waypoints = $(this).data('waypoints'); // Extract waypoints data
 
-        $('#mapModal').modal('show');
-        $('#mapModal').on('shown.bs.modal', function() {
-            initMapModal(waypoints); // Initialize map with waypoints
-        });
-    });
-
-    function initMapModal(waypoints) {
-        var map = new google.maps.Map(document.getElementById('popupMap'), {
-            center: { lat: waypoints[0].latitude, lng: waypoints[0].longitude },
-            zoom: 12
+            $('#mapModal').modal('show'); // Show modal with map
+            $('#mapModal').on('shown.bs.modal', function() {
+                initMapModal(waypoints); // Initialize map in modal after it is shown
+            });
         });
 
-        var directionsService = new google.maps.DirectionsService();
-        var directionsRenderer = new google.maps.DirectionsRenderer({
-            draggable: false,
-            map: map,
-            panel: document.getElementById('directionsPanel')
-        });
+        function initMapModal(waypoints) {
+            var map = new google.maps.Map(document.getElementById('popupMap'), {
+                center: { lat: waypoints[0].latitude, lng: waypoints[0].longitude }, // Set map center
+                zoom: 12 // Set zoom level
+            });
 
-        calculateAndDisplayRoute(directionsService, directionsRenderer, waypoints);
-    }
+            var directionsService = new google.maps.DirectionsService();
+            var directionsRenderer = new google.maps.DirectionsRenderer({
+                draggable: false,
+                map: map,
+                panel: document.getElementById('directionsPanel') // Set panel for directions
+            });
 
-    function calculateAndDisplayRoute(directionsService, directionsRenderer, waypoints) {
-        var waypointMarkers = waypoints.map(point => ({
-            location: new google.maps.LatLng(point.latitude, point.longitude),
-            stopover: true
-        }));
+            calculateAndDisplayRoute(directionsService, directionsRenderer, waypoints); // Calculate and display the route
+        }
 
-        var origin = waypointMarkers.shift().location;
-        var destination = waypointMarkers.pop().location;
+        function calculateAndDisplayRoute(directionsService, directionsRenderer, waypoints) {
+            var waypointMarkers = waypoints.map(point => ({
+                location: new google.maps.LatLng(point.latitude, point.longitude), // Create waypoints
+                stopover: true
+            }));
 
-        directionsService.route({
-            origin: origin,
-            destination: destination,
-            waypoints: waypointMarkers,
-            travelMode: 'DRIVING'
-        }, function(response, status) {
-            if (status === 'OK') {
-                directionsRenderer.setDirections(response);
-            } else {
-                window.alert('Directions request failed due to ' + status);
-            }
-        });
-    }
-    </script>
+            var origin = waypointMarkers.shift().location; // Set the first waypoint as origin
+            var destination = waypointMarkers.pop().location; // Set the last waypoint as destination
+
+            directionsService.route({
+                origin: origin,
+                destination: destination,
+                waypoints: waypointMarkers, // Set intermediate waypoints
+                travelMode: 'DRIVING' // Set travel mode
+            }, function(response, status) {
+                if (status === 'OK') {
+                    directionsRenderer.setDirections(response); // Render the directions
+                } else {
+                    window.alert('Directions request failed due to ' + status); // Alert on failure
+                }
+            });
+        }
+        </script>
     <script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=&v=weekly" async defer></script>
     <script src="{{ asset('plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 
