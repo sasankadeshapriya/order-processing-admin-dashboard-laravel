@@ -186,7 +186,7 @@ public function deleteAssignment($id)
 
 public function showTodayAssignments()
 {
-    $today = Carbon::today()->toDateString();
+    $today = now()->toDateString();
 
     $assignmentsResponse = Http::get('https://api.gsutil.xyz/assignment');
     $employeesResponse = Http::get('https://api.gsutil.xyz/employee/all');
@@ -198,13 +198,12 @@ public function showTodayAssignments()
     Log::info('Employees Response:', $employeesResponse->json());
     Log::info('Vehicles Response:', $vehiclesResponse->json());
     Log::info('Routes Response:', $routesResponse->json());
-    Log::info('Processing assignments for date:');
 
     if ($assignmentsResponse->successful() && $employeesResponse->successful() &&
         $vehiclesResponse->successful() && $routesResponse->successful()) {
 
         $assignments = array_filter($assignmentsResponse->json(), function ($assignment) use ($today) {
-            return Carbon::parse($assignment['assign_date'])->toDateString() === $today;
+            return now()->parse($assignment['assign_date'])->toDateString() === $today;
         });
 
         $employees = collect($employeesResponse->json()['employees'] ?? []);
@@ -220,7 +219,7 @@ public function showTodayAssignments()
             $assignment['employee_name'] = $employeeMap->get($assignment['employee_id'], 'Unknown');
             $assignment['vehicle_number'] = $vehicleMap->get($assignment['vehicle_id'], 'Unknown');
             $assignment['route_name'] = $routeMap->get($assignment['route_id'], 'Unknown');
-            $assignment['assign_date'] = Carbon::parse($assignment['assign_date'])->toDateString();
+            $assignment['assign_date'] = now()->parse($assignment['assign_date'])->toDateString();
             $assignment['waypoints'] = json_decode($waypointMap->get($assignment['route_id'], '[]'), true);
         }
 
@@ -234,7 +233,6 @@ public function showTodayAssignments()
 public function getEmployeeLocation($employeeId)
 {
     try {
-        // Fetch the current location of the employee from the external API
         $response = Http::get("https://api.gsutil.xyz/employee/{$employeeId}/location");
 
         if ($response->successful()) {
@@ -249,4 +247,21 @@ public function getEmployeeLocation($employeeId)
     }
 }
 
+public function getClientsByRoute($routeId)
+{
+    try {
+        $response = Http::get("https://api.gsutil.xyz/client/route/{$routeId}");
+
+        if ($response->successful()) {
+            $clientsData = $response->json();
+            return response()->json($clientsData);
+        } else {
+            return response()->json(['message' => 'Failed to retrieve clients for route'], 500);
+        }
+    } catch (\Exception $e) {
+        Log::error("Error retrieving clients for route ID {$routeId}: {$e->getMessage()}");
+        return response()->json(['message' => 'Failed to retrieve clients for route'], 500);
+    }
 }
+}
+
