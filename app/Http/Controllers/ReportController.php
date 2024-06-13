@@ -18,7 +18,7 @@ class ReportController extends Controller
         $filter = $request->query('filter');
         $startDate = $request->query('start_date');
         $endDate = $request->query('end_date');
-        $url = 'http://localhost:4000/sales/report';
+        $url = 'http://api.gsutil.xyz/sales/report';
 
         if ($startDate && $endDate) {
             $url .= '?start_date=' . $startDate . '&end_date=' . $endDate;
