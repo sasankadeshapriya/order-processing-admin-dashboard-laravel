@@ -26,7 +26,7 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                <a href="{{ route('product.add') }}" class="btn btn-primary">
+                                <a href="{{ route('vehicle-inventory.add') }}" class="btn btn-primary">
                                     Add Vehicle Inventory
                                 </a>
                             </div>
