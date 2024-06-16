@@ -133,4 +133,27 @@
         background-color: #f7f7f7;
     }
 
+    .custom-signin-btn {
+        background-color: #C8B400 !important;
+        /* Custom yellow color */
+        border: 1px solid #C8B400 !important;
+        /* Same color border */
+        color: #FFFFFF !important;
+        /* White text */
+    }
+
+    .custom-signin-btn:hover {
+        background-color: #B0A200 !important;
+        /* Slightly darker shade on hover */
+        border-color: #B0A200 !important;
+        color: #FFFFFF !important;
+    }
+
+    .custom-text-color {
+        color: #6c757d;
+    }
+
+    .custom-text-color:hover {
+        color: #C8B400;
+    }
 </style>

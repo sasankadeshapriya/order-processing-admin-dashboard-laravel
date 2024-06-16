@@ -43,7 +43,6 @@
                                                 <th>Vehicle Number</th>
                                                 <th>Name</th>
                                                 <th>Type</th>
-                                                <th>Assigned</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
@@ -55,7 +54,6 @@
                                                     <td>{{ $vehicle['vehicle_no'] }}</td>
                                                     <td>{{ $vehicle['name'] }}</td>
                                                     <td>{{ $vehicle['type'] }}</td>
-                                                    <td>{{ $vehicle['assigned'] }}</td>
                                                     <td>
                                                         <div class="d-flex">
                                                             <a href="{{ route('vehicle.edit', $vehicle['id']) }}"
@@ -80,7 +78,6 @@
                                                 <th>Vehicle Number</th>
                                                 <th>Name</th>
                                                 <th>Type</th>
-                                                <th>Assigned</th>
                                                 <th>Action</th>
                                             </tr>
                                         </tfoot>

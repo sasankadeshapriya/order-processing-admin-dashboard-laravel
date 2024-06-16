@@ -44,8 +44,10 @@ $('.delete-vehicle-inventory').click(function() {
 
 // When deleting a group of vehicle inventories
 $('.delete-group').click(function() {
+
     var groupRow = $(this).closest('tr'); // Get the main group row
     var groupRows = groupRow.find('.details tbody tr');
+
     var ids = [];
 
     // Collect all item IDs within the group
@@ -107,4 +109,3 @@ $('.delete-group').click(function() {
         }
     });
 });
-

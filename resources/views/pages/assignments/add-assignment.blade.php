@@ -60,7 +60,7 @@
                                     </div>
                                 </div>
                                 <div class="card-footer">
-                                    <button type="submit" class="btn btn-primary" id="submitBtn">Submit Assignment</button>
+                                    <button type="submit" class="btn btn-primary" id="submitBtn">Submit</button>
                                     <a href="{{ route('assignment.manage') }}" class="btn btn-secondary">Back to
                                         Assignments</a>
                                 </div>
@@ -69,9 +69,10 @@
                     </div>
                 </div>
             </div>
-    </div>
+      </div>
     </section>
-    </div>
+  </div>
+
 @endsection
 @section('scripts')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -91,14 +92,14 @@
                         if (response.success) {
                             toastr.success('Assignment added successfully!');
                             $('#assignmentForm')[0]
-                        .reset(); // Clear all form fields after successful submission
+                                .reset(); // Clear all form fields after successful submission
                         } else {
                             // Display error message directly from the server
                             alert('Error adding assignment: ' + (response.message ||
                                 "An unknown error occurred."));
                         }
                         $('#submitBtn').prop('disabled', false).text(
-                        'Submit Assignment'); // Re-enable submit button
+                            'Submit Assignment'); // Re-enable submit button
                     },
                     error: function(xhr) {
                         // Default error message if the server response does not include one
@@ -109,7 +110,7 @@
                         }
                         alert('Error adding assignment: ' + errorMessage);
                         $('#submitBtn').prop('disabled', false).text(
-                        'Submit Assignment'); // Re-enable submit button
+                            'Submit Assignment'); // Re-enable submit button
                     }
                 });
             });
