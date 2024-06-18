@@ -56,12 +56,14 @@
                                             <div class="form-group">
                                                 <label>Vehicle Type</label>
                                                 <select class="form-control" name="type">
+                                                    <option value="" disabled selected>Select Vehicle Type</option>
                                                     <option value="Lorry">Lorry</option>
                                                     <option value="Van">Van</option>
                                                 </select>
                                                 <div class="invalid-feedback d-none" id="error-type"></div>
                                             </div>
                                         </div>
+
                                         <input type="hidden" name="added_by_admin_id" value="1">
                                     </div>
                                 </div>
