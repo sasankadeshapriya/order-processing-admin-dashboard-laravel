@@ -157,9 +157,15 @@ Route::middleware(['web'])->group(function () {
     Route::get('/sales-report', [ReportController::class, 'showSales'])->name('sales.show');
     Route::get('/api/sales/report', [ReportController::class, 'getSalesReport']);
 
+<<<<<<< Updated upstream
     //tracking..
     Route::get('/tracking', [AssignmentController::class, 'showTodayAssignments'])->name('emp.tracking');
     Route::get('/employee/{employeeId}/location', [AssignmentController::class, 'getEmployeeLocation']);
+=======
+    //Route for outstanding report
+    Route::get('/outstanding-report', [ReportController::class, 'outstandingSales'])->name('outstanding.show');
+    Route::get('/api/outstanding/report', [ReportController::class, 'getOutstandingReport']);
+>>>>>>> Stashed changes
 
 });
 
