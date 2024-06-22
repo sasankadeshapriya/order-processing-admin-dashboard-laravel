@@ -161,5 +161,28 @@ class MapController extends Controller
     }
 }
 
+public function showClientLocations()
+{
+    try {
+        $response = Http::get('http://api.gsutil.xyz/client');
+
+        if ($response->successful()) {
+            $clients = $response->json();
+
+            // Assuming you want to log or process the data further
+            Log::info('Retrieved client locations:', ['clients' => $clients]);
+
+            return response()->json(['success' => true, 'clients' => $clients]);
+        } else {
+            $errorDetails = $response->json();
+            Log::error('Failed to retrieve client locations:', ['error' => $errorDetails]);
+            return response()->json(['success' => false, 'message' => 'Failed to retrieve client locations', 'errorDetail' => $errorDetails]);
+        }
+    } catch (\Exception $e) {
+        Log::error('Exception while fetching client locations:', ['message' => $e->getMessage()]);
+        return response()->json(['success' => false, 'message' => 'Server error: Unable to fetch client locations', 'errorDetail' => $e->getMessage()]);
+    }
+}
+
 
 }
