@@ -31,7 +31,8 @@
                                 <div class="card-body">
                                     <div class="form-group">
                                         <label for="employee_id">Employee</label>
-                                        <select class="form-control" name="employee_id">
+                                        <select class="form-control" name="employee_id" required>
+                                            <option value="">Select Employee</option>
                                             @foreach ($employees as $employee)
                                                 <option value="{{ $employee['id'] }}">{{ $employee['name'] }}</option>
                                             @endforeach
@@ -39,7 +40,8 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="vehicle_id">Vehicle</label>
-                                        <select class="form-control" name="vehicle_id">
+                                        <select class="form-control" name="vehicle_id" required>
+                                            <option value="">Select Vehicle</option>
                                             @foreach ($vehicles as $vehicle)
                                                 <option value="{{ $vehicle['id'] }}">{{ $vehicle['vehicle_no'] }}</option>
                                             @endforeach
@@ -47,7 +49,8 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="route_id">Route</label>
-                                        <select class="form-control" name="route_id">
+                                        <select class="form-control" name="route_id" required>
+                                            <option value="">Select Route</option>
                                             @foreach ($routes as $route)
                                                 <option value="{{ $route['id'] }}">{{ $route['name'] }}</option>
                                             @endforeach
@@ -56,7 +59,7 @@
                                     <div class="form-group">
                                         <label for="assign_date">Assign Date</label>
                                         <input type="date" class="form-control" id="assign_date" name="assign_date"
-                                            style="width: 200px">
+                                            style="width: 200px" required>
                                     </div>
                                 </div>
                                 <div class="card-footer">
