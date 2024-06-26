@@ -187,207 +187,247 @@
 @endsection
 
 @section('scripts')
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-    .filter-btn {
-        border-radius: 0px;
-        background-color: #6C757D;
-        border: 1px solid #6C757D;
-        color: white;
-    }
-
-    .filter-btn.active,
-    .filter-btn:focus,
-    .filter-btn:hover {
-        background-color: #343A40;
-        color: white;
-    }
-</style>
-<script>
-    $(document).ready(function() {
-
-        function initializeDataTable() {
-            if (!$.fn.DataTable.isDataTable('#example3')) {
-                $('#example3').DataTable({
-                    "responsive": false,
-                    "lengthChange": true,
-                    "autoWidth": false,
-                    "buttons": ["excel", "pdf", "print", "colvis"],
-                    "order": [[7, 'desc']] // Sorting by credit period end date in descending order.
-                }).buttons().container().appendTo('#example3_wrapper .col-md-6:eq(0)');
-            }
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .filter-btn {
+            border-radius: 0px;
+            background-color: #6C757D;
+            border: 1px solid #6C757D;
+            color: white;
         }
 
-        let paidVsUnpaidChart;
-
-        function fetchOutstandingReport(filter, startDate = null, endDate = null) {
-            showLoadingIndicator();
-
-            let url = `/api/outstanding/report?filter=${filter}`;
-            if (filter === 'custom' && startDate && endDate) {
-                url = `/api/outstanding/report?start_date=${startDate}&end_date=${endDate}`;
-            }
-
-            $.ajax({
-                url: url,
-                method: 'GET',
-                success: function(data) {
-                    console.log('Data fetched successfully:', data);
-                    hideLoadingIndicator();
-                    updateOutstandingReport(data);
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error fetching data:', error);
-                    window.location.href = '/report-error';
-                }
-            });
+        .filter-btn.active,
+        .filter-btn:focus,
+        .filter-btn:hover {
+            background-color: #343A40;
+            color: white;
         }
 
-        function showLoadingIndicator() {
-            $('#loading-indicator').show();
-            $('#content-section').hide();
+        .bg-danger {
+            background-color: rgba(220, 53, 69, 0.2);
+            /* Bootstrap red with opacity 0.2 */
+            color: white;
         }
 
-        function hideLoadingIndicator() {
-            $('#loading-indicator').hide();
-            $('#content-section').show();
+        .bg-success {
+            background-color: rgba(40, 244, 88, 0.2);
+            /* Bootstrap green with opacity 0.2 */
+            color: white;
         }
+    </style>
+    <script>
+        $(document).ready(function() {
 
-        function updateOutstandingReport(data) {
-            $('#totalSalesSum').text(parseFloat(data.overall.total_amount).toFixed(2) || '0.00');
-            $('#totalPaidSum').text(parseFloat(data.overall.total_paid).toFixed(2) || '0.00');
-            $('#totalBalanceSum').text(parseFloat(data.overall.total_balance).toFixed(2) || '0.00');
+            function initializeDataTable() {
+                if (!$.fn.DataTable.isDataTable('#example3')) {
+                    $('#example3').DataTable({
+                        "responsive": false,
+                        "lengthChange": true,
+                        "autoWidth": false,
+                        "buttons": ["excel", "pdf", "print", "colvis"],
+                        "order": [
+                            [7, 'asc']
+                        ], // Sorting by credit period end date in descending order.
+                        "createdRow": function(row, data, dataIndex) {
+                            // Ensure data[7] is the date string in 'MM/DD/YYYY' format
+                            const creditDateString = data[7];
+                            const creditDate = new Date(creditDateString);
+                            const currentDate = new Date();
+                            currentDate.setHours(0, 0, 0, 0); // Normalize current date
+                            const twoDaysAhead = new Date();
+                            twoDaysAhead.setDate(currentDate.getDate() + 2); // Set two days ahead
+                            twoDaysAhead.setHours(0, 0, 0, 0); // Normalize two days ahead date
 
-            let salesTable = $('#example3').DataTable();
-            salesTable.clear();
+                            console.log(
+                                `Checking date: ${creditDateString}, Credit Date: ${creditDate.toDateString()}, Current Date: ${currentDate.toDateString()}, Two Days Ahead: ${twoDaysAhead.toDateString()}`
+                            );
 
-            let rowIndex = 1; // Initialize row index for numbering.
-            if (data.clients && data.clients.length) {
-                data.clients.forEach(client => {
-                    client.invoices.forEach(invoice => {
-                        salesTable.row.add([
-                            rowIndex.toString(), // Display row number
-                            client.name,
-                            client.phone_no || 'N/A',
-                            parseFloat(client.total_amount).toFixed(2),
-                            parseFloat(client.paid_amount).toFixed(2),
-                            parseFloat(client.total_outstanding_balance).toFixed(2),
-                            invoice.reference_number,
-                            new Date(invoice.credit_period_end_date).toLocaleDateString(),
-                            parseFloat(invoice.total_amount).toFixed(2),
-                            parseFloat(invoice.balance).toFixed(2),
-                            parseFloat(invoice.paid_amount).toFixed(2)
-                        ]);
-                        rowIndex++; // Increment row index after adding each row.
-                    });
-                });
-                salesTable.draw();
-            } else {
-                salesTable.row.add(['No records found', '', '', '', '', '', '', '', '', '', '']).draw();
-            }
-
-            updatePaidVsUnpaidChart(data.overall.paid_percentage, data.overall.unpaid_percentage);
-        }
-
-        function updatePaidVsUnpaidChart(paidPercentage, unpaidPercentage) {
-            const ctx = document.getElementById('paidVsUnpaidChart').getContext('2d');
-
-            if (paidVsUnpaidChart) {
-                paidVsUnpaidChart.destroy();
-            }
-
-            // Check for valid percentage values or create a default 'No data' chart
-            if (isNaN(paidPercentage) || isNaN(unpaidPercentage)) {
-                const data = {
-                    labels: ['No data available'],
-                    datasets: [{
-                        data: [100],
-                        backgroundColor: ['#343A40'],
-                        hoverBackgroundColor: ['#343A40']
-                    }]
-                };
-
-                paidVsUnpaidChart = new Chart(ctx, {
-                    type: 'pie',
-                    data: data,
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                enabled: false
+                            if (creditDate < currentDate) {
+                                $(row).addClass('bg-danger text-white');
+                                console.log('Adding red class');
+                            } else if (creditDate <= twoDaysAhead) {
+                                $(row).addClass('bg-success text-white');
+                                console.log('Adding green class');
                             }
                         }
+                    }).buttons().container().appendTo('#example3_wrapper .col-md-6:eq(0)');
+                }
+            }
+
+            // Call initializeDataTable function when document is ready
+            initializeDataTable();
+
+
+            let paidVsUnpaidChart;
+
+            function fetchOutstandingReport(filter, startDate = null, endDate = null) {
+                showLoadingIndicator();
+
+                let url = `/api/outstanding/report?filter=${filter}`;
+                if (filter === 'custom' && startDate && endDate) {
+                    url = `/api/outstanding/report?start_date=${startDate}&end_date=${endDate}`;
+                }
+
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    success: function(data) {
+                        console.log('Data fetched successfully:', data);
+                        hideLoadingIndicator();
+                        updateOutstandingReport(data);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching data:', error);
+                        window.location.href = '/report-error';
                     }
                 });
-            } else {
-                const data = {
-                    labels: ['Paid', 'Unpaid'],
-                    datasets: [{
-                        data: [paidPercentage, unpaidPercentage],
-                        backgroundColor: ['#28a745', '#dc3545']
-                    }]
-                };
+            }
 
-                paidVsUnpaidChart = new Chart(ctx, {
-                    type: 'pie',
-                    data: data,
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                display: true,
-                                position: 'top',
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(tooltipItem) {
-                                        let label = tooltipItem.label || '';
-                                        if (label) {
-                                            label += ': ';
+            function showLoadingIndicator() {
+                $('#loading-indicator').show();
+                $('#content-section').hide();
+            }
+
+            function hideLoadingIndicator() {
+                $('#loading-indicator').hide();
+                $('#content-section').show();
+            }
+
+            function updateOutstandingReport(data) {
+                $('#totalSalesSum').text(parseFloat(data.overall.total_amount).toFixed(2) || '0.00');
+                $('#totalPaidSum').text(parseFloat(data.overall.total_paid).toFixed(2) || '0.00');
+                $('#totalBalanceSum').text(parseFloat(data.overall.total_balance).toFixed(2) || '0.00');
+
+                let salesTable = $('#example3').DataTable();
+                salesTable.clear();
+
+                let rowIndex = 1; // Initialize row index for numbering.
+                if (data.clients && data.clients.length) {
+                    data.clients.forEach(client => {
+                        client.invoices.forEach(invoice => {
+                            salesTable.row.add([
+                                rowIndex.toString(), // Display row number
+                                client.name,
+                                client.phone_no || 'N/A',
+                                parseFloat(client.total_amount).toFixed(2),
+                                parseFloat(client.paid_amount).toFixed(2),
+                                parseFloat(client.total_outstanding_balance).toFixed(2),
+                                invoice.reference_number,
+                                new Date(invoice.credit_period_end_date)
+                                .toLocaleDateString(),
+                                parseFloat(invoice.total_amount).toFixed(2),
+                                parseFloat(invoice.balance).toFixed(2),
+                                parseFloat(invoice.paid_amount).toFixed(2)
+                            ]);
+                            rowIndex++; // Increment row index after adding each row.
+                        });
+                    });
+                    salesTable.draw();
+                } else {
+                    salesTable.row.add(['No records found', '', '', '', '', '', '', '', '', '', '']).draw();
+                }
+
+                updatePaidVsUnpaidChart(data.overall.paid_percentage, data.overall.unpaid_percentage);
+            }
+
+            function updatePaidVsUnpaidChart(paidPercentage, unpaidPercentage) {
+                const ctx = document.getElementById('paidVsUnpaidChart').getContext('2d');
+
+                if (paidVsUnpaidChart) {
+                    paidVsUnpaidChart.destroy();
+                }
+
+                // Check for valid percentage values or create a default 'No data' chart
+                if (isNaN(paidPercentage) || isNaN(unpaidPercentage)) {
+                    const data = {
+                        labels: ['No data available'],
+                        datasets: [{
+                            data: [100],
+                            backgroundColor: ['#343A40'],
+                            hoverBackgroundColor: ['#343A40']
+                        }]
+                    };
+
+                    paidVsUnpaidChart = new Chart(ctx, {
+                        type: 'pie',
+                        data: data,
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    enabled: false
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    const data = {
+                        labels: ['Paid', 'Unpaid'],
+                        datasets: [{
+                            data: [paidPercentage, unpaidPercentage],
+                            backgroundColor: ['#DBF2F2', '#b6e4e4']
+                        }]
+                    };
+
+                    paidVsUnpaidChart = new Chart(ctx, {
+                        type: 'pie',
+                        data: data,
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'top',
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(tooltipItem) {
+                                            let label = tooltipItem.label || '';
+                                            if (label) {
+                                                label += ': ';
+                                            }
+                                            label += `${tooltipItem.raw.toFixed(2)}%`;
+                                            return label;
                                         }
-                                        label += `${tooltipItem.raw.toFixed(2)}%`;
-                                        return label;
                                     }
                                 }
                             }
                         }
-                    }
-                });
+                    });
+                }
             }
-        }
 
-        $('.filter-btn').click(function() {
-            const filter = $(this).data('filter');
+            $('.filter-btn').click(function() {
+                const filter = $(this).data('filter');
 
-            $('.filter-btn').removeClass('active');
-            $(this).addClass('active');
+                $('.filter-btn').removeClass('active');
+                $(this).addClass('active');
 
-            if (filter === 'custom') {
-                $('#custom-date-range').show();
-            } else {
-                $('#custom-date-range').hide();
-                fetchOutstandingReport(filter);
-            }
+                if (filter === 'custom') {
+                    $('#custom-date-range').show();
+                } else {
+                    $('#custom-date-range').hide();
+                    fetchOutstandingReport(filter);
+                }
+            });
+
+            $('#apply-custom-filter').click(function() {
+                const startDate = $('#start-date').val();
+                const endDate = $('#end-date').val();
+
+                if (startDate && endDate) {
+                    fetchOutstandingReport('custom', startDate, endDate);
+                } else {
+                    alert('Please select both start and end dates.');
+                }
+            });
+
+            // Load the default report (week) on page load
+            fetchOutstandingReport('week');
         });
-
-        $('#apply-custom-filter').click(function() {
-            const startDate = $('#start-date').val();
-            const endDate = $('#end-date').val();
-
-            if (startDate && endDate) {
-                fetchOutstandingReport('custom', startDate, endDate);
-            } else {
-                alert('Please select both start and end dates.');
-            }
-        });
-
-        // Load the default report (week) on page load
-        fetchOutstandingReport('week');
-    });
-</script>
+    </script>
 @endsection
-
