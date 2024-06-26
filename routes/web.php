@@ -136,6 +136,7 @@ Route::middleware(['web'])->group(function () {
     Route::get('/route/edit/{id}', [MapController::class, 'editRouteForm'])->name('route.edit');
     Route::put('/route/update/{id}', [MapController::class, 'updateRoute'])->name('route.update');
     Route::delete('/route/{id}', [MapController::class, 'deleteRoute'])->name('route.delete');
+    Route::get('/client/locations', [MapController::class, 'showClientLocations'])->name('client.locations');
 
     //vehicle inventory
     Route::get('/vehicle-inventory', [VehicleInventoryController::class, 'showVehicleInventory'])->name('vehicle.inventory');
@@ -155,6 +156,8 @@ Route::middleware(['web'])->group(function () {
     Route::get('/tracking', [AssignmentController::class, 'showTodayAssignments'])->name('emp.tracking');
     Route::get('/employee/{employeeId}/location', [AssignmentController::class, 'getEmployeeLocation']);
     Route::get('/clients/route/{routeId}', [AssignmentController::class, 'getClientsByRoute']);
+    Route::get('/clients/route/{routeId}', [AssignmentController::class, 'getClientsByRoute'])
+    ->name('getClientsByRoute');
 
     //Route for sales report
     Route::get('/sales-report', [ReportController::class, 'showSales'])->name('sales.show');
