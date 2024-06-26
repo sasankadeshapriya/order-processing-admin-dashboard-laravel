@@ -215,6 +215,24 @@
     </style>
     <script>
         $(document).ready(function() {
+<<<<<<< Updated upstream
+=======
+
+            function initializeDataTable() {
+                if (!$.fn.DataTable.isDataTable('#example3')) {
+                    $('#example3').DataTable({
+                        "responsive": false,
+                        "lengthChange": true,
+                        "autoWidth": false,
+                        "buttons": ["excel", "pdf", "print", "colvis"],
+                        "order": [
+                            [7, 'desc']
+                        ], // Sorting by credit period end date in descending order.
+                    }).buttons().container().appendTo('#example3_wrapper .col-md-6:eq(0)');
+                }
+            }
+
+>>>>>>> Stashed changes
             let paidVsUnpaidChart;
 
             function fetchOutstandingReport(filter, startDate = null, endDate = null) {
@@ -258,7 +276,9 @@
                 const tableBody = $('#outstandingTableBody');
                 tableBody.empty();
 
+                let rowIndex = 1; // Initialize row index for numbering.
                 if (data.clients && data.clients.length) {
+<<<<<<< Updated upstream
                     let rowIndex = 1;
                     data.clients.forEach((client) => {
                         let clientRowSpan = client.invoices.length;
@@ -281,6 +301,26 @@
                         });
 
                         rowIndex++;
+=======
+                    data.clients.forEach(client => {
+                        client.invoices.forEach(invoice => {
+                            salesTable.row.add([
+                                rowIndex.toString(), // Display row number
+                                client.name,
+                                client.phone_no || 'N/A',
+                                parseFloat(client.total_amount).toFixed(2),
+                                parseFloat(client.paid_amount).toFixed(2),
+                                parseFloat(client.total_outstanding_balance).toFixed(2),
+                                invoice.reference_number,
+                                new Date(invoice.credit_period_end_date)
+                                .toLocaleDateString(),
+                                parseFloat(invoice.total_amount).toFixed(2),
+                                parseFloat(invoice.balance).toFixed(2),
+                                parseFloat(invoice.paid_amount).toFixed(2)
+                            ]);
+                            rowIndex++; // Increment row index after adding each row.
+                        });
+>>>>>>> Stashed changes
                     });
                 } else {
                     const row = '<tr><td colspan="11">No records found</td></tr>';
@@ -307,39 +347,67 @@
                     paidVsUnpaidChart.destroy();
                 }
 
-                const data = {
-                    labels: ['Paid', 'Unpaid'],
-                    datasets: [{
-                        data: [paidPercentage, unpaidPercentage],
-                        backgroundColor: ['#28a745', '#dc3545']
-                    }]
-                };
+                // Check for valid percentage values or create a default 'No data' chart
+                if (isNaN(paidPercentage) || isNaN(unpaidPercentage)) {
+                    const data = {
+                        labels: ['No data available'],
+                        datasets: [{
+                            data: [100],
+                            backgroundColor: ['#343A40'],
+                            hoverBackgroundColor: ['#343A40']
+                        }]
+                    };
 
-                paidVsUnpaidChart = new Chart(ctx, {
-                    type: 'pie',
-                    data: data,
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                display: true,
-                                position: 'top',
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(tooltipItem) {
-                                        let label = tooltipItem.label || '';
-                                        if (label) {
-                                            label += ': ';
+                    paidVsUnpaidChart = new Chart(ctx, {
+                        type: 'pie',
+                        data: data,
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    enabled: false
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    const data = {
+                        labels: ['Paid', 'Unpaid'],
+                        datasets: [{
+                            data: [paidPercentage, unpaidPercentage],
+                            backgroundColor: ['#DBF2F2', '#b6e4e4']
+                        }]
+                    };
+
+                    paidVsUnpaidChart = new Chart(ctx, {
+                        type: 'pie',
+                        data: data,
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'top',
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(tooltipItem) {
+                                            let label = tooltipItem.label || '';
+                                            if (label) {
+                                                label += ': ';
+                                            }
+                                            label += `${tooltipItem.raw.toFixed(2)}%`;
+                                            return label;
                                         }
-                                        label += `${tooltipItem.raw.toFixed(2)}%`;
-                                        return label;
                                     }
                                 }
                             }
                         }
-                    }
-                });
+                    });
+                }
             }
 
             $('.filter-btn').click(function() {
