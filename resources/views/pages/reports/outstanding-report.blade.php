@@ -187,120 +187,143 @@
 @endsection
 
 @section('scripts')
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        .filter-btn {
-            border-radius: 0px;
-            background-color: #6C757D;
-            border: 1px solid #6C757D;
-            color: white;
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    .filter-btn {
+        border-radius: 0px;
+        background-color: #6C757D;
+        border: 1px solid #6C757D;
+        color: white;
+    }
+
+    .filter-btn.active,
+    .filter-btn:focus,
+    .filter-btn:hover {
+        background-color: #343A40;
+        color: white;
+    }
+</style>
+<script>
+    $(document).ready(function() {
+
+        function initializeDataTable() {
+            if (!$.fn.DataTable.isDataTable('#example3')) {
+                $('#example3').DataTable({
+                    "responsive": false,
+                    "lengthChange": true,
+                    "autoWidth": false,
+                    "buttons": ["excel", "pdf", "print", "colvis"],
+                    "order": [[7, 'desc']] // Sorting by credit period end date in descending order.
+                }).buttons().container().appendTo('#example3_wrapper .col-md-6:eq(0)');
+            }
         }
 
-        .filter-btn.active,
-        .filter-btn:focus,
-        .filter-btn:hover {
-            background-color: #343A40;
-            color: white;
-        }
-    </style>
-    <script>
-        $(document).ready(function() {
+        let paidVsUnpaidChart;
 
-            function initializeDataTable() {
-                if (!$.fn.DataTable.isDataTable('#example3')) {
-                    $('#example3').DataTable({
-                        "responsive": false,
-                        "lengthChange": true,
-                        "autoWidth": false,
-                        "buttons": ["excel", "pdf", "print", "colvis"]
-                    }).buttons().container().appendTo('#example3_wrapper .col-md-6:eq(0)');
-                }
+        function fetchOutstandingReport(filter, startDate = null, endDate = null) {
+            showLoadingIndicator();
+
+            let url = `/api/outstanding/report?filter=${filter}`;
+            if (filter === 'custom' && startDate && endDate) {
+                url = `/api/outstanding/report?start_date=${startDate}&end_date=${endDate}`;
             }
 
-            let paidVsUnpaidChart;
-
-            function fetchOutstandingReport(filter, startDate = null, endDate = null) {
-                showLoadingIndicator();
-
-                let url = `/api/outstanding/report?filter=${filter}`;
-                if (filter === 'custom' && startDate && endDate) {
-                    url = `/api/outstanding/report?start_date=${startDate}&end_date=${endDate}`;
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function(data) {
+                    console.log('Data fetched successfully:', data);
+                    hideLoadingIndicator();
+                    updateOutstandingReport(data);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching data:', error);
+                    window.location.href = '/report-error';
                 }
+            });
+        }
 
-                $.ajax({
-                    url: url,
-                    method: 'GET',
-                    success: function(data) {
-                        console.log('Data fetched successfully:', data);
-                        hideLoadingIndicator();
-                        updateOutstandingReport(data);
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error fetching data:', error);
-                        window.location.href = '/report-error';
+        function showLoadingIndicator() {
+            $('#loading-indicator').show();
+            $('#content-section').hide();
+        }
+
+        function hideLoadingIndicator() {
+            $('#loading-indicator').hide();
+            $('#content-section').show();
+        }
+
+        function updateOutstandingReport(data) {
+            $('#totalSalesSum').text(parseFloat(data.overall.total_amount).toFixed(2) || '0.00');
+            $('#totalPaidSum').text(parseFloat(data.overall.total_paid).toFixed(2) || '0.00');
+            $('#totalBalanceSum').text(parseFloat(data.overall.total_balance).toFixed(2) || '0.00');
+
+            let salesTable = $('#example3').DataTable();
+            salesTable.clear();
+
+            let rowIndex = 1; // Initialize row index for numbering.
+            if (data.clients && data.clients.length) {
+                data.clients.forEach(client => {
+                    client.invoices.forEach(invoice => {
+                        salesTable.row.add([
+                            rowIndex.toString(), // Display row number
+                            client.name,
+                            client.phone_no || 'N/A',
+                            parseFloat(client.total_amount).toFixed(2),
+                            parseFloat(client.paid_amount).toFixed(2),
+                            parseFloat(client.total_outstanding_balance).toFixed(2),
+                            invoice.reference_number,
+                            new Date(invoice.credit_period_end_date).toLocaleDateString(),
+                            parseFloat(invoice.total_amount).toFixed(2),
+                            parseFloat(invoice.balance).toFixed(2),
+                            parseFloat(invoice.paid_amount).toFixed(2)
+                        ]);
+                        rowIndex++; // Increment row index after adding each row.
+                    });
+                });
+                salesTable.draw();
+            } else {
+                salesTable.row.add(['No records found', '', '', '', '', '', '', '', '', '', '']).draw();
+            }
+
+            updatePaidVsUnpaidChart(data.overall.paid_percentage, data.overall.unpaid_percentage);
+        }
+
+        function updatePaidVsUnpaidChart(paidPercentage, unpaidPercentage) {
+            const ctx = document.getElementById('paidVsUnpaidChart').getContext('2d');
+
+            if (paidVsUnpaidChart) {
+                paidVsUnpaidChart.destroy();
+            }
+
+            // Check for valid percentage values or create a default 'No data' chart
+            if (isNaN(paidPercentage) || isNaN(unpaidPercentage)) {
+                const data = {
+                    labels: ['No data available'],
+                    datasets: [{
+                        data: [100],
+                        backgroundColor: ['#343A40'],
+                        hoverBackgroundColor: ['#343A40']
+                    }]
+                };
+
+                paidVsUnpaidChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: data,
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                enabled: false
+                            }
+                        }
                     }
                 });
-            }
-
-            function showLoadingIndicator() {
-                $('#loading-indicator').show();
-                $('#content-section').hide();
-            }
-
-            function hideLoadingIndicator() {
-                $('#loading-indicator').hide();
-                $('#content-section').show();
-            }
-
-            function updateOutstandingReport(data) {
-                $('#totalSalesSum').text(parseFloat(data.overall.total_amount).toFixed(2) || '0.00');
-                $('#totalPaidSum').text(parseFloat(data.overall.total_paid).toFixed(2) || '0.00');
-                $('#totalBalanceSum').text(parseFloat(data.overall.total_balance).toFixed(2) || '0.00');
-
-                let salesTable = $('#example3').DataTable();
-                salesTable.clear();
-
-                if (data.clients && data.clients.length) {
-                    let rowIndex = 1;
-                    data.clients.forEach((client) => {
-                        client.invoices.forEach((invoice, index) => {
-                            salesTable.row.add([
-                                index === 0 ? rowIndex.toString() : '',
-                                index === 0 ? client.name : '',
-                                index === 0 ? (client.phone_no || 'N/A') : '',
-                                index === 0 ? parseFloat(client.total_amount).toFixed(2) :
-                                '',
-                                index === 0 ? parseFloat(client.paid_amount).toFixed(2) :
-                                '',
-                                index === 0 ? parseFloat(client.total_outstanding_balance)
-                                .toFixed(2) : '',
-                                invoice.reference_number,
-                                new Date(invoice.credit_period_end_date)
-                                .toLocaleDateString(),
-                                parseFloat(invoice.total_amount).toFixed(2),
-                                parseFloat(invoice.balance).toFixed(2),
-                                parseFloat(invoice.paid_amount).toFixed(2)
-                            ]);
-                        });
-                        rowIndex++;
-                    });
-                    salesTable.draw();
-                } else {
-                    salesTable.row.add(['No records found', '', '', '', '', '', '', '', '', '', '']).draw();
-                }
-
-                updatePaidVsUnpaidChart(data.overall.paid_percentage, data.overall.unpaid_percentage);
-            }
-
-
-            function updatePaidVsUnpaidChart(paidPercentage, unpaidPercentage) {
-                const ctx = document.getElementById('paidVsUnpaidChart').getContext('2d');
-
-                if (paidVsUnpaidChart) {
-                    paidVsUnpaidChart.destroy();
-                }
-
+            } else {
                 const data = {
                     labels: ['Paid', 'Unpaid'],
                     datasets: [{
@@ -335,34 +358,36 @@
                     }
                 });
             }
+        }
 
-            $('.filter-btn').click(function() {
-                const filter = $(this).data('filter');
+        $('.filter-btn').click(function() {
+            const filter = $(this).data('filter');
 
-                $('.filter-btn').removeClass('active');
-                $(this).addClass('active');
+            $('.filter-btn').removeClass('active');
+            $(this).addClass('active');
 
-                if (filter === 'custom') {
-                    $('#custom-date-range').show();
-                } else {
-                    $('#custom-date-range').hide();
-                    fetchOutstandingReport(filter);
-                }
-            });
-
-            $('#apply-custom-filter').click(function() {
-                const startDate = $('#start-date').val();
-                const endDate = $('#end-date').val();
-
-                if (startDate && endDate) {
-                    fetchOutstandingReport('custom', startDate, endDate);
-                } else {
-                    alert('Please select both start and end dates.');
-                }
-            });
-
-            // Load the default report (week) on page load
-            fetchOutstandingReport('week');
+            if (filter === 'custom') {
+                $('#custom-date-range').show();
+            } else {
+                $('#custom-date-range').hide();
+                fetchOutstandingReport(filter);
+            }
         });
-    </script>
+
+        $('#apply-custom-filter').click(function() {
+            const startDate = $('#start-date').val();
+            const endDate = $('#end-date').val();
+
+            if (startDate && endDate) {
+                fetchOutstandingReport('custom', startDate, endDate);
+            } else {
+                alert('Please select both start and end dates.');
+            }
+        });
+
+        // Load the default report (week) on page load
+        fetchOutstandingReport('week');
+    });
+</script>
 @endsection
+
