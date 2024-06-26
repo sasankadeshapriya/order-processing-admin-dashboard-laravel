@@ -142,7 +142,7 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table id="outstandingTable" class="table table-bordered table-striped">
+                            <table id="example3" class="table table-bordered table-striped">
                                 <thead>
                                     <tr>
                                         <th>#</th>
@@ -158,7 +158,7 @@
                                         <th>Paid Amount</th>
                                     </tr>
                                 </thead>
-                                <tbody id="outstandingTableBody">
+                                <tbody>
                                     <!-- Sales data will be dynamically added by JavaScript -->
                                 </tbody>
                                 <tfoot>
@@ -187,15 +187,6 @@
 @endsection
 
 @section('scripts')
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <!-- DataTables JS -->
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
-    <!-- DataTables Buttons JS -->
-    <script src="https://cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.html5.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.print.min.js"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -215,6 +206,18 @@
     </style>
     <script>
         $(document).ready(function() {
+
+            function initializeDataTable() {
+                if (!$.fn.DataTable.isDataTable('#example3')) {
+                    $('#example3').DataTable({
+                        "responsive": false,
+                        "lengthChange": true,
+                        "autoWidth": false,
+                        "buttons": ["excel", "pdf", "print", "colvis"]
+                    }).buttons().container().appendTo('#example3_wrapper .col-md-6:eq(0)');
+                }
+            }
+
             let paidVsUnpaidChart;
 
             function fetchOutstandingReport(filter, startDate = null, endDate = null) {
@@ -255,50 +258,41 @@
                 $('#totalPaidSum').text(parseFloat(data.overall.total_paid).toFixed(2) || '0.00');
                 $('#totalBalanceSum').text(parseFloat(data.overall.total_balance).toFixed(2) || '0.00');
 
-                const tableBody = $('#outstandingTableBody');
-                tableBody.empty();
+                let salesTable = $('#example3').DataTable();
+                salesTable.clear();
 
                 if (data.clients && data.clients.length) {
                     let rowIndex = 1;
                     data.clients.forEach((client) => {
-                        let clientRowSpan = client.invoices.length;
-
                         client.invoices.forEach((invoice, index) => {
-                            const row = `<tr>
-                                <td>${index === 0 ? rowIndex : ''}</td>
-                                <td>${index === 0 ? client.name : ''}</td>
-                                <td>${index === 0 ? (client.phone_no || 'N/A') : ''}</td>
-                                <td>${index === 0 ? parseFloat(client.total_amount).toFixed(2) : ''}</td>
-                                <td>${index === 0 ? parseFloat(client.paid_amount).toFixed(2) : ''}</td>
-                                <td>${index === 0 ? parseFloat(client.total_outstanding_balance).toFixed(2) : ''}</td>
-                                <td>${invoice.reference_number}</td>
-                                <td><span class="${new Date(invoice.credit_period_end_date) < new Date() ? 'text-danger' : (new Date(invoice.credit_period_end_date) - new Date() < 2 * 24 * 60 * 60 * 1000 ? 'text-warning' : 'text-success')}">${new Date(invoice.credit_period_end_date).toLocaleDateString()}</span></td>
-                                <td>${parseFloat(invoice.total_amount).toFixed(2)}</td>
-                                <td>${parseFloat(invoice.balance).toFixed(2)}</td>
-                                <td>${parseFloat(invoice.paid_amount).toFixed(2)}</td>
-                            </tr>`;
-                            tableBody.append(row);
+                            salesTable.row.add([
+                                index === 0 ? rowIndex.toString() : '',
+                                index === 0 ? client.name : '',
+                                index === 0 ? (client.phone_no || 'N/A') : '',
+                                index === 0 ? parseFloat(client.total_amount).toFixed(2) :
+                                '',
+                                index === 0 ? parseFloat(client.paid_amount).toFixed(2) :
+                                '',
+                                index === 0 ? parseFloat(client.total_outstanding_balance)
+                                .toFixed(2) : '',
+                                invoice.reference_number,
+                                new Date(invoice.credit_period_end_date)
+                                .toLocaleDateString(),
+                                parseFloat(invoice.total_amount).toFixed(2),
+                                parseFloat(invoice.balance).toFixed(2),
+                                parseFloat(invoice.paid_amount).toFixed(2)
+                            ]);
                         });
-
                         rowIndex++;
                     });
+                    salesTable.draw();
                 } else {
-                    const row = '<tr><td colspan="11">No records found</td></tr>';
-                    tableBody.append(row);
+                    salesTable.row.add(['No records found', '', '', '', '', '', '', '', '', '', '']).draw();
                 }
-
-                // Initialize DataTables with buttons
-                $('#outstandingTable').DataTable({
-                    dom: 'Bfrtip',
-                    buttons: [
-                        'copy', 'csv', 'excel', 'pdf', 'print'
-                    ],
-                    pageLength: 15,
-                    lengthMenu: [10, 15, 25, 50, 100]
-                });
 
                 updatePaidVsUnpaidChart(data.overall.paid_percentage, data.overall.unpaid_percentage);
             }
+
 
             function updatePaidVsUnpaidChart(paidPercentage, unpaidPercentage) {
                 const ctx = document.getElementById('paidVsUnpaidChart').getContext('2d');
