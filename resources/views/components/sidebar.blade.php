@@ -173,7 +173,8 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('emp.tracking') }}" class="nav-link {{ request()->is('tracking') ? 'active' : '' }}">
+                            <a href="{{ route('emp.tracking') }}"
+                                class="nav-link {{ request()->is('tracking') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Employee Tracking</p>
                             </a>
@@ -210,14 +211,14 @@
 
                 <!-- Reports Section -->
                 <li
-                    class="nav-item has-treeview {{ request()->is('report*') || request()->is('sales-report') || request()->is('outstanding-report') ? 'menu-open' : '' }}">
+                    class="nav-item has-treeview {{ request()->is('report*') || request()->is('sales-report') || request()->is('outstanding-report') || request()->is('commission-report') ? 'menu-open' : '' }}">
                     <a href="#"
-                        class="nav-link {{ request()->is('report*') || request()->is('sales-report') || request()->is('outstanding-report') ? 'active' : '' }}">
+                        class="nav-link {{ request()->is('report*') || request()->is('sales-report') || request()->is('outstanding-report') || request()->is('commission-report') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-chart-line"></i>
                         <p>Reports <i class="right fas fa-angle-left"></i></p>
                     </a>
                     <ul class="nav nav-treeview"
-                        style="{{ request()->is('report*') || request()->is('sales-report') || request()->is('outstanding-report') ? 'display: block;' : 'display: none;' }}">
+                        style="{{ request()->is('report*') || request()->is('sales-report') || request()->is('outstanding-report') || request()->is('commission-report') ? 'display: block;' : 'display: none;' }}">
                         <li class="nav-item">
                             <a href="{{ route('sales.show') }}"
                                 class="nav-link {{ request()->is('sales-report') ? 'active' : '' }}">
@@ -232,8 +233,16 @@
                                 <p>Outstanding Report</p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="{{ route('commission.show') }}"
+                                class="nav-link {{ request()->is('commission-report') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Commission Report</p>
+                            </a>
+                        </li>
                     </ul>
                 </li>
+
 
             </ul>
 

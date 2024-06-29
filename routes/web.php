@@ -157,11 +157,16 @@ Route::middleware(['web'])->group(function () {
     Route::get('/employee/{employeeId}/location', [AssignmentController::class, 'getEmployeeLocation']);
     Route::get('/clients/route/{routeId}', [AssignmentController::class, 'getClientsByRoute']);
     Route::get('/clients/route/{routeId}', [AssignmentController::class, 'getClientsByRoute'])
-    ->name('getClientsByRoute');
+        ->name('getClientsByRoute');
 
     //Route for sales report
     Route::get('/sales-report', [ReportController::class, 'showSales'])->name('sales.show');
     Route::get('/api/sales/report', [ReportController::class, 'getSalesReport']);
+
+    // Route for commission report
+    Route::get('/commission-report', [ReportController::class, 'showCommission'])->name('commission.show');
+    Route::get('/api/commission/report', [ReportController::class, 'getCommissionReport']);
+
 
     //tracking..
     Route::get('/tracking', [AssignmentController::class, 'showTodayAssignments'])->name('emp.tracking');

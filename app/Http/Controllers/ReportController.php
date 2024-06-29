@@ -64,4 +64,50 @@ class ReportController extends Controller
         return response()->json(['message' => 'Failed to fetch outstanding report'], 500);
     }
 
+
+    public function showCommission()
+    {
+        return view('pages.reports.comission-report');
+    }
+
+    public function getCommissionReport(Request $request)
+    {
+        $filter = $request->query('filter');
+        $startDate = $request->query('start_date');
+        $endDate = $request->query('end_date');
+
+        // Log the request parameters
+        Log::info('Fetching commission report', [
+            'filter' => $filter,
+            'start_date' => $startDate,
+            'end_date' => $endDate
+        ]);
+
+        $url = 'http://localhost:4000/commission/report';
+
+        if ($startDate && $endDate) {
+            $url .= '?filter=custom&start_date=' . $startDate . '&end_date=' . $endDate;
+        } else if ($filter) {
+            $url .= '?filter=' . $filter;
+        }
+
+        // Log the constructed URL
+        Log::info('Request URL', ['url' => $url]);
+
+        $response = Http::get($url);
+
+        // Log the response status
+        Log::info('API Response Status', ['status' => $response->status()]);
+
+        if ($response->successful()) {
+            // Log the response data
+            Log::info('API Response Data', ['data' => $response->json()]);
+            return $response->json();
+        }
+
+        // Log the error message
+        Log::error('Failed to fetch commission report', ['message' => $response->body()]);
+
+        return response()->json(['message' => 'Failed to fetch commission report'], 500);
+    }
 }
