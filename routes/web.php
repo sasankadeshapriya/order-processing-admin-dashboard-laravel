@@ -175,6 +175,11 @@ Route::middleware(['web'])->group(function () {
     //Route for outstanding report
     Route::get('/outstanding-report', [ReportController::class, 'outstandingSales'])->name('outstanding.show');
     Route::get('/api/outstanding/report', [ReportController::class, 'getOutstandingReport']);
+
+    // Route for day end report
+    Route::get('/day-end-report', [ReportController::class, 'show'])->name('day-end.show');
+    Route::get('/api/day-end/report', [ReportController::class, 'getDayEndReport']);
+
 });
 
 

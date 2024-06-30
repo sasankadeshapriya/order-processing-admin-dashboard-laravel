@@ -110,4 +110,21 @@ class ReportController extends Controller
 
         return response()->json(['message' => 'Failed to fetch commission report'], 500);
     }
+    public function show()
+    {
+        return view('pages.reports.day-end-report');
+    }
+
+    public function getDayEndReport(Request $request)
+    {
+        $url = 'http://localhost:4000/day-report'; // Assuming this is where the data comes from
+        $response = Http::get($url);
+
+        if ($response->successful()) {
+            return $response->json();
+        }
+
+        return response()->json(['message' => 'Failed to fetch day end report'], 500);
+    }
+
 }
