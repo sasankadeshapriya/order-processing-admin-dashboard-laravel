@@ -147,4 +147,5 @@ class ReportController extends Controller
 
         return response()->json(['message' => 'Failed to fetch MRP report data'], 500);
     }
+
 }
