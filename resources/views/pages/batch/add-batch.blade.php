@@ -56,7 +56,7 @@
                                             @endif
                                             <!-- Buy Price -->
                                             <div class="form-group">
-                                                <label>Buy Price</label>
+                                                <label>MRP</label>
                                                 <input type="number" step="0.01" class="form-control" name="buy_price"
                                                     placeholder="100.50">
                                                 <div class="invalid-feedback d-none" id="error-buy_price"></div>

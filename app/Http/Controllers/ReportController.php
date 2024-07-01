@@ -110,6 +110,7 @@ class ReportController extends Controller
 
         return response()->json(['message' => 'Failed to fetch commission report'], 500);
     }
+
     public function show()
     {
         return view('pages.reports.day-end-report');
@@ -125,6 +126,26 @@ class ReportController extends Controller
         }
 
         return response()->json(['message' => 'Failed to fetch day end report'], 500);
+    }
+
+
+    // Display the MRP Report page
+    public function showMrpReport()
+    {
+        return view('pages.reports.mrp-report');
+    }
+
+    // Fetch data for the MRP Report
+    public function getMrpReportData(Request $request)
+    {
+        $url = 'https://api.gsutil.xyz/batch'; // API endpoint
+        $response = Http::get($url);
+
+        if ($response->successful()) {
+            return $response->json();
+        }
+
+        return response()->json(['message' => 'Failed to fetch MRP report data'], 500);
     }
 
 }

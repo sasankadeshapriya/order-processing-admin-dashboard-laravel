@@ -211,67 +211,84 @@
 
                 <!-- Reports Section -->
                 <li
-                    class="nav-item has-treeview
-    {{ request()->is('report*') ||
-    request()->is('sales-report') ||
-    request()->is('outstanding-report') ||
-    request()->is('commission-report') ||
-    request()->is('day-end-report')
-        ? 'menu-open'
-        : '' }}">
+                    class="nav-item has-treeview {{ request()->is('report*') || request()->is('sales-report') || request()->is('outstanding-report') || request()->is('commission-report') ? 'menu-open' : '' }}">
                     <a href="#"
-                        class="nav-link
-        {{ request()->is('report*') ||
-        request()->is('sales-report') ||
-        request()->is('outstanding-report') ||
-        request()->is('commission-report') ||
-        request()->is('day-end-report')
-            ? 'active'
-            : '' }}">
-                        <i class="nav-icon fas fa-chart-line"></i>
-                        <p>Reports <i class="right fas fa-angle-left"></i></p>
-                    </a>
-                    <ul class="nav nav-treeview"
-                        style="{{ request()->is('report*') ||
-                        request()->is('sales-report') ||
-                        request()->is('outstanding-report') ||
-                        request()->is('commission-report') ||
-                        request()->is('day-end-report')
-                            ? 'display: block;'
-                            : 'display: none;' }}">
-                        <li class="nav-item">
-                            <a href="{{ route('sales.show') }}"
-                                class="nav-link {{ request()->is('sales-report') ? 'active' : '' }}">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Sales Report</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('outstanding.show') }}"
-                                class="nav-link {{ request()->is('outstanding-report') ? 'active' : '' }}">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Outstanding Report</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('commission.show') }}"
-                                class="nav-link {{ request()->is('commission-report') ? 'active' : '' }}">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Commission Report</p>
-                            </a>
-                        </li>
-                        <!-- Adding Day End Report -->
-                        <li class="nav-item">
-                            <a href="{{ route('day-end.show') }}"
-                                class="nav-link {{ request()->is('day-end-report') ? 'active' : '' }}">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Day End Report</p>
-                            </a>
-                        </li>
-                    </ul>
+                        class="nav-link {{ request()->is('report*') || request()->is('sales-report') || request()->is('outstanding-report') || request()->is('commission-report') ? 'active' : '' }}">
+                        class="nav-item has-treeview
+{{ request()->is('report*') ||
+request()->is('sales-report') ||
+request()->is('outstanding-report') ||
+request()->is('commission-report') ||
+request()->is('day-end-report') ||
+request()->is('mrp-report')
+    ? 'menu-open'
+    : '' }}">
+                        <a href="#"
+                            class="nav-link
+{{ request()->is('report*') ||
+request()->is('sales-report') ||
+request()->is('outstanding-report') ||
+request()->is('commission-report') ||
+request()->is('day-end-report') ||
+request()->is('mrp-report')
+    ? 'active'
+    : '' }}">
+                            <i class="nav-icon fas fa-chart-line"></i>
+                            <p>Reports <i class="right fas fa-angle-left"></i></p>
+                        </a>
+                        <ul class="nav nav-treeview"
+                            style="{{ request()->is('report*') || request()->is('sales-report') || request()->is('outstanding-report') || request()->is('commission-report') ? 'display: block;' : 'display: none;' }}">
+
+                            style="{{ request()->is('report*') ||
+                            request()->is('sales-report') ||
+                            request()->is('outstanding-report') ||
+                            request()->is('commission-report') ||
+                            request()->is('day-end-report') ||
+                            request()->is('mrp-report')
+                                ? 'display: block;'
+                                : 'display: none;' }}">
+                            <li class="nav-item">
+                                <a href="{{ route('sales.show') }}"
+                                    class="nav-link {{ request()->is('sales-report') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Sales Report</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('outstanding.show') }}"
+                                    class="nav-link {{ request()->is('outstanding-report') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Outstanding Report</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('commission.show') }}"
+                                    class="nav-link {{ request()->is('commission-report') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Commission Report</p>
+                                </a>
+                            </li>
+                        </ul>
                 </li>
 
-
+                <!-- Adding Day End Report -->
+                <li class="nav-item">
+                    <a href="{{ route('day-end.show') }}"
+                        class="nav-link {{ request()->is('day-end-report') ? 'active' : '' }}">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Day End Report</p>
+                    </a>
+                </li>
+                <!-- Adding MRP Report -->
+                <li class="nav-item">
+                    <a href="{{ route('mrp-report.show') }}"
+                        class="nav-link {{ request()->is('mrp-report') ? 'active' : '' }}">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>MRP Report</p>
+                    </a>
+                </li>
+            </ul>
+            </li>
 
             </ul>
 

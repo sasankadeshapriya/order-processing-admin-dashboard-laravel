@@ -58,7 +58,7 @@
                                             @endif
 
                                             <div class="form-group">
-                                                <label>Buy Price</label>
+                                                <label>MRP</label>
                                                 <input type="number" class="form-control" name="buy_price" step="0.01"
                                                     value="{{ $batch->buy_price }}">
                                                 <div class="invalid-feedback d-none" id="error-buy_price"></div>
@@ -151,7 +151,7 @@
                             if (response.success) {
                                 toastr.success(response.message);
                                 initialFormData =
-                                currentFormData; // Update the stored form data
+                                    currentFormData; // Update the stored form data
                                 initialFile = currentFile; // Update the stored file input value
                                 // Optionally update the UI or perform any other actions after successful update
                             } else {

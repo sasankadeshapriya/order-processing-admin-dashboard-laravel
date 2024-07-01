@@ -180,6 +180,10 @@ Route::middleware(['web'])->group(function () {
     Route::get('/day-end-report', [ReportController::class, 'show'])->name('day-end.show');
     Route::get('/api/day-end/report', [ReportController::class, 'getDayEndReport']);
 
+    //mrp report
+    Route::get('/mrp-report', [ReportController::class, 'showMrpReport'])->name('mrp-report.show');
+    Route::get('/api/mrp-data', [ReportController::class, 'getMrpReportData'])->name('mrp-report.data');
+
 });
 
 
