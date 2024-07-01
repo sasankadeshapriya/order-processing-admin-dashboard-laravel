@@ -45,7 +45,7 @@
                                                 <th>Product Code</th>
                                                 <th>SKU</th>
                                                 <th>Qty</th>
-                                                <th>Buy Price</th>
+                                                <th>MRP</th>
                                                 <th>Cash Price</th>
                                                 <th>Cheque Price</th>
                                                 <th>Credit Price</th>
@@ -89,7 +89,7 @@
                                                 <th>Product Code</th>
                                                 <th>SKU</th>
                                                 <th>Qty</th>
-                                                <th>Buy Price</th>
+                                                <th>MRP</th>
                                                 <th>Cash Price</th>
                                                 <th>Cheque Price</th>
                                                 <th>Credit Price</th>
