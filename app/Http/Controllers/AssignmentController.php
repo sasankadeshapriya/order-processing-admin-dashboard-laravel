@@ -10,12 +10,14 @@ use Illuminate\Support\Facades\Validator;
 
 class AssignmentController extends Controller
 {
+    //private $baseURL = 'http://127.0.0.1:4000';
+    private $baseURL = 'https://api.gsutil.xyz';
     public function showAssignments()
 {
-    $assignmentsResponse = Http::get('https://api.gsutil.xyz/assignment');
-    $employeesResponse = Http::get('https://api.gsutil.xyz/employee/all');
-    $vehiclesResponse = Http::get('https://api.gsutil.xyz/vehicle');
-    $routesResponse = Http::get('https://api.gsutil.xyz/route');
+    $assignmentsResponse = Http::get("{$this->baseURL}/assignment");
+    $employeesResponse = Http::get("{$this->baseURL}/employee/all");
+    $vehiclesResponse = Http::get("{$this->baseURL}/vehicle");
+    $routesResponse = Http::get("{$this->baseURL}/route");
 
     if ($assignmentsResponse->successful() && $employeesResponse->successful() && $vehiclesResponse->successful() && $routesResponse->successful()) {
         $assignments = $assignmentsResponse->json();
@@ -43,9 +45,9 @@ class AssignmentController extends Controller
 public function addAssignmentForm()
 {
     // Fetch data from external API
-    $employeesResponse = Http::get('https://api.gsutil.xyz/employee/all');
-    $vehiclesResponse = Http::get('https://api.gsutil.xyz/vehicle');
-    $routesResponse = Http::get('https://api.gsutil.xyz/route');
+    $employeesResponse = Http::get("{$this->baseURL}/employee/all");
+    $vehiclesResponse = Http::get("{$this->baseURL}/vehicle");
+    $routesResponse = Http::get("{$this->baseURL}/route");
 
     $employees = $employeesResponse->successful() ? $employeesResponse->json()['employees'] : [];
     $vehicles = $vehiclesResponse->successful() ? $vehiclesResponse->json() : [];
@@ -85,7 +87,7 @@ public function submitAssignment(Request $request)
         $data['added_by_admin_id'] = 1; // Static admin ID example
 
         // Sending data to external API
-        $response = Http::post('https://api.gsutil.xyz/assignment', $data);
+        $response = Http::post("{$this->baseURL}/assignment", $data);
 
         if ($response->successful()) {
             return response()->json(['success' => true, 'message' => 'Assignment added successfully']);
@@ -102,10 +104,10 @@ public function submitAssignment(Request $request)
 
 public function editAssignmentForm($id)
 {
-    $assignmentResponse = Http::get("http://api.gsutil.xyz/assignment/{$id}");
-    $employeesResponse = Http::get('https://api.gsutil.xyz/employee/all');
-    $vehiclesResponse = Http::get('https://api.gsutil.xyz/vehicle');
-    $routesResponse = Http::get('https://api.gsutil.xyz/route');
+    $assignmentResponse = Http::get("{$this->baseURL}/assignment/{$id}");
+    $employeesResponse = Http::get("{$this->baseURL}/employee/all");
+    $vehiclesResponse = Http::get("{$this->baseURL}/vehicle");
+    $routesResponse = Http::get("{$this->baseURL}/route");
 
     if ($assignmentResponse->successful()) {
         $assignment = $assignmentResponse->json();
@@ -153,7 +155,7 @@ public function updateAssignment(Request $request, $id)
         return response()->json(['success' => false, 'errors' => $validator->errors()]);
     }
 
-    $response = Http::put("http://api.gsutil.xyz/assignment/{$id}", $data);
+    $response = Http::put("{$this->baseURL}/assignment/{$id}", $data);
 
     if ($response->successful()) {
         return response()->json(['success' => true, 'message' => 'Assignment successfully updated']);
@@ -171,7 +173,7 @@ public function updateAssignment(Request $request, $id)
 public function deleteAssignment($id)
 {
     try {
-        $response = Http::delete("https://api.gsutil.xyz/assignment/$id");
+        $response = Http::delete("{$this->baseURL}/assignment/$id");
 
         if ($response->successful()) {
             return response()->json(['success' => true]);
@@ -188,10 +190,10 @@ public function showTodayAssignments()
 {
     $today = now()->toDateString();
 
-    $assignmentsResponse = Http::get('https://api.gsutil.xyz/assignment');
-    $employeesResponse = Http::get('https://api.gsutil.xyz/employee/all');
-    $vehiclesResponse = Http::get('https://api.gsutil.xyz/vehicle');
-    $routesResponse = Http::get('https://api.gsutil.xyz/route');
+    $assignmentsResponse = Http::get("{$this->baseURL}/assignment");
+    $employeesResponse = Http::get("{$this->baseURL}/employee/all");
+    $vehiclesResponse = Http::get("{$this->baseURL}/vehicle");
+    $routesResponse = Http::get("{$this->baseURL}/route");
 
     // Log the responses for debugging.
     Log::info('Assignments Response:', $assignmentsResponse->json());
@@ -233,7 +235,7 @@ public function showTodayAssignments()
 public function getEmployeeLocation($employeeId)
 {
     try {
-        $response = Http::get("https://api.gsutil.xyz/employee/{$employeeId}/location");
+        $response = Http::get("{$this->baseURL}/employee/{$employeeId}/location");
 
         if ($response->successful()) {
             $locationData = $response->json()['location'];
@@ -250,7 +252,7 @@ public function getEmployeeLocation($employeeId)
 public function getClientsByRoute($routeId)
 {
     try {
-        $response = Http::get("https://api.gsutil.xyz/client/route/{$routeId}");
+        $response = Http::get("{$this->baseURL}/client/route/{$routeId}");
 
         if ($response->successful()) {
             $clientsData = $response->json();

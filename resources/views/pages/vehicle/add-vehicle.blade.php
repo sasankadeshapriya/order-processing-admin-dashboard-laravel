@@ -40,7 +40,7 @@
                                             <div class="form-group">
                                                 <label>Vehicle Number</label>
                                                 <input type="text" class="form-control" name="vehicle_no"
-                                                    placeholder="AB-1234 / ABC-1234 / 12-1234">
+                                                    placeholder="AB-1234 / ABC-1234 / 12-1234" id="vehicle_no">
                                                 <div class="invalid-feedback d-none" id="error-vehicle_no"></div>
                                             </div>
                                         </div>
@@ -69,6 +69,8 @@
                                 </div>
                                 <div class="card-footer">
                                     <button type="submit" class="btn btn-primary" id="submitBtn">Submit Vehicle</button>
+                                    <a href="{{ route('vehicle.manage') }}" class="btn btn-secondary">Back to
+                                        vehicles</a>
                                 </div>
                             </form>
                             <!-- /.card-body -->
@@ -90,6 +92,11 @@
     <script src="{{ asset('js/vehicle-actions.js') }}"></script>
     <script>
         $(document).ready(function() {
+            $('#vehicle_no').on('input', function() {
+                // Transform the vehicle number to uppercase
+                $(this).val($(this).val().toUpperCase());
+            });
+
             $('#vehicleForm').submit(function(event) {
                 event.preventDefault(); // Prevent default form submission
                 $('#submitBtn').prop('disabled', true).html(
@@ -101,6 +108,16 @@
                 $('.form-control').removeClass('is-invalid');
 
                 var formData = new FormData(this);
+
+                // Front-end validation for vehicle number
+                const vehicleNo = $('#vehicle_no').val();
+                const vehicleNoPattern = /^(?:[A-Za-z]{2}-\d{4}|[A-Za-z]{3}-\d{4}|\d{2}-\d{4})$/;
+                if (!vehicleNoPattern.test(vehicleNo)) {
+                    $('#error-vehicle_no').removeClass('d-none').text('Invalid vehicle number format');
+                    $('input[name="vehicle_no"]').addClass('is-invalid');
+                    $('#submitBtn').prop('disabled', false).html('Submit Vehicle');
+                    return;
+                }
 
                 // Perform form submission via AJAX
                 $.ajax({
