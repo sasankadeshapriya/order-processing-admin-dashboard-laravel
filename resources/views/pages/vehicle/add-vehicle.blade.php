@@ -91,65 +91,78 @@
 @section('scripts')
     <script src="{{ asset('js/vehicle-actions.js') }}"></script>
     <script>
-        $(document).ready(function() {
-            $('#vehicle_no').on('input', function() {
-                // Transform the vehicle number to uppercase
-                $(this).val($(this).val().toUpperCase());
+    $(document).ready(function() {
+        $('#vehicle_no').on('input', function() {
+            // Transform the vehicle number to uppercase
+            $(this).val($(this).val().toUpperCase());
+        });
+
+        $('#vehicleForm').submit(function(event) {
+            event.preventDefault(); // Prevent default form submission
+            $('#submitBtn').prop('disabled', true).html(
+                '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...'
+            );
+
+            // Clear all previous validation errors
+            $('.invalid-feedback').addClass('d-none').text('');
+            $('.form-control').removeClass('is-invalid');
+
+            var formData = new FormData(this);
+            var hasErrors = false;
+
+            // Check if required fields are empty
+            $('#vehicleForm').find('input[required], select[required]').each(function() {
+                if (!$(this).val()) {
+                    var fieldName = $(this).attr('name');
+                    $('#error-' + fieldName).removeClass('d-none').text('This field is required');
+                    $(this).addClass('is-invalid');
+                    hasErrors = true;
+                }
             });
 
-            $('#vehicleForm').submit(function(event) {
-                event.preventDefault(); // Prevent default form submission
-                $('#submitBtn').prop('disabled', true).html(
-                    '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...'
-                );
+            // Front-end validation for vehicle number only if the field is not empty
+            const vehicleNo = $('#vehicle_no').val();
+            if (vehicleNo && !/^(?:[A-Za-z]{2}-\d{4}|[A-Za-z]{3}-\d{4}|\d{2}-\d{4})$/.test(vehicleNo)) {
+                $('#error-vehicle_no').removeClass('d-none').text('Invalid vehicle number format');
+                $('#vehicle_no').addClass('is-invalid');
+                hasErrors = true;
+            }
 
-                // Clear all previous validation errors
-                $('.invalid-feedback').addClass('d-none').text('');
-                $('.form-control').removeClass('is-invalid');
+            if (hasErrors) {
+                $('#submitBtn').prop('disabled', false).html('Submit Vehicle');
+                return;
+            }
 
-                var formData = new FormData(this);
-
-                // Front-end validation for vehicle number
-                const vehicleNo = $('#vehicle_no').val();
-                const vehicleNoPattern = /^(?:[A-Za-z]{2}-\d{4}|[A-Za-z]{3}-\d{4}|\d{2}-\d{4})$/;
-                if (!vehicleNoPattern.test(vehicleNo)) {
-                    $('#error-vehicle_no').removeClass('d-none').text('Invalid vehicle number format');
-                    $('input[name="vehicle_no"]').addClass('is-invalid');
-                    $('#submitBtn').prop('disabled', false).html('Submit Vehicle');
-                    return;
-                }
-
-                // Perform form submission via AJAX
-                $.ajax({
-                    url: '{{ route('vehicle.submit') }}',
-                    type: 'POST',
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    success: function(response) {
-                        if (response.success) {
-                            toastr.success(response.message);
-                            $('#vehicleForm')[0].reset(); // Clear form fields on success
+            // Perform form submission via AJAX
+            $.ajax({
+                url: '{{ route('vehicle.submit') }}',
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(response) {
+                    if (response.success) {
+                        toastr.success(response.message);
+                        $('#vehicleForm')[0].reset(); // Clear form fields on success
+                    } else {
+                        if (response.errors) {
+                            $.each(response.errors, function(key, value) {
+                                $('#error-' + key).removeClass('d-none').text(value[0]);
+                                $('input[name="' + key + '"], select[name="' + key + '"]').addClass('is-invalid');
+                            });
                         } else {
-                            if (response.errors) {
-                                $.each(response.errors, function(key, value) {
-                                    $('#error-' + key).removeClass('d-none').text(value[0]);
-                                    $('input[name="' + key + '"], select[name="' + key +
-                                        '"]').addClass('is-invalid');
-                                });
-                            } else {
-                                toastr.error(response.message || 'Failed to add vehicle');
-                            }
+                            toastr.error(response.message || 'Failed to add vehicle');
                         }
-                    },
-                    error: function(xhr) {
-                        toastr.error('Error: ' + (xhr.responseJSON.message || xhr.statusText));
-                    },
-                    complete: function() {
-                        $('#submitBtn').prop('disabled', false).html('Submit Vehicle');
                     }
-                });
+                },
+                error: function(xhr) {
+                    toastr.error('Error: ' + (xhr.responseJSON ? xhr.responseJSON.message : xhr.statusText));
+                },
+                complete: function() {
+                    $('#submitBtn').prop('disabled', false).html('Submit Vehicle');
+                }
             });
         });
-    </script>
+    });
+</script>
 @endsection

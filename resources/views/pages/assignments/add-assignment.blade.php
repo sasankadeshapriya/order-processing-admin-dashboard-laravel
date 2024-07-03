@@ -151,7 +151,7 @@
                                         $('[name="' + key + '"]').addClass('is-invalid');
                                     });
                                 } else {
-                                    alert('Error adding assignment: ' + (response.message || "An unknown error occurred."));
+                                    toastr.error('Error adding assignment: ' + (response.message || "An unknown error occurred."));
                                 }
                             }
                             $('#submitBtn').prop('disabled', false).text('Submit Assignment'); // Re-enable submit button
@@ -161,7 +161,7 @@
                             if (xhr.responseJSON && xhr.responseJSON.message) {
                                 errorMessage = xhr.responseJSON.message;
                             }
-                            alert('Error adding assignment: ' + errorMessage);
+                            toastr.error('Error adding assignment: ' + errorMessage);
                             $('#submitBtn').prop('disabled', false).text('Submit Assignment'); // Re-enable submit button
                         }
                     });
