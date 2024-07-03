@@ -46,7 +46,7 @@ class ReportController extends Controller
         $filter = $request->query('filter', 'week');
         $startDate = $request->query('start_date');
         $endDate = $request->query('end_date');
-        $url = 'http://localhost:4000/outstanding';
+        $url = 'https://api.gsutil.xyz/outstanding';
 
         if ($startDate && $endDate) {
             $url .= '?filter=custom&start_date=' . $startDate . '&end_date=' . $endDate;
@@ -83,7 +83,7 @@ class ReportController extends Controller
             'end_date' => $endDate
         ]);
 
-        $url = 'http://localhost:4000/commission/report';
+        $url = 'https://api.gsutil.xyz/commission/report';
 
         if ($startDate && $endDate) {
             $url .= '?filter=custom&start_date=' . $startDate . '&end_date=' . $endDate;
@@ -118,7 +118,7 @@ class ReportController extends Controller
 
     public function getDayEndReport(Request $request)
     {
-        $url = 'http://localhost:4000/day-report'; // Assuming this is where the data comes from
+        $url = 'https://api.gsutil.xyz/day-report'; // Assuming this is where the data comes from
         $response = Http::get($url);
 
         if ($response->successful()) {

@@ -7,7 +7,7 @@
                 <img src="{{ asset('dist/img/user.svg') }}" class="img-circle elevation-2" alt="User Image">
             </div>
             <div class="info">
-                <a href="#" class="d-block">Sasanka Deshapriya</a>
+                <a href="#" class="d-block">{{ session('email') ?? 'No User Signed In' }}</a>
             </div>
         </div>
 
