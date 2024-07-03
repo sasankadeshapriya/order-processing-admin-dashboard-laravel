@@ -135,41 +135,55 @@
                 return; // Stop the form submission if there are validation errors
             }
 
+            // Check if the form data has changed
+            var currentFormData = $(this).serialize();
+            if (initialFormData === currentFormData) {
+                toastr.info('No changes detected. Please modify the data before updating.');
+                $submitBtn.prop('disabled', false).text('Update Assignment'); // Re-enable the submit button
+                return; // Stop the form submission if no changes are detected
+            }
+
             // If there are no validation errors, submit the form via AJAX
             $submitBtn.prop('disabled', true).html(
                 '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Updating...'
             );
 
-            var currentFormData = $(this).serialize();
-
             $.ajax({
-    url: $(this).attr('action'),
-    type: 'PUT', // Change to PUT since this is an update
-    data: currentFormData,
-    success: function(response) {
-    console.log('AJAX success callback executed');
-    if (response.success) {
-        toastr.success(response.message);
-        initialFormData = currentFormData; // Update the initial form data to current
-        $submitBtn.prop('disabled', false).text('Update Assignment'); // Re-enable the submit button
-    } else {
-        alert(response.message);
-        // Display field errors if present
-        if (response.errors && typeof response.errors === 'object' && Object.keys(response.errors).length > 0) {
-            $.each(response.errors, function(key, value) {
-                $('#error-' + key).removeClass('d-none').text(value[0]);
+                url: $(this).attr('action'),
+                type: 'PUT', // Change to PUT since this is an update
+                data: currentFormData,
+                beforeSend: function() {
+                    $submitBtn.prop('disabled', true).html(
+                        '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Updating...'
+                    );
+                },
+                success: function(response) {
+                    console.log('AJAX success callback executed');
+                    if (response.success) {
+                        toastr.success(response.message);
+                        initialFormData = currentFormData; // Update the initial form data to current
+                        $submitBtn.prop('disabled', false).text('Update Assignment'); // Re-enable the submit button
+                    } else {
+                        toastr.error(response.message);
+                        // Display field errors if present
+                        if (response.errors && typeof response.errors === 'object' && Object.keys(response.errors).length > 0) {
+                            $.each(response.errors, function(key, value) {
+                                $('#error-' + key).removeClass('d-none').text(value[0]);
+                            });
+                        }
+                        $submitBtn.prop('disabled', false).text('Update Assignment'); // Re-enable the submit button
+                    }
+                },
+                error: function(xhr) {
+                    console.log('AJAX error callback executed');
+                    var errorMessage = 'Error: ' + (xhr.responseJSON ? xhr.responseJSON.message : xhr.statusText);
+                    toastr.error(errorMessage);
+                    $submitBtn.prop('disabled', false).text('Update Assignment'); // Re-enable the submit button
+                },
+                complete: function() {
+                    $submitBtn.prop('disabled', false).text('Update Assignment'); // Re-enable the submit button
+                }
             });
-        }
-        $submitBtn.prop('disabled', false).text('Update Assignment'); // Re-enable the submit button
-    }
-},
-    error: function(xhr) {
-        console.log('AJAX error callback executed');
-        var errorMessage = 'Error: ' + (xhr.responseJSON ? xhr.responseJSON.message : xhr.statusText);
-        toastr.error(errorMessage);
-        $submitBtn.prop('disabled', false).text('Update Assignment'); // Re-enable the submit button
-    }
-});
         });
     });
 </script>
