@@ -29,12 +29,12 @@
                                   enctype="multipart/form-data" id="editVehicleForm">
                                 @csrf
                                 @method('PUT')
-                                <div class="card-body">
+                                <div class="card-body"> 
                                     <div class="row">
                                         <div class="col-sm-6">
                                             <div class="form-group">
                                                 <label>Vehicle Number</label>
-                                                <input type="text" class="form-control" name="vehicle_number"
+                                                <input type="text" class="form-control" name="vehicle_number"  placeholder="AB-1234 / ABC-1234 / 12-1234"
                                                        id="vehicle_no"
                                                        value="{{ isset($vehicle->vehicle_no) ? $vehicle->vehicle_no : '' }}">
                                                 <div class="invalid-feedback d-none" id="error-vehicle_number"></div>
@@ -43,7 +43,7 @@
                                         <div class="col-sm-6">
                                             <div class="form-group">
                                                 <label>Vehicle Name</label>
-                                                <input type="text" class="form-control" name="vehicle_name"
+                                                <input type="text" class="form-control" name="vehicle_name" placeholder="Delivery Truck"
                                                        value="{{ $vehicle->name }}">
                                                 <div class="invalid-feedback d-none" id="error-vehicle_name"></div>
                                             </div>
