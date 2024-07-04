@@ -12,10 +12,11 @@ use Illuminate\Support\Facades\Validator;
 
 class VehicleController extends Controller
 {
+    private $baseURL = 'https://api.gsutil.xyz';
    public function showData()
     {
         try {
-            $response = Http::get('https://api.gsutil.xyz/vehicle');
+            $response = Http::get("{$this->baseURL}/vehicle");
             $vehicles = $response->json();
 
             // Check if the response was successful (status code 2xx)
@@ -85,7 +86,7 @@ class VehicleController extends Controller
                 'added_by_admin_id' => $added_by_admin_id,
             ];
 
-            $vehicleResponse = Http::post('https://api.gsutil.xyz/vehicle', $vehicleData);
+            $vehicleResponse = Http::post("{$this->baseURL}/vehicle", $vehicleData);
 
             if ($vehicleResponse->successful()) {
                 return response()->json(['success' => true, 'message' => 'Vehicle added successfully']);
@@ -100,9 +101,8 @@ class VehicleController extends Controller
     }
 
     public function editVehicleForm($id)
-{
-    // Replace 'https://api.gsutil.xyz/vehicle/{id}' with your actual API URL
-    $response = Http::get("https://api.gsutil.xyz/vehicle/{$id}");
+    {
+    $response = Http::get("{$this->baseURL}/vehicle/{$id}");
 
     if ($response->successful()) {
         $vehicle = $response->json();
@@ -139,7 +139,7 @@ public function updateVehicle(Request $request, $id)
         \Log::info('Sending Data to API:', ['data' => $data]);
 
         // Send a PUT request to update the vehicle data
-        $response = Http::put("https://api.gsutil.xyz/vehicle/{$id}", $data);
+        $response = Http::put("{$this->baseURL}/vehicle/{$id}", $data);
 
         \Log::info('Response Status Code:', ['status' => $response->status()]);
         \Log::info('Response Body:', ['body' => $response->body()]);
@@ -148,7 +148,7 @@ public function updateVehicle(Request $request, $id)
             return response()->json(['success' => true, 'message' => 'Vehicle successfully updated']);
         } else {
             \Log::error('Failed to update vehicle:', ['error' => $response->json()]);
-            return response()->json(['success' => false, 'message' => 'Failed to update vehicle']);
+            return response()->json(['success' => false, 'message' => $response->json('message')]);
         }
     } catch (\Exception $e) {
         \Log::error('Exception:', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
@@ -156,10 +156,11 @@ public function updateVehicle(Request $request, $id)
     }
 }
 
+
 public function deleteVehicle($id)
 {
     try {
-        $response = Http::delete("https://api.gsutil.xyz/vehicle/$id");
+        $response = Http::delete("{$this->baseURL}/vehicle/$id");
 
         if ($response->successful()) {
             return response()->json(['success' => true]);
