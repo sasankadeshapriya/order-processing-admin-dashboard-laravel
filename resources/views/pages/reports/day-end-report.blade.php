@@ -194,9 +194,9 @@
                 products.forEach(product => {
                     table.row.add([
                         product.productName,
+                        product.productCode,
                         product.sku,
-                        product.quantity,
-                        product.productCode
+                        product.quantity
                     ]).draw();
                 });
             }
