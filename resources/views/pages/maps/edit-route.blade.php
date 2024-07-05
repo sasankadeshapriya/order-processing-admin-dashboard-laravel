@@ -19,7 +19,7 @@
             </div>
         </div>
     </section>
-    <section class="content">
+    <section class="content"> 
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12">
@@ -30,12 +30,16 @@
                                 @method('PUT')
                                 <div class="form-group">
                                     <label for="routeName">Route Name:</label>
-                                    <input type="text" class="form-control" id="routeName" name="route_name" value="{{ $route->name }}" required>
+                                    <input type="text" class="form-control" id="routeName" name="route_name" value="{{ $route->name }}" placeholder="Enter route name"> 
+                                    <div class="invalid-feedback d-none" id="error-route_name"></div>
                                 </div>
                                 <div id="map" style="height: 58vh;"></div>
                                 <input type="hidden" name="waypoints" id="waypointsField" />
                                 <input type="hidden" name="added_by_admin_id" value="1" />
-                                <button type="submit" class="btn btn-primary mt-3">Update Route</button>
+                                <button type="submit" class="btn btn-primary mt-3">
+                                    <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span> 
+                                    Update Route
+                                </button>
                                 <button type="button" class="btn btn-secondary mt-3" id="undoButton">Undo</button>
                                 <button type="button" class="btn btn-danger mt-3" id="clearButton">Clear All</button>
                                 <button type="button" class="btn btn-secondary mt-3" onclick="window.location.href='{{ route('route.manage') }}'">Back to Routes</button>
@@ -59,16 +63,35 @@
 <script>
     let map, directionsService, directionsRenderer;
     let routePoints = JSON.parse(@json($route->waypoints));
+    let startMarker;
     let clientLocations = []; // Array to hold client locations
 
     function initMap() {
         const mapOptions = {
             zoom: 7,
             center: { lat: 7.8731, lng: 80.7718 },
+            minZoom: 6,
+            restriction: {
+                latLngBounds: {
+                    north: 10.2,
+                    south: 5.7,
+                    east: 82.0,
+                    west: 79.5,
+                },
+                strictBounds: false
+            }
         };
         map = new google.maps.Map(document.getElementById('map'), mapOptions);
         directionsService = new google.maps.DirectionsService();
-        directionsRenderer = new google.maps.DirectionsRenderer({map: map, draggable: true});
+        directionsRenderer = new google.maps.DirectionsRenderer({
+            map: map,
+            draggable: true,
+            polylineOptions: {
+                strokeColor: '#FF0000', // Set polyline color to red
+                strokeOpacity: 1.0,
+                strokeWeight: 4
+            }
+        });
 
         renderRoute();
 
@@ -87,18 +110,70 @@
 
     function undoLastWaypoint() {
         if (routePoints.length > 0) {
-            routePoints.pop();
-            renderRoute();
+            routePoints.pop(); // Remove the last point
+
+            if (routePoints.length === 0) {
+                if (startMarker) {
+                    startMarker.setMap(null); // Remove start marker if no points left
+                }
+                directionsRenderer.setDirections({ routes: [] }); // Clear the route
+            } else if (routePoints.length === 1) {
+                // If only one point is left, set it as the start marker and clear the route
+                if (startMarker) {
+                    startMarker.setMap(null);
+                }
+                startMarker = new google.maps.Marker({
+                    position: new google.maps.LatLng(routePoints[0].latitude, routePoints[0].longitude),
+                    map: map,
+                    title: 'Start Point',
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        fillColor: '#FF0000',
+                        fillOpacity: 1,
+                        strokeWeight: 1,
+                        strokeColor: '#FFFFFF',
+                        scale: 10
+                    }
+                });
+                directionsRenderer.setDirections({ routes: [] });
+            } else {
+                renderRoute(); // Recalculate and display the route
+            }
         }
     }
 
     function clearWaypoints() {
         routePoints = [];
-        renderRoute();
+        if (startMarker) {
+            startMarker.setMap(null); // Remove start marker
+        }
+        directionsRenderer.setDirections({ routes: [] });
     }
 
     function renderRoute() {
-        if (routePoints.length < 2) {
+        if (routePoints.length === 1) {
+            const firstPoint = routePoints[0];
+            if (!startMarker) {
+                startMarker = new google.maps.Marker({
+                    position: new google.maps.LatLng(firstPoint.latitude, firstPoint.longitude),
+                    map: map,
+                    title: 'Start Point',
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        fillColor: '#FF0000',
+                        fillOpacity: 1,
+                        strokeWeight: 1,
+                        strokeColor: '#FFFFFF',
+                        scale: 10
+                    }
+                });
+            } else {
+                startMarker.setPosition(new google.maps.LatLng(firstPoint.latitude, firstPoint.longitude));
+                startMarker.setMap(map);
+            }
+            directionsRenderer.setDirections({ routes: [] });
+            return;
+        } else if (routePoints.length < 2) {
             directionsRenderer.setDirections({ routes: [] });
             return;
         }
@@ -111,6 +186,25 @@
         const origin = waypoints.shift().location;
         const destination = waypoints.pop().location;
 
+        // Create start marker if it doesn't exist
+        if (!startMarker) {
+            startMarker = new google.maps.Marker({
+                position: origin,
+                map: map,
+                title: 'Start Point',
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    fillColor: '#FF0000',
+                    fillOpacity: 1,
+                    strokeWeight: 1,
+                    strokeColor: '#FFFFFF',
+                    scale: 10
+                }
+            });
+        } else {
+            startMarker.setPosition(origin); // Update position if marker already exists
+        }
+
         directionsService.route({
             origin: origin,
             destination: destination,
@@ -119,10 +213,20 @@
         }, function(response, status) {
             if (status === 'OK') {
                 directionsRenderer.setDirections(response);
+                focusOnPolyline(response);
             } else {
                 console.error('Failed to render directions due to:', status);
             }
         });
+    }
+
+    function focusOnPolyline(response) {
+        const bounds = new google.maps.LatLngBounds();
+        const route = response.routes[0].overview_path;
+        for (let i = 0; i < route.length; i++) {
+            bounds.extend(route[i]);
+        }
+        map.fitBounds(bounds);
     }
 
     function fetchClientLocations() {
@@ -149,7 +253,6 @@
                 title: client.organization_name
             });
 
-            // Optional: Add info window to marker
             const infoWindow = new google.maps.InfoWindow({
                 content: `<strong>${client.organization_name}</strong><br>Lat: ${client.latitude}, Lng: ${client.longitude}`
             });
@@ -160,34 +263,82 @@
         });
     }
 
-    document.getElementById('updateRouteForm').addEventListener('submit', function(e) {
+    document.addEventListener('DOMContentLoaded', function () {
+    const updateRouteForm = document.getElementById('updateRouteForm');
+    const submitButton = updateRouteForm.querySelector('button[type="submit"]');
+    const routeNameInput = document.getElementById('routeName');
+    const spinner = submitButton.querySelector('.spinner-border');
+    let initialFormData = getFormDataAsJson(updateRouteForm);
+    let initialWaypoints = JSON.stringify(routePoints);
+
+    updateRouteForm.addEventListener('submit', function(e) {
         e.preventDefault();
+
+        const currentFormData = getFormDataAsJson(updateRouteForm);
+
+        if (JSON.stringify(routePoints) === initialWaypoints && initialFormData === currentFormData) {
+            toastr.info('No changes detected. Please modify the data before updating.');
+            return;
+        }
+
+        // Validate route name
+        const routeName = routeNameInput.value.trim();
+        let hasError = false;
+
+        if (!routeName) {
+            routeNameInput.classList.add('is-invalid');
+            document.getElementById('error-route_name').textContent = 'Route name is required.';
+            document.getElementById('error-route_name').classList.remove('d-none');
+            hasError = true;
+        } else {
+            routeNameInput.classList.remove('is-invalid');
+            document.getElementById('error-route_name').classList.add('d-none');
+        }
+
         if (routePoints.length < 2) {
             toastr.error('Please add at least two waypoints to update the route.');
+            hasError = true;
+        }
+
+        if (hasError) {
             return;
         }
 
         document.getElementById('waypointsField').value = JSON.stringify(routePoints);
-        var formData = new FormData(this);
 
-        fetch($(this).attr('action'), {
+        spinner.classList.remove('d-none');
+        submitButton.disabled = true;
+
+        fetch(updateRouteForm.action, {
             method: 'POST',
-            body: formData
+            body: new FormData(updateRouteForm)
         }).then(response => response.json())
         .then(data => {
             if (data.success) {
                 toastr.success(data.message || 'Route successfully updated.');
+                initialFormData = currentFormData;
+                initialWaypoints = JSON.stringify(routePoints); // Update initial waypoints
             } else {
                 toastr.error(data.message || 'Failed to update route.');
             }
         }).catch(error => {
             toastr.error('Error: ' + error.message);
+        }).finally(() => {
+            spinner.classList.add('d-none');
+            submitButton.disabled = false;
         });
     });
 
+    function getFormDataAsJson(form) {
+        const formData = new FormData(form);
+        const formObject = {};
+        formData.forEach((value, key) => formObject[key] = value);
+        return JSON.stringify(formObject);
+    }
+
     document.getElementById('undoButton').addEventListener('click', undoLastWaypoint);
     document.getElementById('clearButton').addEventListener('click', clearWaypoints);
+});
+
 </script>
 @endsection
-
-
