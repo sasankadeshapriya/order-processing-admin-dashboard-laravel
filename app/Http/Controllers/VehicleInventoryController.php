@@ -186,7 +186,7 @@ class VehicleInventoryController extends Controller
         try {
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json'
-            ])->put("http://api.gsutil.xyz/vehicle-inventory/{$id}", $data);
+            ])->put("http://api.gsutil.xyz/vehicle-inventory/admin/{$id}", $data);
 
             if ($response->successful()) {
                 $responseBody = $response->json();
