@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Validator;
 class AssignmentController extends Controller
 {
     private $baseURL = 'https://api.gsutil.xyz';
+    //private $baseURL = ' http://127.0.0.1:4000';
     public function showAssignments()
 {
     $assignmentsResponse = Http::get("{$this->baseURL}/assignment");
