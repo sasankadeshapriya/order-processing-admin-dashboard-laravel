@@ -8,6 +8,7 @@ use App\Http\Controllers\MapController;
 use App\Http\Controllers\VehicleInventoryController;
 use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ClientController;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
@@ -183,6 +184,14 @@ Route::middleware(['web'])->group(function () {
     //mrp report
     Route::get('/mrp-report', [ReportController::class, 'showMrpReport'])->name('mrp-report.show');
     Route::get('/api/mrp-data', [ReportController::class, 'getMrpReportData'])->name('mrp-report.data');
+
+    // Client Routes
+    Route::get('/client', [ClientController::class, 'showData'])->name('client.manage');
+    Route::delete('/client/{id}', [ClientController::class, 'deleteClient'])->name('client.delete');
+    Route::get('/add-client', [ClientController::class, 'addClientForm'])->name('client.add');
+    Route::post('/add-client', [ClientController::class, 'submitClient'])->name('client.submit');
+    Route::get('/client/edit/{id}', [ClientController::class, 'editClientForm'])->name('client.edit');
+    // Route::put('/client/update/{id}', [ClientController::class, 'updateClient'])->name('client.update');
 
 });
 

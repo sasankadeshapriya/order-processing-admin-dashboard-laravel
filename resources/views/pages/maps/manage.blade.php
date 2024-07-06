@@ -102,55 +102,84 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}" async defer></script>
     <script>
-        // Event handler for clicking the third column of a table row
-        $('#example1 tbody').on('click', 'td:nth-child(3)', function() {
-            var waypoints = $(this).data('waypoints'); // Extract waypoints data
+    // Event handler for clicking the third column of a table row
+    $('#example1 tbody').on('click', 'td:nth-child(3)', function() {
+        var waypoints = $(this).data('waypoints'); // Extract waypoints data
 
-            $('#mapModal').modal('show'); // Show modal with map
-            $('#mapModal').on('shown.bs.modal', function() {
-                initMapModal(waypoints); // Initialize map in modal after it is shown
-            });
+        $('#mapModal').modal('show'); // Show modal with map
+        $('#mapModal').on('shown.bs.modal', function() {
+            initMapModal(waypoints); // Initialize map in modal after it is shown
+        });
+    });
+
+    function initMapModal(waypoints) {
+        const sriLankaCenter = { lat: 7.8731, lng: 80.7718 };
+        const mapOptions = {
+            zoom: 7,
+            center: sriLankaCenter,
+            minZoom: 6,
+            restriction: {
+                latLngBounds: {
+                    north: 10.2,
+                    south: 5.7,
+                    east: 82.0,
+                    west: 79.5,
+                },
+                strictBounds: false
+            }
+        };
+
+        var map = new google.maps.Map(document.getElementById('popupMap'), mapOptions);
+
+        var directionsService = new google.maps.DirectionsService();
+        var directionsRenderer = new google.maps.DirectionsRenderer({
+            draggable: false,
+            map: map,
+            polylineOptions: {
+                strokeColor: '#FF0000', // Set polyline color to red
+                strokeOpacity: 1.0,
+                strokeWeight: 4
+            },
+            panel: document.getElementById('directionsPanel') // Set panel for directions
         });
 
-        function initMapModal(waypoints) {
-            var map = new google.maps.Map(document.getElementById('popupMap'), {
-                center: { lat: waypoints[0].latitude, lng: waypoints[0].longitude }, // Set map center
-                zoom: 12 // Set zoom level
-            });
+        calculateAndDisplayRoute(directionsService, directionsRenderer, waypoints);
+    }
 
-            var directionsService = new google.maps.DirectionsService();
-            var directionsRenderer = new google.maps.DirectionsRenderer({
-                draggable: false,
-                map: map,
-                panel: document.getElementById('directionsPanel') // Set panel for directions
-            });
+    function calculateAndDisplayRoute(directionsService, directionsRenderer, waypoints) {
+        var waypointMarkers = waypoints.map(point => ({
+            location: new google.maps.LatLng(point.latitude, point.longitude),
+            stopover: true
+        }));
 
-            calculateAndDisplayRoute(directionsService, directionsRenderer, waypoints); // Calculate and display the route
+        var origin = waypointMarkers.shift().location;
+        var destination = waypointMarkers.pop().location;
+
+        directionsService.route({
+            origin: origin,
+            destination: destination,
+            waypoints: waypointMarkers,
+            travelMode: 'DRIVING'
+        }, function(response, status) {
+            if (status === 'OK') {
+                directionsRenderer.setDirections(response);
+                focusOnPolyline(response, directionsRenderer.getMap()); // Focus camera on the polyline
+            } else {
+                window.alert('Directions request failed due to ' + status);
+            }
+        });
+    }
+
+    function focusOnPolyline(response, map) {
+        const bounds = new google.maps.LatLngBounds();
+        const route = response.routes[0].overview_path;
+        for (let i = 0; i < route.length; i++) {
+            bounds.extend(route[i]);
         }
+        map.fitBounds(bounds);
+    }
+</script>
 
-        function calculateAndDisplayRoute(directionsService, directionsRenderer, waypoints) {
-            var waypointMarkers = waypoints.map(point => ({
-                location: new google.maps.LatLng(point.latitude, point.longitude), // Create waypoints
-                stopover: true
-            }));
-
-            var origin = waypointMarkers.shift().location; // Set the first waypoint as origin
-            var destination = waypointMarkers.pop().location; // Set the last waypoint as destination
-
-            directionsService.route({
-                origin: origin,
-                destination: destination,
-                waypoints: waypointMarkers, // Set intermediate waypoints
-                travelMode: 'DRIVING' // Set travel mode
-            }, function(response, status) {
-                if (status === 'OK') {
-                    directionsRenderer.setDirections(response); // Render the directions
-                } else {
-                    window.alert('Directions request failed due to ' + status); // Alert on failure
-                }
-            });
-        }
-        </script>
     <script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=&v=weekly" async defer></script>
     <script src="{{ asset('plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 

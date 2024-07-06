@@ -122,6 +122,33 @@
 
                 <!-- Vehicle Section -->
                 <li
+                    class="nav-item has-treeview {{ request()->is('client') || request()->is('client/*') || request()->is('add-client') ? 'menu-open' : '' }}">
+                    <a href="#"
+                        class="nav-link {{ request()->is('client') || request()->is('client/*') || request()->is('add-client') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-users"></i>
+                        <p>Client <i class="right fas fa-angle-left"></i></p>
+                    </a>
+                    <ul class="nav nav-treeview"
+                        style="{{ request()->is('client') || request()->is('client/*') || request()->is('add-client') ? 'display: block;' : 'display: none;' }}">
+                        <li class="nav-item">
+                            <a href="{{ route('client.add') }}"
+                                class="nav-link {{ request()->is('add-client') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Add Client</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('client.manage') }}"
+                                class="nav-link {{ request()->is('client') && !request()->is('client/*') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Manage Clients</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- Vehicle Section -->
+                <li
                     class="nav-item has-treeview {{ request()->is('vehicle') || request()->is('vehicle/*') || request()->is('add-vehicle') ? 'menu-open' : '' }}">
                     <a href="#"
                         class="nav-link {{ request()->is('vehicle') || request()->is('vehicle/*') || request()->is('add-vehicle') ? 'active' : '' }}">
