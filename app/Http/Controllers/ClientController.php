@@ -10,34 +10,28 @@ use Illuminate\Support\Facades\Validator;
 
 class ClientController extends Controller
 {
+    //private $baseURL = ' http://127.0.0.1:4000/client';
+    
     public function showData()
     {
+        $clients = [];
         try {
             $response = Http::get('https://api.gsutil.xyz/client');
-            $clients = $response->json();
-
             if ($response->successful()) {
-                return view('pages.client.client', compact('clients'));
+                $clients = $response->json();
             } else {
                 Log::error('API Error: ' . $response->status());
-                return view('pages.error')->with([
-                    'errorCode' => $response->status(),
-                ]);
             }
         } catch (RequestException $e) {
             Log::error('Request Exception: ' . $e->getMessage());
-            return view('pages.error')->with([
-                'errorCode' => $e->response->status(),
-                'errorMessage' => $e->response->json()
-            ]);
         } catch (\Exception $e) {
             Log::error('General Exception: ' . $e->getMessage());
-            return view('pages.error')->with([
-                'errorCode' => $e->getCode(),
-                'errorMessage' => 'General Error: ' . $e->getMessage()
-            ]);
         }
+    
+        return view('pages.client.client', compact('clients'));
     }
+    
+    
 
     public function addClientForm()
     {
@@ -95,6 +89,122 @@ class ClientController extends Controller
             \Log::error('Error: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Server error: Unable to add client', 'errorDetail' => $e->getMessage()]);
         }
-    }    
+    } 
+    
+    public function editClientForm($id)
+{
+    try {
+        // Fetch the client data
+        $clientResponse = Http::get("https://api.gsutil.xyz/client/{$id}");
+        
+        if ($clientResponse->successful()) {
+            $client = $clientResponse->json();
+        } else {
+            return redirect()->route('client.manage')->withErrors('Client not found.');
+        }
+        
+        // Fetch the routes data
+        $routesResponse = Http::get('https://api.gsutil.xyz/route'); // Adjust the endpoint as necessary
+        
+        if ($routesResponse->successful()) {
+            $routes = $routesResponse->json();
+            Log::info('Routes data fetched successfully:', $routes);
+        } else {
+            Log::error('Error fetching routes: ' . $routesResponse->status());
+            $routes = [];
+        }
+
+        return view('pages.client.edit-client', ['client' => (object) $client, 'routes' => $routes]);
+    } catch (\Exception $e) {
+        Log::error('Exception in editClientForm: ' . $e->getMessage());
+        return redirect()->route('client.manage')->withErrors('An error occurred while fetching client data.');
+    }
+}
+
+
+    
+
+public function updateClient(Request $request, $id)
+{
+    $validator = Validator::make($request->all(), [
+        'name' => 'required|string|min:2|max:50',
+        'organization_name' => 'nullable|string|max:100',
+        'phone_no' => 'required|string|min:10|max:15',
+        'status' => 'required|in:verified,not verified',
+        'discount' => 'nullable|numeric|min:0|max:100',
+        'credit_limit' => 'nullable|numeric|min:0',
+        'credit_period' => 'nullable|numeric|min:1',
+        'route_id' => 'required|numeric',
+        'latitude' => 'nullable|numeric',
+        'longitude' => 'nullable|numeric',
+        'added_by_employee_id' => 'required|numeric'
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['success' => false, 'errors' => $validator->errors()]);
+    }
+
+    $data = $request->except(['_token', '_method']);
+    
+    $response = Http::put("https://api.gsutil.xyz/client/{$id}", $data);
+
+    if ($response->successful()) {
+        return response()->json(['success' => true, 'message' => 'Client successfully updated']);
+    } else {
+        return response()->json(['success' => false, 'message' => 'Failed to update client']);
+    }
+}
+
+// Method to toggle client status
+public function toggleClientStatus(Request $request, $id)
+{
+    // Validate the request data
+    $validator = Validator::make($request->all(), [
+        'status' => 'required|string|in:verified,not verified',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['success' => false, 'errors' => $validator->errors()]);
+    }
+
+    try {
+        $validatedData = $validator->validated();
+        $status = $validatedData['status'];
+
+        // Make the API request with the validated status
+        $response = Http::post("https://api.gsutil.xyz/client/verify/{$id}", [
+            'status' => $status
+        ]);
+
+        if ($response->successful()) {
+            return response()->json(['success' => true, 'message' => 'Client status updated successfully']);
+        } else {
+            Log::error('API Error: ' . $response->status());
+            return response()->json(['success' => false, 'message' => 'Failed to update client status']);
+        }
+    } catch (RequestException $e) {
+        Log::error('Request Exception: ' . $e->getMessage());
+        return response()->json(['success' => false, 'message' => 'Request error: ' . $e->getMessage()]);
+    } catch (\Exception $e) {
+        Log::error('General Exception: ' . $e->getMessage());
+        return response()->json(['success' => false, 'message' => 'Server error: ' . $e->getMessage()]);
+    }
+}
+
+public function deleteClient($id)
+    {
+        try {
+            $response = Http::delete("https://api.gsutil.xyz/client/$id");
+
+            if ($response->successful()) {
+                return response()->json(['success' => true]);
+            } else {
+                return response()->json(['success' => false, 'message' => 'Failed to delete client']);
+            }
+        } catch (\Exception $e) {
+            \Log::error('General Exception: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Server error: Unable to delete client']);
+        }
+    }
     
 }

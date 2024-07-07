@@ -90,6 +90,9 @@
                                             @foreach ($routes as $route)
                                                 <option value="{{ $route['id'] }}">{{ $route['name'] }}</option>
                                             @endforeach
+                                            @if (empty($routes))
+                                                    <option value="" disabled>No routes available</option>
+                                            @endif
                                         </select>
                                         <div class="invalid-feedback d-none" id="error-route_id"></div>
                                     </div>
