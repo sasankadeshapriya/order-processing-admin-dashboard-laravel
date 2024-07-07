@@ -255,3 +255,21 @@ Route::post('/api/proxy/change-password', function (Request $request) {
         ->header('Access-Control-Allow-Methods', 'POST')
         ->header('Access-Control-Allow-Headers', 'Content-Type');
 });
+
+
+Route::put('/api/proxy/vehicle-inventory/toggle-looked/{id}', function (Request $request, $id) {
+    \Log::info('Toggle looked request received for ID: ' . $id, $request->all());
+
+    $response = Http::withHeaders([
+        'Content-Type' => 'application/json',
+        'Accept' => 'application/json',
+    ])->put('http://api.gsutil.xyz/vehicle-inventory/toggle-looked/' . $id, $request->all());
+
+    \Log::info('Response from external API', ['response' => $response->json()]);
+
+    return response()->json($response->json(), $response->status())
+        ->header('Content-Type', 'application/json')
+        ->header('Access-Control-Allow-Origin', '*')
+        ->header('Access-Control-Allow-Methods', 'PUT')
+        ->header('Access-Control-Allow-Headers', 'Content-Type');
+});

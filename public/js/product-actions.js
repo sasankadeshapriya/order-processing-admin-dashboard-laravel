@@ -4,7 +4,7 @@ $(document).ready(function() {
 
         Swal.fire({
             title: 'Are you sure?',
-            text: "You won't be able to revert this!",
+            text: "Warning: Deleting batches and unlocked vehicle inventories! Proceed with caution.",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#C8B400',
@@ -28,7 +28,7 @@ $(document).ready(function() {
                             toastr.success('Product deleted successfully');
                             $('#example1').DataTable().row($('button[data-id="' + id + '"]').closest('tr')).remove().draw();
                         } else {
-                            toastr.error(response.message || 'Failed to delete product');
+                            toastr.error(response.message || 'Failed to delete product *Please unlock related vehicle inventories before deleting the product.');
                         }
                     },
                     error: function(xhr) {

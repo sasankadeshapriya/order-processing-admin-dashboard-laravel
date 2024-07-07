@@ -48,19 +48,24 @@
                                             @foreach ($clients as $key => $client)
                                                 <tr>
                                                     <td>{{ ++$key }}</td>
-                                                    <td>{{ $client['name'] }}</td>
-                                                    <td>{{ $client['organization_name'] }}</td>
-                                                    <td data-lat="{{ $client['latitude'] ?? 'null' }}" data-lng="{{ $client['longitude'] ?? 'null' }}">
-                                                        <button type="button" class="btn btn-info btn-sm view-map-btn">View Map</button>
+                                                    <td>{{ $client['name'] ?? 'N/A' }}</td>
+                                                    <td>{{ $client['organization_name'] ?? 'N/A' }}</td>
+                                                    <td data-lat="{{ $client['latitude'] ?? 'null' }}"
+                                                        data-lng="{{ $client['longitude'] ?? 'null' }}">
+                                                        <button type="button" class="btn btn-info btn-sm view-map-btn">View
+                                                            Map</button>
                                                     </td>
-                                                    <td>{{ $client['phone_no'] }}</td>
-                                                    <td>{{ $client['status'] }}</td>
+                                                    <td>{{ $client['phone_no'] ?? 'N/A' }}</td>
+                                                    <td>{{ $client['status'] ?? 'N/A' }}</td>
                                                     <td>
                                                         <div class="d-flex">
-                                                            <a href="{{ route('client.edit', $client['id']) }}" class="btn btn-secondary btn-sm mr-2">
+                                                            <a href="{{ route('client.edit', $client['id']) }}"
+                                                                class="btn btn-secondary btn-sm mr-2">
                                                                 <i class="fas fa-pencil-alt"></i>
                                                             </a>
-                                                            <button type="button" class="btn btn-danger btn-sm delete-client" data-id="{{ $client['id'] }}">
+                                                            <button type="button"
+                                                                class="btn btn-danger btn-sm delete-client"
+                                                                data-id="{{ $client['id'] }}">
                                                                 <i class="fas fa-trash"></i>
                                                             </button>
                                                         </div>
@@ -110,41 +115,45 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}" async defer></script>
     <script>
-    $(document).ready(function () {
-        $('.view-map-btn').on('click', function () {
-            var lat = $(this).closest('td').data('lat');
-            var lng = $(this).closest('td').data('lng');
+        $(document).ready(function() {
+            $('.view-map-btn').on('click', function() {
+                var lat = $(this).closest('td').data('lat');
+                var lng = $(this).closest('td').data('lng');
 
-            $('#mapModal').modal('show');
-            $('#mapModal').on('shown.bs.modal', function () {
-                initMapModal(lat, lng);
+                $('#mapModal').modal('show');
+                $('#mapModal').on('shown.bs.modal', function() {
+                    initMapModal(lat, lng);
+                });
             });
         });
-    });
 
-    function initMapModal(lat, lng) {
-    const modalBody = document.querySelector('#mapModal .modal-body');
-    if (lat == null || lng == null) {
-        modalBody.innerHTML = '<p class="text-center text-danger">Location data not available.</p>';
-        modalBody.style.height = '400px'; // keep the height consistent
-    } else {
-        modalBody.innerHTML = '<div id="popupMap" style="height: 400px;"></div>';
-        const location = { lat: parseFloat(lat), lng: parseFloat(lng) };
-        const mapOptions = {
-            zoom: 15,
-            center: location
-        };
+        function initMapModal(lat, lng) {
+            const modalBody = document.querySelector('#mapModal .modal-body');
+            if (lat == null || lng == null) {
+                modalBody.innerHTML = '<p class="text-center text-danger">Location data not available.</p>';
+                modalBody.style.height = '400px'; // keep the height consistent
+            } else {
+                modalBody.innerHTML = '<div id="popupMap" style="height: 400px;"></div>';
+                const location = {
+                    lat: parseFloat(lat),
+                    lng: parseFloat(lng)
+                };
+                const mapOptions = {
+                    zoom: 15,
+                    center: location
+                };
 
-        var map = new google.maps.Map(document.getElementById('popupMap'), mapOptions);
+                var map = new google.maps.Map(document.getElementById('popupMap'), mapOptions);
 
-        new google.maps.Marker({
-            position: location,
-            map: map
-        });
-    }
-}
+                new google.maps.Marker({
+                    position: location,
+                    map: map
+                });
+            }
+        }
     </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=&v=weekly" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=&v=weekly" async
+        defer></script>
     <script src="{{ asset('plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="../../plugins/datatables/jquery.dataTables.min.js"></script>
     <script src="../../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>

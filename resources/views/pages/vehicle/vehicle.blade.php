@@ -51,9 +51,9 @@
                                             @foreach ($vehicles as $key => $vehicle)
                                                 <tr>
                                                     <td>{{ ++$key }}</td>
-                                                    <td>{{ $vehicle['vehicle_no'] }}</td>
-                                                    <td>{{ $vehicle['name'] }}</td>
-                                                    <td>{{ $vehicle['type'] }}</td>
+                                                    <td>{{ $vehicle['vehicle_no'] ?? 'N/A' }}</td>
+                                                    <td>{{ $vehicle['name'] ?? 'N/A' }}</td>
+                                                    <td>{{ $vehicle['type'] ?? 'N/A' }}</td>
                                                     <td>
                                                         <div class="d-flex">
                                                             <a href="{{ route('vehicle.edit', $vehicle['id']) }}"
