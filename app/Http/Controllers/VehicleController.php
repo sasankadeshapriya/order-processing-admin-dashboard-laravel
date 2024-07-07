@@ -11,52 +11,30 @@ use Illuminate\Support\Facades\Validator;
 
 
 class VehicleController extends Controller
-{
+{ 
     private $baseURL = 'https://api.gsutil.xyz';
-    //private $baseURL = ' http://127.0.0.1:4000';
    
-   public function showData()
+    public function showData()
     {
+        $vehicles = [];
+    
         try {
             $response = Http::get("{$this->baseURL}/vehicle");
-            $vehicles = $response->json();
-
-            // Check if the response was successful (status code 2xx)
+    
             if ($response->successful()) {
                 $vehicles = $response->json();
-                return view('pages.vehicle.vehicle', compact('vehicles'));
             } else {
-                // Log the error
-                \Log::error('API Error: ' . $response->status());
-
-                // Return the error view with status code and message
-                return view('pages.error')->with([
-                    'errorCode' => $response->status(),
-                ]);
+                Log::error('API Error: ' . $response->status());
             }
         } catch (RequestException $e) {
-            // Log the error
-            \Log::error('Request Exception: ' . $e->getMessage());
-
-            // Get the HTTP status code from the response headers
-            $statusCode = $e->response->status();
-
-            // Return the error view with status code and message
-            return view('pages.error')->with([
-                'errorCode' => $statusCode,
-                'errorMessage' => $e->response->json() // Assuming the API returns error messages in JSON format
-            ]);
+            Log::error('Request Exception: ' . $e->getMessage());
         } catch (\Exception $e) {
-            // Log the error
-            \Log::error('General Exception: ' . $e->getMessage());
-
-            // Return the error view with error code and description
-            return view('pages.error')->with([
-                'errorCode' => $e->getCode(),
-                'errorMessage' => 'General Error: ' . $e->getMessage()
-            ]);
+            Log::error('General Exception: ' . $e->getMessage());
         }
+    
+        return view('pages.vehicle.vehicle', compact('vehicles'));
     }
+    
 
     public function addVehicleForm()
     {

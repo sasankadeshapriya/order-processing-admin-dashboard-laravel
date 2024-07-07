@@ -55,8 +55,12 @@ class MapController extends Controller
     }
 
     public function showData()
-    {
+{
+    $routes = [];
+    
+    try {
         $response = Http::get('http://api.gsutil.xyz/route');
+
         if ($response->successful()) {
             $routes = $response->json();
 
@@ -80,14 +84,18 @@ class MapController extends Controller
                     $route['waypoints_summary'] = 'No waypoints defined';
                 }
             }
-            return view('pages.maps.manage', compact('routes'));
         } else {
-            return view('pages.error')->with([
-                'errorCode' => $response->status(),
-                'errorMessage' => 'Failed to retrieve routes.'
-            ]);
+            Log::error('API Error: ' . $response->status());
         }
+    } catch (RequestException $e) {
+        Log::error('Request Exception: ' . $e->getMessage());
+    } catch (\Exception $e) {
+        Log::error('General Exception: ' . $e->getMessage());
     }
+
+    return view('pages.maps.manage', compact('routes'));
+}
+
 
     public function editRouteForm($id)
     {
