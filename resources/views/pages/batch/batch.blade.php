@@ -57,15 +57,15 @@
                                             @foreach ($items as $key => $item)
                                                 <tr>
                                                     <td>{{ ++$key }}</td>
-                                                    <td>{{ $item['Product']['name'] }}</td>
-                                                    <td>{{ $item['Product']['product_code'] }}</td>
-                                                    <td>{{ $item['sku'] }}</td>
-                                                    <td>{{ $item['quantity'] }}</td>
-                                                    <td>{{ $item['buy_price'] }}</td>
-                                                    <td>{{ $item['cash_price'] }}</td>
-                                                    <td>{{ $item['check_price'] }}</td>
-                                                    <td>{{ $item['credit_price'] }}</td>
-                                                    <td>{{ $item['expire_date'] }}</td>
+                                                    <td>{{ $item['Product']['name'] ?? 'N/A' }}</td>
+                                                    <td>{{ $item['Product']['product_code'] ?? 'N/A' }}</td>
+                                                    <td>{{ $item['sku'] ?? 'N/A' }}</td>
+                                                    <td>{{ $item['quantity'] ?? 'N/A' }}</td>
+                                                    <td>{{ $item['buy_price'] ?? 'N/A' }}</td>
+                                                    <td>{{ $item['cash_price'] ?? 'N/A' }}</td>
+                                                    <td>{{ $item['check_price'] ?? 'N/A' }}</td>
+                                                    <td>{{ $item['credit_price'] ?? 'N/A' }}</td>
+                                                    <td>{{ $item['expire_date'] ?? 'N/A' }}</td>
                                                     <td>
                                                         <div class="d-flex">
                                                             <a href="{{ route('batch.edit', $item['id']) }}"

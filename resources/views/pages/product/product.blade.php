@@ -53,16 +53,20 @@
                                             @foreach ($products as $key => $product)
                                                 <tr>
                                                     <td>{{ ++$key }}</td>
-                                                    <td>{{ $product['name'] }}</td>
-                                                    <td>{{ $product['product_code'] }}</td>
-                                                    <td>{{ $product['description'] }}</td>
-                                                    <td>{{ $product['measurement_unit'] }}</td>
+                                                    <td>{{ $product['name'] ?? 'N/A' }}</td>
+                                                    <td>{{ $product['product_code'] ?? 'N/A' }}</td>
+                                                    <td>{{ $product['description'] ?? 'N/A' }}</td>
+                                                    <td>{{ $product['measurement_unit'] ?? 'N/A' }}</td>
                                                     <td>
-                                                        <a href="javascript:void(0);"
-                                                            onclick="openImagePopup('{{ $product['product_image'] }}')">
-                                                            <img src="{{ $product['product_image'] }}" alt="product image"
-                                                                width="30px" height="30px">
-                                                        </a>
+                                                        @if ($product['product_image'])
+                                                            <a href="javascript:void(0);"
+                                                                onclick="openImagePopup('{{ $product['product_image'] }}')">
+                                                                <img src="{{ $product['product_image'] }}"
+                                                                    alt="product image" width="30px" height="30px">
+                                                            </a>
+                                                        @else
+                                                            No Image
+                                                        @endif
                                                     </td>
                                                     <td>
                                                         <div class="d-flex">

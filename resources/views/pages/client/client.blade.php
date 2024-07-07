@@ -21,8 +21,8 @@
         </section>
 
         <section class="content">
-    <div class="container-fluid">
-        <div class="row">
+        <div class="container-fluid">
+          <div class="row">
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
@@ -74,9 +74,9 @@
                                                         <i class="fas fa-pencil-alt"></i>
                                                     </a>
                                                     <button type="button"
-                                                                class="btn btn-danger btn-sm delete-client"
-                                                                data-id="{{ $client['id'] }}">
-                                                                <i class="fas fa-trash"></i>
+                                                          class="btn btn-danger btn-sm delete-client"
+                                                          data-id="{{ $client['id'] }}">
+                                                          <i class="fas fa-trash"></i>
                                                     </button>
                                                 </div>
                                             </td>
@@ -186,6 +186,7 @@
                 modalBody.style.height = '400px'; // keep the height consistent
             } else {
                 modalBody.innerHTML = '<div id="popupMap" style="height: 400px;"></div>';
+
                 const location = { lat: parseFloat(lat), lng: parseFloat(lng) };
                 const mapOptions = {
                     zoom: 15,
