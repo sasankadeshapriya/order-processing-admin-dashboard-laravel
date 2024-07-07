@@ -120,7 +120,34 @@
                     </ul>
                 </li>
 
-                <!-- Vehicle Section -->
+                <!-- Employee Section -->
+                <li
+                    class="nav-item has-treeview {{ request()->is('employee') || request()->is('employee/*') || request()->is('add-employee') ? 'menu-open' : '' }}">
+                    <a href="#"
+                        class="nav-link {{ request()->is('employee') || request()->is('employee/*') || request()->is('add-employee') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-user-tie"></i>
+                        <p>Employee <i class="right fas fa-angle-left"></i></p>
+                    </a>
+                    <ul class="nav nav-treeview"
+                        style="{{ request()->is('employee') || request()->is('employee/*') || request()->is('add-employee') ? 'display: block;' : 'display: none;' }}">
+                        <li class="nav-item">
+                            <a href="{{ route('employee.add') }}"
+                                class="nav-link {{ request()->is('add-employee') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Add Employee</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('employee.manage') }}"
+                                class="nav-link {{ request()->is('employee') && !request()->is('employee/*') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Manage Employee</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                
+                <!-- client Section -->
                 <li
                     class="nav-item has-treeview {{ request()->is('client') || request()->is('client/*') || request()->is('add-client') ? 'menu-open' : '' }}">
                     <a href="#"
