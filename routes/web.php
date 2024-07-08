@@ -10,6 +10,8 @@ use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\TrashController;
+use App\Http\Controllers\EmployeeController;
+
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
@@ -192,7 +194,15 @@ Route::middleware(['web'])->group(function () {
     Route::get('/add-client', [ClientController::class, 'addClientForm'])->name('client.add');
     Route::post('/add-client', [ClientController::class, 'submitClient'])->name('client.submit');
     Route::get('/client/edit/{id}', [ClientController::class, 'editClientForm'])->name('client.edit');
-    // Route::put('/client/update/{id}', [ClientController::class, 'updateClient'])->name('client.update');
+    Route::put('/client/update/{id}', [ClientController::class, 'updateClient'])->name('client.update');
+    Route::post('/client/toggle-status/{id}', [ClientController::class, 'toggleClientStatus'])->name('client.toggle-status');
+
+    // Employee Routes
+    Route::get('/employee', [EmployeeController::class, 'showData'])->name('employee.manage');
+    Route::get('/add-employee', [EmployeeController::class, 'addEmployeeForm'])->name('employee.add');
+    Route::post('/employee/submit', [EmployeeController::class, 'submitEmployee'])->name('employee.submit');
+    Route::get('/employee/edit/{id}', [EmployeeController::class, 'editEmployeeForm'])->name('employee.edit');
+    Route::put('/employee/update/{id}', [EmployeeController::class, 'updateEmployee'])->name('employee.update');
 
     // Fetch deleted records for specified models
     Route::get('/trash', [TrashController::class, 'showData'])->name('show.recyclebin');

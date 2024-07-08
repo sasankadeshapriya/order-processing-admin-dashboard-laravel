@@ -11,36 +11,63 @@ use Illuminate\Support\Facades\Validator;
 class AssignmentController extends Controller
 {
     private $baseURL = 'https://api.gsutil.xyz';
-    //private $baseURL = ' http://127.0.0.1:4000';
+
     public function showAssignments()
-{
-    $assignmentsResponse = Http::get("{$this->baseURL}/assignment");
-    $employeesResponse = Http::get("{$this->baseURL}/employee/all");
-    $vehiclesResponse = Http::get("{$this->baseURL}/vehicle");
-    $routesResponse = Http::get("{$this->baseURL}/route");
-
-    if ($assignmentsResponse->successful() && $employeesResponse->successful() && $vehiclesResponse->successful() && $routesResponse->successful()) {
-        $assignments = $assignmentsResponse->json();
-        $employees = $employeesResponse->json()['employees'] ?? [];
-        $vehicles = $vehiclesResponse->json();
-        $routes = $routesResponse->json();
-
-        $employeeMap = collect($employees)->pluck('name', 'id');
-        $vehicleMap = collect($vehicles)->pluck('vehicle_no', 'id');
-        $routeMap = collect($routes)->pluck('name', 'id');
-
-        foreach ($assignments as &$assignment) {
-            $assignment['employee_name'] = $employeeMap[$assignment['employee_id']] ?? 'Unknown';
-            $assignment['vehicle_number'] = $vehicleMap[$assignment['vehicle_id']] ?? 'Unknown';
-            $assignment['route_name'] = $routeMap[$assignment['route_id']] ?? 'Unknown';
-            $assignment['assign_date'] = Carbon::parse($assignment['assign_date'])->toDateString(); // Format the date
+    {
+        $assignments = [];
+        $employees = [];
+        $vehicles = [];
+        $routes = [];
+    
+        try {
+            $assignmentsResponse = Http::get("{$this->baseURL}/assignment");
+            $employeesResponse = Http::get("{$this->baseURL}/employee/all");
+            $vehiclesResponse = Http::get("{$this->baseURL}/vehicle");
+            $routesResponse = Http::get("{$this->baseURL}/route");
+    
+            if ($assignmentsResponse->successful()) {
+                $assignments = $assignmentsResponse->json();
+            } else {
+                Log::error('Failed to fetch assignments: ' . $assignmentsResponse->status());
+            }
+    
+            if ($employeesResponse->successful()) {
+                $employees = $employeesResponse->json()['employees'] ?? [];
+            } else {
+                Log::error('Failed to fetch employees: ' . $employeesResponse->status());
+            }
+    
+            if ($vehiclesResponse->successful()) {
+                $vehicles = $vehiclesResponse->json();
+            } else {
+                Log::error('Failed to fetch vehicles: ' . $vehiclesResponse->status());
+            }
+    
+            if ($routesResponse->successful()) {
+                $routes = $routesResponse->json();
+            } else {
+                Log::error('Failed to fetch routes: ' . $routesResponse->status());
+            }
+    
+            $employeeMap = collect($employees)->pluck('name', 'id');
+            $vehicleMap = collect($vehicles)->pluck('vehicle_no', 'id');
+            $routeMap = collect($routes)->pluck('name', 'id');
+    
+            foreach ($assignments as &$assignment) {
+                $assignment['employee_name'] = $employeeMap[$assignment['employee_id']] ?? 'Unknown';
+                $assignment['vehicle_number'] = $vehicleMap[$assignment['vehicle_id']] ?? 'Unknown';
+                $assignment['route_name'] = $routeMap[$assignment['route_id']] ?? 'Unknown';
+                $assignment['assign_date'] = Carbon::parse($assignment['assign_date'])->toDateString(); // Format the date
+            }
+        } catch (RequestException $e) {
+            Log::error('Request Exception: ' . $e->getMessage());
+        } catch (\Exception $e) {
+            Log::error('General Exception: ' . $e->getMessage());
         }
-
+    
         return view('pages.assignments.manage-assignments', compact('assignments'));
-    } else {
-        return back()->withErrors('Failed to fetch data from external APIs.');
     }
-}
+    
 
 public function addAssignmentForm()
 {
@@ -87,7 +114,7 @@ public function submitAssignment(Request $request)
         $data['added_by_admin_id'] = 1; // Static admin ID example
 
         // Sending data to external API
-        $response = Http::post("{$this->baseURL}/assignment", $data);
+        $response = Http::post("", $data);
 
         if ($response->successful()) {
             return response()->json(['success' => true, 'message' => 'Assignment added successfully']);
@@ -104,7 +131,7 @@ public function submitAssignment(Request $request)
 
 public function editAssignmentForm($id)
 {
-    $assignmentResponse = Http::get("{$this->baseURL}/assignment/{$id}");
+    $assignmentResponse = Http::get("/{$id}");
     $employeesResponse = Http::get("{$this->baseURL}/employee/all");
     $vehiclesResponse = Http::get("{$this->baseURL}/vehicle");
     $routesResponse = Http::get("{$this->baseURL}/route");
@@ -155,7 +182,7 @@ public function updateAssignment(Request $request, $id)
         return response()->json(['success' => false, 'errors' => $validator->errors()]);
     }
 
-    $response = Http::put("{$this->baseURL}/assignment/{$id}", $data);
+    $response = Http::put("/{$id}", $data);
 
     if ($response->successful()) {
         return response()->json(['success' => true, 'message' => 'Assignment successfully updated']);
@@ -173,7 +200,7 @@ public function updateAssignment(Request $request, $id)
 public function deleteAssignment($id)
 {
     try {
-        $response = Http::delete("{$this->baseURL}/assignment/$id");
+        $response = Http::delete("/$id");
 
         if ($response->successful()) {
             return response()->json(['success' => true]);
@@ -190,7 +217,7 @@ public function showTodayAssignments()
 {
     $today = now()->toDateString();
 
-    $assignmentsResponse = Http::get("{$this->baseURL}/assignment");
+    $assignmentsResponse = Http::get("");
     $employeesResponse = Http::get("{$this->baseURL}/employee/all");
     $vehiclesResponse = Http::get("{$this->baseURL}/vehicle");
     $routesResponse = Http::get("{$this->baseURL}/route");
