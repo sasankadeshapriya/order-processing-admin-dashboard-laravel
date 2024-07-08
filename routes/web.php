@@ -204,8 +204,13 @@ Route::middleware(['web'])->group(function () {
     Route::get('/employee/edit/{id}', [EmployeeController::class, 'editEmployeeForm'])->name('employee.edit');
     Route::put('/employee/update/{id}', [EmployeeController::class, 'updateEmployee'])->name('employee.update');
 
-    // Fetch deleted records for specified models
-    Route::get('/trash', [TrashController::class, 'showData'])->name('show.recyclebin');
+
+    // Route for trash records view
+    Route::get('/trash', [TrashController::class, 'showTrash'])->name('trash.show');
+    // Route for fetching deleted records by model
+    Route::get('/api/trash/deletedRecords/{model}', [TrashController::class, 'getDeletedRecords']);
+    Route::put('/api/trash/restore/{model}/{id}', [TrashController::class, 'restoreRecord']);
+
 
 });
 
