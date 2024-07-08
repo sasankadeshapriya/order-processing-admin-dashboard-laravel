@@ -28,7 +28,7 @@ $(document).ready(function() {
                             toastr.success('Route deleted successfully');
                             $('#example1').DataTable().row($('button[data-id="' + id + '"]').closest('tr')).remove().draw();
                         } else {
-                            toastr.error(response.message || 'Failed to delete route');
+                            toastr.error(response.message || 'Failed to delete route *Please remove related assignments before deleting the route.');
                         }
                     },
                     error: function(xhr) {

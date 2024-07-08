@@ -27,7 +27,7 @@ $(document).ready(function() {
                             toastr.success('Vehicle deleted successfully');
                             $('#example1').DataTable().row($('button[data-id="' + id + '"]').closest('tr')).remove().draw();
                         } else {
-                            toastr.error(response.message || 'Failed to delete vehicle');
+                            toastr.error(response.message || 'Failed to delete vehicle *Please remove related assignments before deleting the vehicle.');
                         }
                     },
                     error: function(xhr) {

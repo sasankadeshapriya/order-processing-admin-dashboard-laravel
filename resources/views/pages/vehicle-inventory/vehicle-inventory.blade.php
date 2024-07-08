@@ -30,6 +30,7 @@
                                     Inventory</a>
                             </div>
                             <div class="card-body">
+                                <p>aqty: available quentity <code> & </code> iqty: initial quentity</p>
                                 <div class="table-responsive">
                                     <table id="example1" class="table table-bordered table-striped">
                                         <thead>
@@ -51,7 +52,8 @@
                                                             fn($item) => $item['looked'] == 1,
                                                         );
                                                     @endphp
-                                                    <tr class="{{ $locked ? 'table-danger' : '' }}">
+                                                    <tr class="group-row {{ $locked ? 'table-danger' : '' }}"
+                                                        data-locked="{{ $locked ? 'true' : 'false' }}">
                                                         <td>{{ $vehicleNo }}</td>
                                                         <td>{{ $items->first()['Assignment']['Vehicle']['name'] ?? 'N/A' }}
                                                         </td>
@@ -69,7 +71,8 @@
                                                                         <tr>
                                                                             <th>Name</th>
                                                                             <th>SKU</th>
-                                                                            <th>Qty</th>
+                                                                            <th>AQty</th>
+                                                                            <th>IQty</th>
                                                                             <th>Unit</th>
                                                                             <th>Action</th>
                                                                         </tr>
@@ -81,12 +84,12 @@
                                                                                 </td>
                                                                                 <td>{{ $item['sku'] ?? 'N/A' }}</td>
                                                                                 <td>{{ $item['quantity'] ?? 'N/A' }}</td>
+                                                                                <td>{{ $item['intialqty'] ?? 'N/A' }}</td>
                                                                                 <td>{{ $item['Product']['measurement_unit'] ?? 'N/A' }}
                                                                                 </td>
                                                                                 <td>
                                                                                     <a href="{{ route('vehicle-inventory.edit', $item['id']) }}"
-                                                                                        class="btn btn-secondary btn-sm edit-link {{ $locked ? 'disabled-link' : '' }}"
-                                                                                        onclick="return {{ $locked ? 'false' : 'true' }};">
+                                                                                        class="btn btn-secondary btn-sm edit-link {{ $locked ? 'disabled-link' : '' }}">
                                                                                         <i class="fas fa-pencil-alt"></i>
                                                                                     </a>
                                                                                     <button type="button"
@@ -115,7 +118,7 @@
                                                                 <button type="button"
                                                                     class="btn btn-danger btn-sm delete-group {{ $locked ? 'disabled' : '' }}"
                                                                     data-ids="{{ implode(',', $items->pluck('id')->toArray()) }}">
-                                                                    <i class="fas fa-trash-alt"></i> Delete Group
+                                                                    <i class="fas fa-trash-alt"></i>
                                                                 </button>
                                                             </div>
                                                         </td>
@@ -148,6 +151,7 @@
     <script src="{{ asset('js/vehicle-inventory-actions.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Toggle details visibility
             document.querySelectorAll('.toggle-details').forEach(button => {
                 button.addEventListener('click', function() {
                     const detailsDiv = this.nextElementSibling;
@@ -156,6 +160,7 @@
                 });
             });
 
+            // Prevent default action for disabled edit links
             document.querySelectorAll('.edit-link').forEach(link => {
                 link.addEventListener('click', function(event) {
                     if (this.classList.contains('disabled-link')) {
@@ -164,53 +169,93 @@
                 });
             });
 
+            // Update button states based on lock status
+            function updateButtonStates() {
+                document.querySelectorAll('.group-row').forEach(row => {
+                    const isLocked = row.dataset.locked === 'true';
+                    const toggleButton = row.querySelector('.toggle-looked');
+                    const groupRows = row.querySelectorAll('.details tbody tr');
+
+                    groupRows.forEach(subRow => {
+                        const editLink = subRow.querySelector('.edit-link');
+                        const deleteButton = subRow.querySelector('.delete-vehicle-inventory');
+
+                        if (editLink) {
+                            editLink.classList.toggle('disabled-link', isLocked);
+                        }
+
+                        if (deleteButton) {
+                            deleteButton.disabled = isLocked;
+                            deleteButton.classList.toggle('disabled', isLocked);
+                        }
+                    });
+
+                    const deleteGroupButton = row.querySelector('.delete-group');
+                    if (deleteGroupButton) {
+                        deleteGroupButton.disabled = isLocked;
+                        deleteGroupButton.classList.toggle('disabled', isLocked);
+                    }
+
+                    if (toggleButton) {
+                        toggleButton.dataset.lock = isLocked ? 'false' : 'true';
+                        toggleButton.classList.toggle('btn-warning', !isLocked);
+                        toggleButton.classList.toggle('btn-secondary', isLocked);
+                        toggleButton.querySelector('i').className = isLocked ? 'fas fa-lock' :
+                            'fas fa-lock-open';
+                        row.classList.toggle('table-danger', isLocked);
+                    }
+                });
+            }
+
+            // Initial update on page load
+            updateButtonStates();
+
+            // Toggle lock state for each vehicle inventory one by one
             document.querySelectorAll('.toggle-looked').forEach(button => {
                 button.addEventListener('click', function() {
-                    const groupRow = $(this).closest('tr');
-                    const groupRows = groupRow.find('.details tbody tr');
-                    var ids = groupRows.map(function() {
-                        return $(this).find('.delete-vehicle-inventory').data('id');
-                    }).get();
+                    const groupRow = this.closest('tr');
+                    const groupRows = groupRow.querySelectorAll('.details tbody tr');
+                    let ids = Array.from(groupRows).map(row => row.querySelector(
+                        '.delete-vehicle-inventory').dataset.id);
 
-                    const isLock = $(this).data('lock') === 'false';
+                    const isCurrentlyLocked = groupRow.dataset.locked === 'true';
+
+                    function toggleLockState(index) {
+                        if (index >= ids.length) {
+                            toastr.success(
+                                `All items successfully ${isCurrentlyLocked ? 'unlocked' : 'locked'}.`
+                            );
+                            groupRow.dataset.locked = isCurrentlyLocked ? 'false' : 'true';
+                            updateButtonStates();
+                            return;
+                        }
+
+                        $.ajax({
+                            url: `/api/proxy/vehicle-inventory/toggle-looked/${ids[index]}`,
+                            type: 'PUT',
+                            contentType: 'application/json',
+                            success: function(response) {
+                                toggleLockState(index + 1);
+                            },
+                            error: function(xhr, status, error) {
+                                toastr.error(
+                                    `Failed to ${isCurrentlyLocked ? 'unlock' : 'lock'} item with ID ${ids[index]}: ${xhr.responseText}`
+                                );
+                                toggleLockState(index + 1);
+                            }
+                        });
+                    }
 
                     Swal.fire({
-                        title: `Are you sure you want to ${isLock ? 'unlock' : 'lock'} these items?`,
+                        title: `Are you sure you want to ${isCurrentlyLocked ? 'unlock' : 'lock'} these items?`,
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonColor: '#C8B400',
                         cancelButtonColor: '#d33',
-                        confirmButtonText: `Yes, ${isLock ? 'unlock' : 'lock'} them!`
+                        confirmButtonText: `Yes, ${isCurrentlyLocked ? 'unlock' : 'lock'} them!`
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            $.ajax({
-                                url: `/api/proxy/vehicle-inventory/toggle-looked/${ids.join(',')}`,
-                                type: 'PUT',
-                                contentType: 'application/json',
-                                success: function(response) {
-                                    toastr.success(
-                                        `Items successfully ${isLock ? 'unlocked' : 'locked'}.`
-                                    );
-                                    groupRows.each(function() {
-                                        $(this).find(
-                                            '.btn-secondary, .btn-danger'
-                                        ).prop('disabled', !
-                                            isLock);
-                                    });
-                                    $(button).data('lock', isLock.toString());
-                                    $(button).find('i').toggleClass(
-                                        'fa-lock fa-lock-open');
-                                    $(button).toggleClass(
-                                        'btn-secondary btn-warning');
-                                    $(groupRow).find('.delete-group').prop(
-                                        'disabled', !isLock);
-                                },
-                                error: function(xhr, status, error) {
-                                    toastr.error(
-                                        `Failed to ${isLock ? 'unlock' : 'lock'} items: ${xhr.responseText}`
-                                    );
-                                }
-                            });
+                            toggleLockState(0); // Start processing from the first ID
                         }
                     });
                 });

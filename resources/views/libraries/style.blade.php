@@ -156,4 +156,12 @@
     .custom-text-color:hover {
         color: #C8B400;
     }
+
+
+    .disabled-link {
+        pointer-events: none;
+        cursor: not-allowed;
+        opacity: 0.6;
+        /* Optional: Makes the link appear grayed out */
+    }
 </style>

@@ -141,6 +141,10 @@
 
                 <div class="card">
                     <div class="card-body">
+                        <p>
+                            <span class="badge bg-danger">Red</span> indicates the date has been exceeded.
+                            <span class="badge bg-success">Green</span> indicates only two days remain.
+                        </p>
                         <div class="table-responsive">
                             <table id="example3" class="table table-bordered table-striped">
                                 <thead>
