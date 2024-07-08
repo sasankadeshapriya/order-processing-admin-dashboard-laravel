@@ -74,4 +74,57 @@ class EmployeeController extends Controller
             return response()->json(['success' => false, 'message' => 'Server error: Unable to add employee', 'errorDetail' => $e->getMessage()]);
         }
     }
+
+    public function editEmployeeForm($id)
+    {
+        $response = Http::get("https://api.gsutil.xyz/employee/{$id}/details");
+    
+        if ($response->successful()) {
+            $employeeData = $response->json();
+            if (isset($employeeData['employee'])) {
+                $employee = (object) $employeeData['employee'];
+                return view('pages.employee.edit-employee', ['employee' => $employee]);
+            } else {
+                return redirect()->route('employee.manage')->withErrors('Employee details not found.');
+            }
+        } else {
+            return redirect()->route('employee.manage')->withErrors('Employee not found.');
+        }
+    }
+    
+
+    public function updateEmployee(Request $request, $id)
+{
+    $validator = Validator::make($request->all(), [
+        'email' => 'required|email|max:50',
+        'password' => 'nullable|string|min:8',
+        'commission_rate' => 'nullable|numeric',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['success' => false, 'errors' => $validator->errors()]);
+    }
+
+    $data = $request->except(['_token', '_method']);
+    if ($request->filled('password')) {
+        $data['password'] = bcrypt($request->password);
+    } else {
+        unset($data['password']);
+    }
+
+    Log::info('Data to be sent to API:', $data);
+
+    $response = Http::put("https://api.gsutil.xyz/employee/{$id}", $data);
+    if ($response->successful()) {
+        Log::info('API Response:', $response->json());
+        return response()->json(['success' => true, 'message' => 'Employee successfully updated']);
+    } else {
+        Log::error('API Update Failed:', $response->json());
+        return response()->json(['success' => false, 'message' => 'Failed to update employee']);
+    }
+}
+
+    
+
+
 }

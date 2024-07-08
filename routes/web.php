@@ -200,6 +200,8 @@ Route::middleware(['web'])->group(function () {
     Route::get('/add-employee', [EmployeeController::class, 'addEmployeeForm'])->name('employee.add');
     Route::post('/employee/submit', [EmployeeController::class, 'submitEmployee'])->name('employee.submit');
     Route::get('/employee/edit/{id}', [EmployeeController::class, 'editEmployeeForm'])->name('employee.edit');
+    Route::put('/employee/update/{id}', [EmployeeController::class, 'updateEmployee'])->name('employee.update');
+
 });
 
 
