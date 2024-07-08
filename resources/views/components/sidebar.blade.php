@@ -120,6 +120,46 @@
                     </ul>
                 </li>
 
+                <!-- Invoices Section -->
+                <li
+                    class="nav-item has-treeview {{ request()->is('invoices') ? 'menu-open' : '' }}">
+                    <a href="#"
+                        class="nav-link {{ request()->is('invoices') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-file-invoice-dollar"></i>
+                        <p>Invoices <i class="right fas fa-angle-left"></i></p>
+                    </a>
+                    <ul class="nav nav-treeview"
+                        style="{{ request()->is('invoices') ? 'display: block;' : 'display: none;' }}">
+                        <li class="nav-item">
+                            <a href="{{ route('invoices.show') }}"
+                                class="nav-link {{ request()->is('invoices') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Manage Invoices</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- Payments Section -->
+                <li
+                    class="nav-item has-treeview {{ request()->is('payment') ? 'menu-open' : '' }}">
+                    <a href="#"
+                        class="nav-link {{ request()->is('payment') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-money-check-alt"></i>
+                        <p>Payments <i class="right fas fa-angle-left"></i></p>
+                    </a>
+                    <ul class="nav nav-treeview"
+                        style="{{ request()->is('payment') ? 'display: block;' : 'display: none;' }}">
+                        <li class="nav-item">
+                            <a href="{{ route('payment.manage') }}"
+                                class="nav-link {{ request()->is('payment') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Manage Payments</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
                 <!-- Employee Section -->
                 <li
                     class="nav-item has-treeview {{ request()->is('employee') || request()->is('employee/*') || request()->is('add-employee') ? 'menu-open' : '' }}">

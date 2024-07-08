@@ -11,9 +11,11 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\TrashController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\DashboardController;
 
-
+>>>>>>> a356a905bc4583ed10f5922bccd39314f96ebd37
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 
@@ -211,6 +213,14 @@ Route::middleware(['web'])->group(function () {
     Route::get('/api/trash/deletedRecords/{model}', [TrashController::class, 'getDeletedRecords']);
     Route::put('/api/trash/restore/{model}/{id}', [TrashController::class, 'restoreRecord']);
 
+
+    //Invoice
+    Route::get('/invoices', [InvoiceController::class, 'showInvoices'])->name('invoices.show');
+    Route::delete('/invoice/{id}', [InvoiceController::class, 'deleteInvoice'])->name('invoice.delete');
+
+    //payment
+    Route::get('/payment', [PaymentController::class, 'showPayments'])->name('payment.manage');
+    Route::put('/payment/{paymentId}/state', [PaymentController::class, 'toggleUpdateState']);
 
 });
 
