@@ -15,7 +15,6 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\DashboardController;
 
->>>>>>> a356a905bc4583ed10f5922bccd39314f96ebd37
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 
