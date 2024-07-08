@@ -11,8 +11,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\TrashController;
 use App\Http\Controllers\EmployeeController;
-
-
+use App\Http\Controllers\InvoiceController;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 
@@ -206,6 +205,11 @@ Route::middleware(['web'])->group(function () {
 
     // Fetch deleted records for specified models
     Route::get('/trash', [TrashController::class, 'showData'])->name('show.recyclebin');
+
+    //Invoice
+    Route::get('/invoices', [InvoiceController::class, 'showInvoices'])->name('invoices.show');
+    Route::delete('/invoice/{id}', [InvoiceController::class, 'deleteInvoice'])->name('invoice.delete');
+
 
 });
 
