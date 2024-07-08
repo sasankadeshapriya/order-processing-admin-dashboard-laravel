@@ -11,6 +11,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\TrashController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\DashboardController;
 
 
 use Illuminate\Support\Facades\Http;
@@ -104,9 +105,8 @@ Route::post('/api/proxy/verify-otp', function (Request $request) {
 
 // Protected routes
 Route::middleware(['web'])->group(function () {
-    Route::get('/', function () {
-        return view('pages.home');
-    });
+
+    Route::get('/', [DashboardController::class, 'showDashboard']);
 
     // Product Routes
     Route::get('/product', [ProductController::class, 'showData'])->name('product.manage');
