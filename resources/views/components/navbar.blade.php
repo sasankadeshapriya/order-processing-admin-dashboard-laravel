@@ -43,7 +43,7 @@
 
         <!-- recycle bin -->
         <li class="nav-item">
-            <a class="nav-link" href="{{ route('show.recyclebin') }}" role="button">
+            <a class="nav-link" href="{{ route('trash.show') }}" role="button">
                 <i class="fas fa-recycle"></i>
             </a>
         </li>
