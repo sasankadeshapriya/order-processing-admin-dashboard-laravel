@@ -251,11 +251,12 @@ class AssignmentController extends Controller
         }
     }
 
+    //AssignmentController
     public function getClientsByRoute($routeId)
     {
         try {
-            $response = Http::get("{$this->baseURL}/client/route/{$routeId}");
-
+            $response = Http::get("https://api.gsutil.xyz/client/route/{$routeId}/locations");
+            
             if ($response->successful()) {
                 $clientsData = $response->json();
                 return response()->json($clientsData);
