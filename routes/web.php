@@ -204,7 +204,7 @@ Route::middleware(['web'])->group(function () {
     Route::post('/employee/submit', [EmployeeController::class, 'submitEmployee'])->name('employee.submit');
     Route::get('/employee/edit/{id}', [EmployeeController::class, 'editEmployeeForm'])->name('employee.edit');
     Route::put('/employee/update/{id}', [EmployeeController::class, 'updateEmployee'])->name('employee.update');
-
+    Route::delete('/employee/{id}', [EmployeeController::class, 'deleteEmployee'])->name('employee.delete');
 
     // Route for trash records view
     Route::get('/trash', [TrashController::class, 'showTrash'])->name('trash.show');
@@ -220,7 +220,8 @@ Route::middleware(['web'])->group(function () {
     //payment
     Route::get('/payment', [PaymentController::class, 'showPayments'])->name('payment.manage');
     Route::put('/payment/toggle-state/{id}', [PaymentController::class, 'togglePaymentState'])->name('payment.toggle-state');
-
+    Route::delete('/payment/{id}', [PaymentController::class, 'deletePayment'])->name('payment.delete');
+    Route::get('/all-payments', [PaymentController::class, 'showAllPayments'])->name('payment.all');
 });
 
 

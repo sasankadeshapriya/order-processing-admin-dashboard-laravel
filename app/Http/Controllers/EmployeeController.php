@@ -124,7 +124,21 @@ class EmployeeController extends Controller
     }
 }
 
-    
+public function deleteEmployee($id)
+{
+    try {
+        $response = Http::delete("https://api.gsutil.xyz/employee/$id");
+
+        if ($response->successful()) {
+            return response()->json(['success' => true]);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Failed to delete employee']);
+        }
+    } catch (\Exception $e) {
+        \Log::error('General Exception: ' . $e->getMessage());
+        return response()->json(['success' => false, 'message' => 'Server error: Unable to delete employee']);
+    }
+}   
 
 
 }

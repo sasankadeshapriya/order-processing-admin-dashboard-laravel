@@ -116,17 +116,6 @@
             img.style.width = '100%';
             popup.document.body.appendChild(img);
         }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.delete-employee').forEach(function(button) {
-                button.addEventListener('click', function() {
-                    var employeeId = this.getAttribute('data-id');
-                    if (confirm('Are you sure you want to delete this employee?')) {
-                        // Implement the delete functionality using AJAX or form submission
-                    }
-                });
-            });
-        });
     </script>
 
 @endsection
