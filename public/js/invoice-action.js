@@ -26,7 +26,10 @@ $(document).ready(function() {
                     success: function(response) {
                         if (response.success) {
                             toastr.success('invoice deleted successfully');
-                            $('#example1').DataTable().row($('button[data-id="' + id + '"]').closest('tr')).remove().draw();
+                            // $('#example1').DataTable().row($('button[data-id="' + id + '"]').closest('tr')).remove().draw();
+                            // Remove the row from the table
+                            $('button[data-id="' + id + '"]').closest('tr').remove();
+
                         } else {
                             toastr.error(response.message || 'Failed to delete invoice');
                         }
