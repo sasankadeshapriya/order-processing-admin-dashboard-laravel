@@ -134,27 +134,29 @@
                             <a href="{{ route('invoices.show') }}"
                                 class="nav-link {{ request()->is('invoices') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>Manage Invoices</p>
+                                <p>All Invoices</p>
                             </a>
                         </li>
                     </ul>
                 </li>
 
                 <!-- Payments Section -->
-                <li
-                    class="nav-item has-treeview {{ request()->is('payment') ? 'menu-open' : '' }}">
-                    <a href="#"
-                        class="nav-link {{ request()->is('payment') ? 'active' : '' }}">
+                <li class="nav-item has-treeview {{ request()->is('payment*') || request()->is('all-payments') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ request()->is('payment*') || request()->is('all-payments') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-money-check-alt"></i>
                         <p>Payments <i class="right fas fa-angle-left"></i></p>
                     </a>
-                    <ul class="nav nav-treeview"
-                        style="{{ request()->is('payment') ? 'display: block;' : 'display: none;' }}">
+                    <ul class="nav nav-treeview" style="{{ request()->is('payment*') || request()->is('all-payments') ? 'display: block;' : 'display: none;' }}">
                         <li class="nav-item">
-                            <a href="{{ route('payment.manage') }}"
-                                class="nav-link {{ request()->is('payment') ? 'active' : '' }}">
+                            <a href="{{ route('payment.manage') }}" class="nav-link {{ request()->is('payment') && !request()->is('all-payments') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>Manage Payments</p>
+                                <p>Verify Cheques</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('payment.all') }}" class="nav-link {{ request()->is('all-payments') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>All Payments</p>
                             </a>
                         </li>
                     </ul>

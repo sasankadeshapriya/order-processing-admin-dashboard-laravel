@@ -60,7 +60,7 @@
                                                             <i class="fas fa-eye"></i> Toggle Products
                                                         </button>
                                                         @if (isset($invoice['products']))
-                                                        <div class="products-details" id="products-{{ $invoice['id'] }}" style="display: none;">
+                                                            <div class="products-details" id="products-{{ $invoice['id'] }}" style="display: none;">
                                                                 <table class="table">
                                                                     <thead>
                                                                         <tr>
@@ -85,11 +85,9 @@
                                                         @endif
                                                     </td>
                                                     <td>
-                                                    <button type="button"
-                                                          class="btn btn-danger btn-sm delete-invoice"
-                                                          data-id="{{ $invoice['id'] }}">
-                                                          <i class="fas fa-trash"></i>
-                                                    </button>
+                                                        <button type="button" class="btn btn-danger btn-sm delete-invoice" data-id="{{ $invoice['id'] }}">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
                                                     </td>
                                                 </tr>
                                             @endforeach
@@ -121,21 +119,31 @@
 @endsection
 
 @section('scripts')
-    <script src="{{ asset('js/invoice-action.js') }}"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap4.min.js"></script>
+    <script src="{{ asset('js/invoice-action.js') }}"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        $(document).ready(function() {
+            // Destroy any existing DataTable instance
+            if ($.fn.dataTable.isDataTable('#example1')) {
+                $('#example1').DataTable().destroy();
+            }
+
+            // Initialize DataTable
+            $('#example1').DataTable({
+                "order": [[0, "asc"]]
+            });
+
             // Toggle products visibility
-            document.querySelectorAll('.toggle-products').forEach(button => {
-                button.addEventListener('click', function() {
-                    const invoiceId = this.getAttribute('data-id');
-                    const productsDetails = document.getElementById(`products-${invoiceId}`);
-                    if (productsDetails) {
-                        productsDetails.style.display = productsDetails.style.display === 'none' ? 'block' : 'none';
-                    } else {
-                        console.error(`Products details not found for invoice ID ${invoiceId}`);
-                    }
-                });
+            $('.toggle-products').click(function() {
+                const invoiceId = $(this).data('id');
+                const productsDetails = $(`#products-${invoiceId}`);
+                if (productsDetails.length) {
+                    productsDetails.toggle();
+                } else {
+                    console.error(`Products details not found for invoice ID ${invoiceId}`);
+                }
             });
         });
     </script>
