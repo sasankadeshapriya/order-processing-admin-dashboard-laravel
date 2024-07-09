@@ -54,7 +54,7 @@
                                                     <td>{{ $invoice['balance'] }}</td>
                                                     <td>{{ $invoice['discount'] }}</td>
                                                     <td>{{ \Carbon\Carbon::parse($invoice['credit_period_end_date'])->format('Y-m-d') }}</td>
-                                                    <td>{{ \Carbon\Carbon::parse($invoice['createdAt'])->format('Y-m-d H:i') }}</td>
+                                                    <td>{{ \Carbon\Carbon::parse($invoice['createdAt'])->format('Y-m-d') }}</td>
                                                     <td>
                                                         <button type="button" class="btn btn-info btn-sm toggle-products" data-id="{{ $invoice['id'] }}">
                                                             <i class="fas fa-eye"></i> Toggle Products

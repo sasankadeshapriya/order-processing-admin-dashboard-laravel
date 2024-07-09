@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Client\RequestException;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class PaymentController extends Controller
 {
@@ -73,24 +76,44 @@ class PaymentController extends Controller
     }
 }
 
-public function toggleUpdateState($paymentId)
-{
-    try {
-        $response = Http::put("https://api.gsutil.xyz/payment/{$paymentId}/state", [
-            'state' => 'verified' // Example state to update
+public function togglePaymentState(Request $request, $id)
+    {
+        Log::info('togglePaymentState called', ['id' => $id, 'state' => $request->state]);
+
+        // Validate the request data
+        $validator = \Validator::make($request->all(), [
+            'state' => 'required|string|in:verified,not-verified',
         ]);
 
-        if ($response->successful()) {
-            return response()->json($response->json());
-        } else {
-            return response()->json(['message' => 'Failed to update payment state'], $response->status());
+        if ($validator->fails()) {
+            Log::error('Validation failed', ['errors' => $validator->errors()]);
+            return response()->json(['success' => false, 'errors' => $validator->errors()]);
         }
-    } catch (RequestException $e) {
-        Log::error('Request Exception: ' . $e->getMessage());
-        return response()->json(['message' => 'API request failed'], $e->response->status());
-    } catch (\Exception $e) {
-        Log::error('General Exception: ' . $e->getMessage());
-        return response()->json(['message' => 'An unexpected error occurred'], 500);
-    }
-}
+        
+        try {
+            $validatedData = $validator->validated();
+            $state = $validatedData['state'];
+
+            Log::info('Updating payment state', ['id' => $id, 'state' => $state]);
+
+            $url = "https://api.gsutil.xyz/payment/{$id}/state";
+            Log::info("Making API request to URL: {$url} with state: {$state}");
+
+            // Make the API request with the validated state
+            $response = Http::put($url, [
+                'state' => $state
+            ]);
+
+            if ($response->successful()) {
+                Log::info('Payment state updated successfully', ['response' => $response->json()]);
+                return response()->json(['success' => true, 'message' => 'Payment state updated successfully']);
+            } else {
+                Log::error('API Error', ['status' => $response->status(), 'response' => $response->body()]);
+                return response()->json(['success' => false, 'message' => 'Failed to update payment state']);
+            }
+        } catch (\Exception $e) {
+            Log::error('Exception', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return response()->json(['success' => false, 'message' => 'Server error: ' . $e->getMessage()]);
+        }
+    }   
 }

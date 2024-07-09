@@ -219,7 +219,7 @@ Route::middleware(['web'])->group(function () {
 
     //payment
     Route::get('/payment', [PaymentController::class, 'showPayments'])->name('payment.manage');
-    Route::put('/payment/{paymentId}/state', [PaymentController::class, 'toggleUpdateState']);
+    Route::put('/payment/toggle-state/{id}', [PaymentController::class, 'togglePaymentState'])->name('payment.toggle-state');
 
 });
 

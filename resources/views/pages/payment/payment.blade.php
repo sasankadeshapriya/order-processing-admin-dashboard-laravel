@@ -40,7 +40,7 @@
                                                 <th>State</th>
                                                 <th>Client Organization</th>
                                                 <th>Created At</th>
-                                                <th>Action</th>
+                                                <th>Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -51,13 +51,10 @@
                                                     <td>{{ $payment['amount'] }}</td>
                                                     <td>{{ ucfirst($payment['payment_option']) }}</td>
                                                     <td>
-                                                        <div class="form-check">
-                                                            <input class="form-check-input toggle-state" type="checkbox"
-                                                                   data-payment-id="{{ $payment['id'] }}"
-                                                                   data-checked="{{ $payment['state'] === 'verified' ? 'true' : 'false' }}"
-                                                                   {{ $payment['state'] === 'verified' ? 'checked' : '' }}>
-                                                            <label class="form-check-label">
-                                                                {{ ucfirst($payment['state']) }}
+                                                        <div class="form-check form-switch">
+                                                            <input class="form-check-input state-toggle" type="checkbox" id="stateToggle_{{ $payment['id'] }}" data-payment-id="{{ $payment['id'] }}" {{ $payment['state'] == 'verified' ? 'checked' : '' }}>
+                                                            <label class="form-check-label" for="stateToggle_{{ $payment['id'] }}">
+                                                                <span class="state-text">{{ ucfirst($payment['state']) }}</span>
                                                             </label>
                                                         </div>
                                                     </td>
@@ -65,7 +62,7 @@
                                                     <td>{{ \Carbon\Carbon::parse($payment['createdAt'])->format('Y-m-d H:i') }}</td>
                                                     <td>
                                                         <button type="button" class="btn btn-danger btn-sm delete-payment" data-id="{{ $payment['id'] }}">
-                                                            <i class="fas fa-trash" title="Delete Payment"></i>
+                                                            <i class="fas fa-trash"></i>
                                                         </button>
                                                     </td>
                                                 </tr>
@@ -80,7 +77,7 @@
                                                 <th>State</th>
                                                 <th>Client Organization</th>
                                                 <th>Created At</th>
-                                                <th>Action</th>
+                                                <th>Actions</th>
                                             </tr>
                                         </tfoot>
                                     </table>
@@ -92,50 +89,44 @@
             </div>
         </section>
     </div>
-
 @endsection
 
 @section('scripts')
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
-            // Handle checkbox change
-            $('.toggle-state').change(function() {
-                const paymentId = $(this).data('payment-id');
-                const checked = $(this).prop('checked');
-                const newState = checked ? 'verified' : 'not verified';
+            // Handle state toggle checkbox change
+            $('.state-toggle').on('change', function() {
+                var checkbox = $(this); // Store reference to checkbox
+                var paymentId = checkbox.data('payment-id');
+                var isChecked = checkbox.prop('checked');
+                var state = isChecked ? 'verified' : 'not-verified';
+                var stateTextElement = checkbox.closest('tr').find('.state-text');
 
-                // Example API endpoint to update payment state
+                // Send state update to server
                 $.ajax({
-                    url: `/api/payment/${paymentId}/state`,
+                    url: '/payment/toggle-state/' + paymentId,
                     method: 'PUT',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ state: newState }),
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content'),
+                        state: state
+                    },
                     success: function(response) {
-                        console.log('Payment state updated successfully:', response);
-                        // Optionally update UI or show success message
+                        if (response.success) {
+                            toastr.success('State updated successfully');
+                            // Update state text
+                            stateTextElement.text(state.charAt(0).toUpperCase() + state.slice(1).replace('-', ' '));
+                        } else {
+                            toastr.error('Failed to update state');
+                            // Revert checkbox state if update failed
+                            checkbox.prop('checked', !isChecked);
+                        }
                     },
                     error: function(xhr, status, error) {
-                        console.error('Failed to update payment state:', error);
-                        // Handle error or show error message
-                    }
-                });
-            });
-
-            // Example for delete payment button click handler
-            $('.delete-payment').click(function() {
-                const paymentId = $(this).data('id');
-                
-                // Example API endpoint to delete payment
-                $.ajax({
-                    url: `/api/payment/${paymentId}`,
-                    method: 'DELETE',
-                    success: function(response) {
-                        console.log('Payment deleted successfully:', response);
-                        // Optionally update UI or show success message
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Failed to delete payment:', error);
-                        // Handle error or show error message
+                        console.error('Server error: Unable to update state', error);
+                        toastr.error('Server error: Unable to update state');
+                        // Revert checkbox state if error occurred
+                        checkbox.prop('checked', !isChecked);
                     }
                 });
             });
