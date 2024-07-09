@@ -164,4 +164,31 @@
         opacity: 0.6;
         /* Optional: Makes the link appear grayed out */
     }
+
+    .bg-dangerr {
+        background-color: rgb(14, 119, 180);
+        /* Bootstrap red with opacity 0.2 */
+        color: white;
+        padding: 3px;
+        /* Small padding around the text */
+        border-radius: 3px;
+    }
+
+    .bg-dangery {
+        background-color: #17A2B8;
+        /* Bootstrap red with opacity 0.2 */
+        color: white;
+        padding: 3px;
+        /* Small padding around the text */
+        border-radius: 3px;
+    }
+
+    .bg-dangerred {
+        background-color: #dc0000;
+        /* Bootstrap red with opacity 0.2 */
+        color: white;
+        padding: 3px;
+        /* Small padding around the text */
+        border-radius: 3px;
+    }
 </style>

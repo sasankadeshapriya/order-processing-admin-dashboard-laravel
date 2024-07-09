@@ -30,7 +30,7 @@
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Assignment ID</label>
-                                        <input type="number" step="" class="form-control" name="assignment_id"
+                                        <input type="number" class="form-control" name="assignment_id"
                                             placeholder="Enter Assignment ID">
                                         <div class="invalid-feedback d-none" id="error-assignment_id">Assignment ID is
                                             required.
@@ -65,10 +65,15 @@
                                             quantity.
                                         </div>
                                     </div>
+                                    <h6><span class="bg-dangerr">
+                                            Please ensure that the entered available quantity is equal to or less than the
+                                            specified value!
+                                        </span>
+                                    </h6>
                                 </div>
                             </div>
                             <input type="hidden" name="added_by_admin_id" value="1">
-                            <input type="hidden" name="sku" id="skuInput"> <!-- Hidden input for SKU -->
+                            <input type="hidden" name="sku" id="skuInput">
                         </div>
                         <div class="card-footer">
                             <button type="submit" class="btn btn-primary">Submit</button>
@@ -76,6 +81,49 @@
                                 Inventory</a>
                         </div>
                     </form>
+                </div>
+            </div>
+
+            <div class="container-fluid mt-5">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Assignments</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="assignmentTable" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Employee Name</th>
+                                        <th>Vehicle Number</th>
+                                        <th>Route Name</th>
+                                        <th>Assign Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($assignments as $key => $assignment)
+                                        <tr>
+                                            <td>{{ ++$key }}</td>
+                                            <td>{{ $assignment['employee_name'] ?? 'N/A' }}</td>
+                                            <td>{{ $assignment['vehicle_number'] ?? 'N/A' }}</td>
+                                            <td>{{ $assignment['route_name'] ?? 'N/A' }}</td>
+                                            <td>{{ $assignment['assign_date'] ?? 'N/A' }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Employee Name</th>
+                                        <th>Vehicle Number</th>
+                                        <th>Route Name</th>
+                                        <th>Assign Date</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -99,14 +147,17 @@
                     contentType: false,
                     processData: false,
                     success: function(response) {
-                        toastr.success(response.message);
-                        $('#vehicleInventoryForm')[0].reset();
-                        $('#availableQuantity').text('')
-                            .hide(); // Hide the available quantity text
-                        clearValidation();
+                        if (response.success) {
+                            toastr.success(response.message);
+                            $('#vehicleInventoryForm')[0].reset();
+                            $('#availableQuantity').text('').hide();
+                            clearValidation();
 
-                        if (response.success && response.products) {
-                            updateDropdown(response.products);
+                            if (response.products) {
+                                updateDropdown(response.products);
+                            }
+                        } else {
+                            toastr.error(response.message || 'Error occurred');
                         }
                     },
                     error: function(xhr) {
@@ -123,7 +174,7 @@
 
             function updateDropdown(products) {
                 let productSelect = $('#productSelect');
-                productSelect.empty(); // Clear existing options
+                productSelect.empty();
                 productSelect.append($('<option>', {
                     value: '',
                     text: 'Select Product'
@@ -144,14 +195,33 @@
                 let sku = selectedOption.attr('data-sku');
                 $('#quantityInput').attr('max', maxQuantity);
                 $('#skuInput').val(sku);
-                $('#availableQuantity').text('Available quantity: ' + maxQuantity)
-                    .show(); // Show and update the available quantity text
+                $('#availableQuantity').html('<span class="bg-dangerred">Available quantity: ' + maxQuantity +
+                    '</span>').show();
             }
 
             function clearValidation() {
                 $('.form-control').removeClass('is-invalid');
                 $('.invalid-feedback').addClass('d-none').empty();
             }
+
+            $('#assignmentTable').DataTable({
+                responsive: true,
+                lengthChange: false,
+                autoWidth: false,
+                buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"],
+                order: [
+                    [4, 'desc']
+                ],
+                columnDefs: [{
+                        targets: 1,
+                        type: 'string'
+                    },
+                    {
+                        targets: 4,
+                        type: 'date'
+                    }
+                ]
+            }).buttons().container().appendTo('#assignmentTable_wrapper .col-md-6:eq(0)');
         });
     </script>
 @endsection

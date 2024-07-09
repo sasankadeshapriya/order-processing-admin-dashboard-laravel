@@ -30,7 +30,17 @@
                                     Inventory</a>
                             </div>
                             <div class="card-body">
-                                <p>aqty: available quentity <code> & </code> iqty: initial quentity</p>
+                                <h6>
+                                    <span class="bg-dangerr">
+                                        AQty: available quantity && IQty: initial quentity
+                                    </span>
+                                </h6>
+                                <h6>
+                                    <span class="bg-dangery">
+                                        The lock icon is used to secure the vehicle inventory and mark it as ready. Once
+                                        locked, administrators will not be able to edit or delete the inventory.
+                                    </span>
+                                </h6>
                                 <div class="table-responsive">
                                     <table id="example1" class="table table-bordered table-striped">
                                         <thead>

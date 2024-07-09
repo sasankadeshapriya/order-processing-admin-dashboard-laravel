@@ -27,7 +27,20 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-12">
+                        <div class="callout callout-info">
+                            <h5><i class="fas fa-info"></i> Note:</h5>
+                            Label products with the code followed by a short, uppercase name. Include 'packet'
+                            if applicable; omit details for bulk kg items.<br>
+                            Whole Chicken With Skin : WCWS#1<br>
+                            Chicken Sausages 500G Pack : PCS500GP#1
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
                         <div class="card">
+                            <div class="card-header">
+                            </div>
                             <!-- /.card-header -->
                             <form method="POST" action="{{ route('product.submit') }}" enctype="multipart/form-data"
                                 id="productForm">

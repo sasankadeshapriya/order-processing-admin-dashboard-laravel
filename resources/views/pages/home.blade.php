@@ -14,6 +14,27 @@
                 /* Adjust bottom margin as needed */
             }
         }
+
+        .bg-danger {
+            background-color: rgba(220, 53, 69, 0.2);
+            /* Bootstrap red with opacity 0.2 */
+            color: white;
+        }
+
+        .bg-dangerr {
+            background-color: rgb(14, 119, 180);
+            /* Bootstrap red with opacity 0.2 */
+            color: white;
+            padding: 2px;
+            /* Small padding around the text */
+            border-radius: 4px;
+        }
+
+        .bg-success {
+            background-color: rgba(197, 168, 5, 0.2);
+            /* Bootstrap green with opacity 0.2 */
+            color: white;
+        }
     </style>
 
     <div class="content-wrapper">
@@ -50,7 +71,7 @@
                             <div class="icon">
                                 <i class="custom-icon-three"></i>
                             </div>
-                            <a href="#" class="small-box-footer">More info <i
+                            <a href="{{ route('invoices.show') }}" class="small-box-footer">More info <i
                                     class="fas fa-arrow-circle-right"></i></a>
                         </div>
                     </div>
@@ -65,7 +86,7 @@
                             <div class="icon">
                                 <i class="custom-icon-two"></i>
                             </div>
-                            <a href="#" class="small-box-footer">More info <i
+                            <a href="{{ route('payment.manage') }}" class="small-box-footer">More info <i
                                     class="fas fa-arrow-circle-right"></i></a>
                         </div>
                     </div>
@@ -80,7 +101,7 @@
                             <div class="icon">
                                 <i class="custom-icon-one"></i>
                             </div>
-                            <a href="#" class="small-box-footer">More info <i
+                            <a href="{{ route('product.manage') }}" class="small-box-footer">More info <i
                                     class="fas fa-arrow-circle-right"></i></a>
                         </div>
                     </div>
@@ -95,7 +116,7 @@
                             <div class="icon">
                                 <i class="custom-icon-four"></i>
                             </div>
-                            <a href="#" class="small-box-footer">More info <i
+                            <a href="{{ route('route.manage') }}" class="small-box-footer">More info <i
                                     class="fas fa-arrow-circle-right"></i></a>
                         </div>
                     </div>
@@ -108,7 +129,13 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title">Product Sales (This Month)</h3>
+                                <h2 class="card-title">Product Sales [This Month]</h2> </br>
+                                <h6><span class="bg-dangerr">Note: This chart displays only the products sold
+                                        in the
+                                        current month. Products with
+                                        zero sales are not included.
+                                    </span>
+                                </h6>
                             </div>
                             <div class="card-body">
                                 <canvas id="salesChart"
@@ -129,7 +156,12 @@
             var salesChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: {!! json_encode(array_column($soldProductDetails, 'product_name')) !!},
+                    // Combine product_name and product_code into the labels
+                    labels: {!! json_encode(
+                        array_map(function ($item) {
+                            return $item['product_name'] . ' / ' . $item['product_code'];
+                        }, $soldProductDetails),
+                    ) !!},
                     datasets: [{
                         label: 'Total Quantity Sold',
                         data: {!! json_encode(array_column($soldProductDetails, 'total_quantity')) !!},

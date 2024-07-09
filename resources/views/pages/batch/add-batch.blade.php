@@ -24,11 +24,24 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-12">
+                        <div class="callout callout-info">
+                            <h5><i class="fas fa-info"></i> Note:</h5>
+                            Please format the SKU as follows: Append an additional '#' to the product code, followed by the
+                            current month and year. For example, if the product code is 'WCWS#1', the SKU should be entered
+                            as <span class="bg-dangerr">'WCWS#1#07-24'.</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
                         <div class="card">
                             <form method="POST" action="{{ route('batch.submit') }}" id="batchForm">
                                 @csrf
                                 <div class="card-body">
-                                    <p>All prices in <code>.LKR</code> format.</p>
+                                    <h6><span class="bg-dangerr">
+                                            All prices in .LKR format.
+                                        </span>
+                                    </h6>
                                     <div class="row">
                                         <div class="col-sm-6">
                                             <!-- SKU -->
@@ -56,14 +69,14 @@
                                             @endif
                                             <!-- Buy Price -->
                                             <div class="form-group">
-                                                <label>MRP</label>
+                                                <label>MRP [LKR]</label>
                                                 <input type="number" step="0.01" class="form-control" name="buy_price"
                                                     placeholder="100.50">
                                                 <div class="invalid-feedback d-none" id="error-buy_price"></div>
                                             </div>
                                             <!-- Cash Price -->
                                             <div class="form-group">
-                                                <label>Cash Price</label>
+                                                <label>Cash Price [LKR]</label>
                                                 <input type="number" step="0.01" class="form-control" name="cash_price"
                                                     placeholder="105.50">
                                                 <div class="invalid-feedback d-none" id="error-cash_price"></div>
@@ -72,14 +85,14 @@
                                         <div class="col-sm-6">
                                             <!-- Check Price -->
                                             <div class="form-group">
-                                                <label>Cheque Price</label>
+                                                <label>Cheque Price [LKR]</label>
                                                 <input type="number" step="0.01" class="form-control" name="check_price"
                                                     placeholder="110.50">
                                                 <div class="invalid-feedback d-none" id="error-check_price"></div>
                                             </div>
                                             <!-- Credit Price -->
                                             <div class="form-group">
-                                                <label>Credit Price</label>
+                                                <label>Credit Price [LKR]</label>
                                                 <input type="number" step="0.01" class="form-control"
                                                     name="credit_price" placeholder="115.50">
                                                 <div class="invalid-feedback d-none" id="error-credit_price"></div>
@@ -194,4 +207,15 @@
             });
         });
     </script>
+    <style>
+        .bg-dangerr {
+            background-color: rgb(14, 119, 180);
+            /* Bootstrap red with opacity 0.2 */
+            color: white;
+            padding: 3px;
+            /* Small padding around the text */
+            border-radius: 3px;
+        }
+    </style>
+
 @endsection

@@ -9,10 +9,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Carbon\Carbon;
 
 
 class VehicleInventoryController extends Controller
 {
+
 
     public function showVehicleInventory()
     {
@@ -56,24 +58,51 @@ class VehicleInventoryController extends Controller
         }
     }
 
+    private $baseURL = 'https://api.gsutil.xyz';
+
     public function addVehicleInventoryForm()
     {
         try {
-            $batches = Http::get('https://api.gsutil.xyz/batch')->json();
-            $products = collect($batches)->map(function ($batch) {
-                return [
-                    'id' => $batch['product_id'],
-                    'name' => $batch['Product']['name'],
-                    'sku' => $batch['sku'],
-                    'quantity' => $batch['quantity']
-                ];
-            })->unique('id');
-        } catch (\Exception $e) {
-            \Log::error('Error fetching batches: ' . $e->getMessage());
-            $products = [];
-        }
+            $batches = Http::get("{$this->baseURL}/batch")->json();
+            $assignmentsResponse = Http::get("{$this->baseURL}/assignment");
+            $employeesResponse = Http::get("{$this->baseURL}/employee/all");
+            $vehiclesResponse = Http::get("{$this->baseURL}/vehicle");
+            $routesResponse = Http::get("{$this->baseURL}/route");
 
-        return view('pages.vehicle-inventory.add-vehicle-inventory', compact('products'));
+            if ($assignmentsResponse->successful() && $employeesResponse->successful() && $vehiclesResponse->successful() && $routesResponse->successful()) {
+                $assignments = $assignmentsResponse->json();
+                $employees = $employeesResponse->json()['employees'] ?? [];
+                $vehicles = $vehiclesResponse->json();
+                $routes = $routesResponse->json();
+
+                $employeeMap = collect($employees)->pluck('name', 'id');
+                $vehicleMap = collect($vehicles)->pluck('vehicle_no', 'id');
+                $routeMap = collect($routes)->pluck('name', 'id');
+
+                foreach ($assignments as &$assignment) {
+                    $assignment['employee_name'] = $employeeMap[$assignment['employee_id']] ?? 'Unknown';
+                    $assignment['vehicle_number'] = $vehicleMap[$assignment['vehicle_id']] ?? 'Unknown';
+                    $assignment['route_name'] = $routeMap[$assignment['route_id']] ?? 'Unknown';
+                    $assignment['assign_date'] = Carbon::parse($assignment['assign_date'])->toDateString();
+                }
+
+                $products = collect($batches)->map(function ($batch) {
+                    return [
+                        'id' => $batch['product_id'],
+                        'name' => $batch['Product']['name'],
+                        'sku' => $batch['sku'],
+                        'quantity' => $batch['quantity']
+                    ];
+                })->unique('id');
+
+                return view('pages.vehicle-inventory.add-vehicle-inventory', compact('products', 'assignments'));
+            } else {
+                return redirect('/error');
+            }
+        } catch (\Exception $e) {
+            Log::error('Error fetching data: ' . $e->getMessage());
+            return redirect('/error');
+        }
     }
 
     public function submitVehicleInventory(Request $request)

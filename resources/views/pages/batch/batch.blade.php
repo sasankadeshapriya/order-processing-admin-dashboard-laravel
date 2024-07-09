@@ -35,7 +35,10 @@
                             </div>
                             <!-- /.card-header -->
                             <div class="card-body">
-                                <p>All prices in <code>.LKR</code> format.</p>
+                                <h6><span class="bg-dangerr">
+                                        All prices in .LKR format.
+                                    </span>
+                                </h6>
                                 <div class="table-responsive">
                                     <table id="example1" class="table table-bordered table-striped">
                                         <thead>
@@ -45,10 +48,10 @@
                                                 <th>Product Code</th>
                                                 <th>SKU</th>
                                                 <th>Qty</th>
-                                                <th>MRP</th>
-                                                <th>Cash Price</th>
-                                                <th>Cheque Price</th>
-                                                <th>Credit Price</th>
+                                                <th>MRP [LKR]</th>
+                                                <th>Cash Price [LKR]</th>
+                                                <th>Cheque Price [LKR]</th>
+                                                <th>Credit Price [LKR]</th>
                                                 <th>Expire Date</th>
                                                 <th>Action</th>
                                             </tr>
@@ -89,10 +92,10 @@
                                                 <th>Product Code</th>
                                                 <th>SKU</th>
                                                 <th>Qty</th>
-                                                <th>MRP</th>
-                                                <th>Cash Price</th>
-                                                <th>Cheque Price</th>
-                                                <th>Credit Price</th>
+                                                <th>MRP [LKR]</th>
+                                                <th>Cash Price [LKR]</th>
+                                                <th>Cheque Price [LKR]</th>
+                                                <th>Credit Price [LKR]</th>
                                                 <th>Expire Date</th>
                                                 <th>Action</th>
                                             </tr>

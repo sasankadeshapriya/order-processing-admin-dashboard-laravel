@@ -29,6 +29,20 @@
 
         <section class="content">
             <div class="container-fluid">
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="callout callout-info">
+                            <h5><i class="fas fa-info"></i> Note:</h5>
+                            <span class="badge bg-success">↑ Green Up Arrow:</span> Indicates an increase compared to the
+                            previous value<br>
+                            <span class="badge bg-danger">↓ Red Down Arrow: </span> Indicates a decrease compared to the
+                            previous value.<br>
+                            **If you choose week as filter compare it with previous week**
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Button group for all screen sizes -->
                 <div class="row mb-2">
                     <div class="col-12">
@@ -176,8 +190,12 @@
                         <!-- Most Sold Products CHART -->
                         <div class="card">
                             <div class="card-header custom-bg-color-small-box">
-                                <h3 class="card-title">Most Sold Products</h3>
-
+                                <h3 class="card-title">Most Sold Products</h3><br>
+                                <h6><span class="bg-dangerr">Note: This chart displays only the products sold for filter.
+                                        Products with
+                                        0 sales are not included.
+                                    </span>
+                                </h6>
                                 <div class="card-tools">
                                     <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                         <i class="fas fa-minus"></i>
@@ -234,15 +252,18 @@
                     <div class="col-sm-12">
                         <div class="card">
                             <div class="card-body">
-                                <p>All prices in <code>.LKR</code> format.</p>
+                                <h6><span class="bg-dangerr">
+                                        All prices in .LKR format.
+                                    </span>
+                                </h6>
                                 <div class="table-responsive">
                                     <table id="example3" class="table table-bordered table-striped">
                                         <thead>
                                             <tr>
                                                 <th>Reference Number</th>
-                                                <th>Total Amount</th>
-                                                <th>Paid Amount</th>
-                                                <th>Balance</th>
+                                                <th>Total Amount [LKR]</th>
+                                                <th>Paid Amount [LKR]</th>
+                                                <th>Balance [LKR]</th>
                                                 <th>Payment Option</th>
                                                 <th>Client</th>
                                                 <th>Date</th>
@@ -254,9 +275,9 @@
                                         <tfoot>
                                             <tr>
                                                 <th>Reference Number</th>
-                                                <th>Total Amount</th>
-                                                <th>Paid Amount</th>
-                                                <th>Balance</th>
+                                                <th>Total Amount [LKR]</th>
+                                                <th>Paid Amount [LKR]</th>
+                                                <th>Balance [LKR]</th>
                                                 <th>Payment Option</th>
                                                 <th>Client</th>
                                                 <th>Date</th>
