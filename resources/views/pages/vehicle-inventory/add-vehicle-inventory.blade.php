@@ -104,7 +104,7 @@
                                 <tbody>
                                     @foreach ($assignments as $key => $assignment)
                                         <tr>
-                                            <td>{{ ++$key }}</td>
+                                            <td>{{ $assignment['id'] }}</td>
                                             <td>{{ $assignment['employee_name'] ?? 'N/A' }}</td>
                                             <td>{{ $assignment['vehicle_number'] ?? 'N/A' }}</td>
                                             <td>{{ $assignment['route_name'] ?? 'N/A' }}</td>
