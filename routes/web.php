@@ -202,9 +202,8 @@ Route::middleware(['web'])->group(function () {
     Route::get('/employee', [EmployeeController::class, 'showData'])->name('employee.manage');
     Route::get('/add-employee', [EmployeeController::class, 'addEmployeeForm'])->name('employee.add');
     Route::post('/employee/submit', [EmployeeController::class, 'submitEmployee'])->name('employee.submit');
-    Route::get('/employee/edit/{id}', [EmployeeController::class, 'editEmployeeForm'])->name('employee.edit');
-    Route::put('/employee/update/{id}', [EmployeeController::class, 'updateEmployee'])->name('employee.update');
     Route::delete('/employee/{id}', [EmployeeController::class, 'deleteEmployee'])->name('employee.delete');
+    Route::put('/employee/update-commission/{id}', [EmployeeController::class, 'updateCommissionRate']);
 
     // Route for trash records view
     Route::get('/trash', [TrashController::class, 'showTrash'])->name('trash.show');

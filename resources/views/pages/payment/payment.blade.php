@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Payments')
+@section('title', 'Cheque Payments')
 
 @section('content')
     <div class="content-wrapper">
@@ -27,13 +27,12 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="table-responsive">
-                                    <table id="example1" class="table table-bordered table-striped">
+                                    <table id="paymentsTable" class="table table-bordered table-striped">
                                         <thead>
                                             <tr>
                                                 <th>#</th>
                                                 <th>Reference Number</th>
                                                 <th>Amount</th>
-                                                <th>Payment Option</th>
                                                 <th>Client Organization</th>
                                                 <th>Created At</th>
                                                 <th>State</th>
@@ -46,7 +45,6 @@
                                                     <td>{{ ++$key }}</td>
                                                     <td>{{ $payment['reference_number'] }}</td>
                                                     <td>{{ $payment['amount'] }}</td>
-                                                    <td>{{ ucfirst($payment['payment_option']) }}</td>
                                                     <td>{{ $payment['organization_name'] ?? 'N/A' }}</td>
                                                     <td>{{ \Carbon\Carbon::parse($payment['createdAt'])->format('Y-m-d H:i') }}</td>
                                                     <td>
@@ -70,7 +68,6 @@
                                                 <th>#</th>
                                                 <th>Reference Number</th>
                                                 <th>Amount</th>
-                                                <th>Payment Option</th>
                                                 <th>Client Organization</th>
                                                 <th>Created At</th>
                                                 <th>State</th>
@@ -91,8 +88,13 @@
 @section('scripts')
     <script src="{{ asset('js/payment-action.js') }}"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.24/js/dataTables.bootstrap4.min.js"></script>
     <script>
         $(document).ready(function() {
+            // Initialize DataTables
+            $('#paymentsTable').DataTable();
+
             // Handle state toggle checkbox change
             $('.state-toggle').on('change', function() {
                 var checkbox = $(this); // Store reference to checkbox
