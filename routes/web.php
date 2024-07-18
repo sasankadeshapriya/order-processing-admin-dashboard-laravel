@@ -14,6 +14,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\AdminController;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
@@ -221,6 +222,10 @@ Route::middleware(['web'])->group(function () {
     Route::put('/payment/toggle-state/{id}', [PaymentController::class, 'togglePaymentState'])->name('payment.toggle-state');
     Route::delete('/payment/{id}', [PaymentController::class, 'deletePayment'])->name('payment.delete');
     Route::get('/all-payments', [PaymentController::class, 'showAllPayments'])->name('payment.all');
+
+    // User Settings routes
+    Route::post('/admin/admin/password-change', [AdminController::class, 'changePassword'])->name('password.update');
+    Route::post('/admin/delete-account', [AdminController::class, 'deleteAccount'])->name('account.delete');
 });
 
 

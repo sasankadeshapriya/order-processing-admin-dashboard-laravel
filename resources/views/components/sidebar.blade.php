@@ -2,12 +2,12 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <!-- Sidebar user panel (optional) -->
-        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex" data-toggle="modal" data-target="#userPanelModal">
             <div class="image">
                 <img src="{{ asset('dist/img/user.svg') }}" class="img-circle elevation-2" alt="User Image">
             </div>
             <div class="info">
-                <a href="#" class="d-block">{{ session('email') ?? 'No User Signed In' }}</a>
+                <a class="d-block">{{ session('email') ?? 'No User Signed In' }}</a>
             </div>
         </div>
 
@@ -121,10 +121,8 @@
                 </li>
 
                 <!-- Invoices Section -->
-                <li
-                    class="nav-item has-treeview {{ request()->is('invoices') ? 'menu-open' : '' }}">
-                    <a href="#"
-                        class="nav-link {{ request()->is('invoices') ? 'active' : '' }}">
+                <li class="nav-item has-treeview {{ request()->is('invoices') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ request()->is('invoices') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-file-invoice-dollar"></i>
                         <p>Invoices <i class="right fas fa-angle-left"></i></p>
                     </a>
@@ -141,20 +139,25 @@
                 </li>
 
                 <!-- Payments Section -->
-                <li class="nav-item has-treeview {{ request()->is('payment*') || request()->is('all-payments') ? 'menu-open' : '' }}">
-                    <a href="#" class="nav-link {{ request()->is('payment*') || request()->is('all-payments') ? 'active' : '' }}">
+                <li
+                    class="nav-item has-treeview {{ request()->is('payment*') || request()->is('all-payments') ? 'menu-open' : '' }}">
+                    <a href="#"
+                        class="nav-link {{ request()->is('payment*') || request()->is('all-payments') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-money-check-alt"></i>
                         <p>Payments <i class="right fas fa-angle-left"></i></p>
                     </a>
-                    <ul class="nav nav-treeview" style="{{ request()->is('payment*') || request()->is('all-payments') ? 'display: block;' : 'display: none;' }}">
+                    <ul class="nav nav-treeview"
+                        style="{{ request()->is('payment*') || request()->is('all-payments') ? 'display: block;' : 'display: none;' }}">
                         <li class="nav-item">
-                            <a href="{{ route('payment.manage') }}" class="nav-link {{ request()->is('payment') && !request()->is('all-payments') ? 'active' : '' }}">
+                            <a href="{{ route('payment.manage') }}"
+                                class="nav-link {{ request()->is('payment') && !request()->is('all-payments') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Verify Cheques</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('payment.all') }}" class="nav-link {{ request()->is('all-payments') ? 'active' : '' }}">
+                            <a href="{{ route('payment.all') }}"
+                                class="nav-link {{ request()->is('all-payments') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>All Payments</p>
                             </a>
@@ -188,7 +191,7 @@
                         </li>
                     </ul>
                 </li>
-                
+
                 <!-- client Section -->
                 <li
                     class="nav-item has-treeview {{ request()->is('client') || request()->is('client/*') || request()->is('add-client') ? 'menu-open' : '' }}">
@@ -370,3 +373,108 @@
     </div>
     <!-- /.sidebar -->
 </aside>
+
+<!-- User Panel Modal -->
+<div class="modal fade" id="userPanelModal" tabindex="-1" role="dialog" aria-labelledby="userPanelModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userPanelModalLabel">User Settings</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Change Password Form -->
+                <form id="changePasswordForm">
+                    @csrf
+                    <input type="hidden" name="email" value="{{ session('email') }}">
+                    <div class="form-group">
+                        <label for="newPassword">New Password</label>
+                        <input type="password" class="form-control" id="newPassword" name="new_password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <input type="password" class="form-control" id="confirmPassword" name="confirm_password"
+                            required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Password</button>
+                </form>
+                <hr>
+                <!-- Delete Account Form -->
+                <form id="deleteAccountForm">
+                    @csrf
+                    <div class="form-group">
+                        <label for="emailValidation">Enter Email to Confirm</label>
+                        <input type="email" class="form-control" id="emailValidation" name="email" required>
+                    </div>
+                    <button type="submit" class="btn btn-danger">Delete Account</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('changePasswordForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (newPassword !== confirmPassword) {
+            toastr.error('Passwords do not match!');
+            return;
+        }
+
+        const formData = new FormData(this);
+        try {
+            const response = await fetch('{{ route('password.update') }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                        'content')
+                }
+            });
+            const result = await response.json();
+            if (response.ok) {
+                toastr.success('Password changed successfully!');
+                window.location.href = '{{ route('logout') }}'; // Redirect after successful change
+            } else {
+                toastr.error(result.message || 'Error updating password.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            toastr.error('Server error: Unable to change password.');
+        }
+    });
+
+    document.getElementById('deleteAccountForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        try {
+            const response = await fetch('{{ route('account.delete') }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                        'content')
+                }
+            });
+            const result = await response.json();
+            if (response.ok) {
+                toastr.success('User account deleted successfully!');
+                window.location.href = '{{ route('logout') }}'; // Redirect after successful deletion
+            } else {
+                toastr.error(result.message || 'Error deleting account.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            toastr.error('Server error: Unable to delete account.');
+        }
+    });
+</script>
