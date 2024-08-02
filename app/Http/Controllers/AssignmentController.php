@@ -10,8 +10,12 @@ use Illuminate\Support\Facades\Validator;
 
 class AssignmentController extends Controller
 {
-    private $baseURL = 'https://api.gsutil.xyz';
-    //private $baseURL = ' http://127.0.0.1:4000/assignment';
+    private $baseURL;
+    public function __construct()
+    {
+        $this->baseURL = env('API_URL');
+    }
+
     public function showAssignments()
     {
         $assignmentsResponse = Http::get("{$this->baseURL}/assignment");
@@ -255,8 +259,8 @@ class AssignmentController extends Controller
     public function getClientsByRoute($routeId)
     {
         try {
-            $response = Http::get("https://api.gsutil.xyz/client/route/{$routeId}/locations");
-            
+            $response = Http::get(env('API_URL') . "/client/route/{$routeId}/locations");
+
             if ($response->successful()) {
                 $clientsData = $response->json();
                 return response()->json($clientsData);

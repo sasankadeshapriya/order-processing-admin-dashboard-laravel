@@ -11,16 +11,20 @@ use Illuminate\Support\Facades\Validator;
 
 
 class VehicleController extends Controller
-{ 
-    private $baseURL = 'https://api.gsutil.xyz';
-   
+{
+    private $baseURL;
+    public function __construct()
+    {
+        $this->baseURL = env('API_URL');
+    }
+
     public function showData()
     {
         $vehicles = [];
-    
+
         try {
             $response = Http::get("{$this->baseURL}/vehicle");
-    
+
             if ($response->successful()) {
                 $vehicles = $response->json();
             } else {
@@ -31,10 +35,10 @@ class VehicleController extends Controller
         } catch (\Exception $e) {
             Log::error('General Exception: ' . $e->getMessage());
         }
-    
+
         return view('pages.vehicle.vehicle', compact('vehicles'));
     }
-    
+
 
     public function addVehicleForm()
     {
@@ -82,76 +86,76 @@ class VehicleController extends Controller
 
     public function editVehicleForm($id)
     {
-    $response = Http::get("{$this->baseURL}/vehicle/{$id}");
-
-    if ($response->successful()) {
-        $vehicle = $response->json();
-        return view('pages.vehicle.edit-vehicle', ['vehicle' => (object) $vehicle]);
-    } else {
-        // Handle errors or redirect if the vehicle is not found
-        return redirect()->route('vehicle.manage')->withErrors('Vehicle not found.');
-    }
-}
-
-public function updateVehicle(Request $request, $id)
-{
-    try {
-        \Log::info('Request Data:', $request->all());
-
-        // Validate the incoming request data
-        $validator = Validator::make($request->all(), [
-            'vehicle_number' => 'required|string|max:8',
-            'vehicle_name' => 'required|string|min:2|max:50',
-            'vehicle_model' => 'required|in:Lorry,Van',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['success' => false, 'errors' => $validator->errors()]);
-        }
-
-        // Map data from the request to the API's expected parameters
-        $data = [
-            'vehicle_no' => $request->input('vehicle_number'),
-            'name' => $request->input('vehicle_name'),
-            'type' => $request->input('vehicle_model'),
-        ];
-
-        \Log::info('Sending Data to API:', ['data' => $data]);
-
-        // Send a PUT request to update the vehicle data
-        $response = Http::put("{$this->baseURL}/vehicle/{$id}", $data);
-
-        \Log::info('Response Status Code:', ['status' => $response->status()]);
-        \Log::info('Response Body:', ['body' => $response->body()]);
+        $response = Http::get("{$this->baseURL}/vehicle/{$id}");
 
         if ($response->successful()) {
-            return response()->json(['success' => true, 'message' => 'Vehicle successfully updated']);
+            $vehicle = $response->json();
+            return view('pages.vehicle.edit-vehicle', ['vehicle' => (object) $vehicle]);
         } else {
-            \Log::error('Failed to update vehicle:', ['error' => $response->json()]);
-            return response()->json(['success' => false, 'message' => $response->json('message')]);
+            // Handle errors or redirect if the vehicle is not found
+            return redirect()->route('vehicle.manage')->withErrors('Vehicle not found.');
         }
-    } catch (\Exception $e) {
-        \Log::error('Exception:', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
-        return response()->json(['success' => false, 'message' => 'An unexpected error occurred']);
     }
-}
 
+    public function updateVehicle(Request $request, $id)
+    {
+        try {
+            \Log::info('Request Data:', $request->all());
 
-public function deleteVehicle($id)
-{
-    try {
-        $response = Http::delete("{$this->baseURL}/vehicle/$id");
+            // Validate the incoming request data
+            $validator = Validator::make($request->all(), [
+                'vehicle_number' => 'required|string|max:8',
+                'vehicle_name' => 'required|string|min:2|max:50',
+                'vehicle_model' => 'required|in:Lorry,Van',
+            ]);
 
-        if ($response->successful()) {
-            return response()->json(['success' => true]);
-        } else {
-            return response()->json(['success' => false, 'message' => 'Failed to delete product']);
+            if ($validator->fails()) {
+                return response()->json(['success' => false, 'errors' => $validator->errors()]);
+            }
+
+            // Map data from the request to the API's expected parameters
+            $data = [
+                'vehicle_no' => $request->input('vehicle_number'),
+                'name' => $request->input('vehicle_name'),
+                'type' => $request->input('vehicle_model'),
+            ];
+
+            \Log::info('Sending Data to API:', ['data' => $data]);
+
+            // Send a PUT request to update the vehicle data
+            $response = Http::put("{$this->baseURL}/vehicle/{$id}", $data);
+
+            \Log::info('Response Status Code:', ['status' => $response->status()]);
+            \Log::info('Response Body:', ['body' => $response->body()]);
+
+            if ($response->successful()) {
+                return response()->json(['success' => true, 'message' => 'Vehicle successfully updated']);
+            } else {
+                \Log::error('Failed to update vehicle:', ['error' => $response->json()]);
+                return response()->json(['success' => false, 'message' => $response->json('message')]);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Exception:', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return response()->json(['success' => false, 'message' => 'An unexpected error occurred']);
         }
-    } catch (\Exception $e) {
-        \Log::error('General Exception: ' . $e->getMessage());
-        return response()->json(['success' => false, 'message' => 'Server error: Unable to delete product']);
     }
-}
+
+
+    public function deleteVehicle($id)
+    {
+        try {
+            $response = Http::delete("{$this->baseURL}/vehicle/$id");
+
+            if ($response->successful()) {
+                return response()->json(['success' => true]);
+            } else {
+                return response()->json(['success' => false, 'message' => 'Failed to delete product']);
+            }
+        } catch (\Exception $e) {
+            \Log::error('General Exception: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Server error: Unable to delete product']);
+        }
+    }
 
 
 }

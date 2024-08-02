@@ -14,9 +14,8 @@ class DashboardController extends Controller
     public function showDashboard()
     {
         try {
-            $response = Http::get('http://api.gsutil.xyz/dashboard/summary');
+            $response = Http::get(env('API_URL') . '/dashboard/summary');
 
-            // Check if the response was successful (status code 2xx)
             if ($response->successful()) {
                 $data = $response->json();
                 $totalAmount = $data['totalAmount'] ?? 0;

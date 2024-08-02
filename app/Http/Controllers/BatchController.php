@@ -17,7 +17,7 @@ class BatchController extends Controller
     public function showData()
     {
         try {
-            $response = Http::get('https://api.gsutil.xyz/batch');
+            $response = Http::get(env('API_URL') . '/batch');
             $items = $response->json();
 
             // Check if the response was successful (status code 2xx)
@@ -60,7 +60,7 @@ class BatchController extends Controller
     public function deleteBatch($id)
     {
         try {
-            $response = Http::delete("https://api.gsutil.xyz/batch/$id");
+            $response = Http::delete(env('API_URL') . "/batch/$id");
 
             if ($response->successful()) {
                 return response()->json(['success' => true]);
@@ -76,7 +76,7 @@ class BatchController extends Controller
     public function addBatchForm()
     {
         try {
-            $response = Http::get('https://api.gsutil.xyz/product');
+            $response = Http::get(env('API_URL') . '/product');
 
             if ($response->successful()) {
                 $products = $response->json();
@@ -134,7 +134,7 @@ class BatchController extends Controller
             }
 
             // Sending the data to the API
-            $response = Http::post('http://api.gsutil.xyz/batch', $batchData);
+            $response = Http::post(env('API_URL') . '/batch', $batchData);
 
             // Handle API response
             if ($response->successful()) {
@@ -151,14 +151,14 @@ class BatchController extends Controller
 
     public function editBatchForm($id)
     {
-        $batchResponse = Http::get("https://api.gsutil.xyz/batch/{$id}");
+        $batchResponse = Http::get(env('API_URL') . "/batch/{$id}");
         if (!$batchResponse->successful()) {
             return redirect()->route('batch.manage')->withErrors('Batch not found.');
         }
         $batch = $batchResponse->object(); // Convert to object
 
         // Debugging API response for products
-        $productsResponse = Http::get('https://api.gsutil.xyz/product');
+        $productsResponse = Http::get(env('API_URL') . '/product');
         if (!$productsResponse->successful()) {
             \Log::error("Failed to fetch products: " . $productsResponse->body());
             $products = [];
@@ -207,7 +207,7 @@ class BatchController extends Controller
         }
 
         // Sending the formatted data to the API
-        $response = Http::put("https://api.gsutil.xyz/batch/{$id}", $data);
+        $response = Http::put(env('API_URL') . "/batch/{$id}", $data);
         if ($response->successful()) {
             return response()->json(['success' => true, 'message' => 'Batch successfully updated']);
         } else {

@@ -23,7 +23,7 @@ class AdminController extends Controller
         }
 
         try {
-            $response = Http::put('https://api.gsutil.xyz/admin/admin/password-change', [
+            $response = Http::put(env('API_URL') . '/admin/admin/password-change', [
                 'email' => $request->input('email'),
                 'newPassword' => $request->input('new_password'),
             ]);
@@ -54,7 +54,7 @@ class AdminController extends Controller
         }
 
         try {
-            $response = Http::delete('https://api.gsutil.xyz/admin/admin/delete-account', [
+            $response = Http::delete(env('API_URL') . '/admin/admin/delete-account', [
                 'email' => $request->input('email'),
             ]);
 
