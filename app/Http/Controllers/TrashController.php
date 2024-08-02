@@ -33,7 +33,7 @@ class TrashController extends Controller
 
     public function getDeletedRecords($model)
     {
-        $url = "https://api.gsutil.xyz/trash/deletedRecords/{$model}";
+        $url = env('API_URL') . "/trash/deletedRecords/{$model}";
 
         $response = Http::get($url);
 
@@ -46,7 +46,7 @@ class TrashController extends Controller
 
     public function restoreRecord($model, $id)
     {
-        $url = "https://api.gsutil.xyz/trash/restore/{$model}/{$id}";
+        $url = env('API_URL') . "/trash/restore/{$model}/{$id}";
 
         try {
             $response = Http::put($url);

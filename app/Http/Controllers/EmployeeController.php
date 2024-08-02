@@ -13,7 +13,7 @@ class EmployeeController extends Controller
     public function showData()
     {
         try {
-            $response = Http::get('https://api.gsutil.xyz/employee/all');
+            $response = Http::get(env('API_URL') . '/employee/all');
             $employees = $response->json()['employees'] ?? [];
 
             if ($response->successful()) {
@@ -59,10 +59,16 @@ class EmployeeController extends Controller
 
         try {
             $employeeData = $request->only([
-                'name', 'email', 'password', 'nic', 'phone_no', 'commission_rate', 'added_by_admin_id'
+                'name',
+                'email',
+                'password',
+                'nic',
+                'phone_no',
+                'commission_rate',
+                'added_by_admin_id'
             ]);
 
-            $employeeResponse = Http::post('https://api.gsutil.xyz/employee/add', $employeeData);
+            $employeeResponse = Http::post(env('API_URL') . '/employee/add', $employeeData);
 
             if ($employeeResponse->successful()) {
                 return response()->json(['success' => true, 'message' => 'Employee added successfully']);
@@ -75,48 +81,46 @@ class EmployeeController extends Controller
         }
     }
 
-public function deleteEmployee($id)
-{
-    try {
-        $response = Http::delete("https://api.gsutil.xyz/employee/$id");
+    public function deleteEmployee($id)
+    {
+        try {
+            $response = Http::delete(env('API_URL') . "/employee/$id");
 
-        if ($response->successful()) {
-            return response()->json(['success' => true]);
-        } else {
-            return response()->json(['success' => false, 'message' => 'Failed to delete employee']);
+            if ($response->successful()) {
+                return response()->json(['success' => true]);
+            } else {
+                return response()->json(['success' => false, 'message' => 'Failed to delete employee']);
+            }
+        } catch (\Exception $e) {
+            \Log::error('General Exception: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Server error: Unable to delete employee']);
         }
-    } catch (\Exception $e) {
-        \Log::error('General Exception: ' . $e->getMessage());
-        return response()->json(['success' => false, 'message' => 'Server error: Unable to delete employee']);
-    }
-}   
-
-public function updateCommissionRate(Request $request, $id)
-{
-    $validator = Validator::make($request->all(), [
-        'commission_rate' => 'required|numeric'
-    ]);
-
-    if ($validator->fails()) {
-        return response()->json(['success' => false, 'errors' => $validator->errors()]);
     }
 
-    try {
-        $updateData = $request->only(['commission_rate']);
+    public function updateCommissionRate(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'commission_rate' => 'required|numeric'
+        ]);
 
-        // Perform your API call or database update here
-        // Example using HTTP Client for API call
-        $response = Http::put("https://api.gsutil.xyz/employee/update-commission/$id", $updateData);
-
-        if ($response->successful()) {
-            return response()->json(['success' => true, 'message' => 'Commission rate updated successfully']);
-        } else {
-            return response()->json(['success' => false, 'message' => $response->json()['message'] ?? 'Failed to update commission rate']);
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()]);
         }
-    } catch (\Exception $e) {
-        \Log::error('Error: ' . $e->getMessage());
-        return response()->json(['success' => false, 'message' => 'Server error: Unable to update commission rate', 'errorDetail' => $e->getMessage()]);
+
+        try {
+            $updateData = $request->only(['commission_rate']);
+
+            $response = Http::put(env('API_URL') . "/employee/update-commission/$id", $updateData);
+
+            if ($response->successful()) {
+                return response()->json(['success' => true, 'message' => 'Commission rate updated successfully']);
+            } else {
+                return response()->json(['success' => false, 'message' => $response->json()['message'] ?? 'Failed to update commission rate']);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Server error: Unable to update commission rate', 'errorDetail' => $e->getMessage()]);
+        }
     }
-}
 
 }

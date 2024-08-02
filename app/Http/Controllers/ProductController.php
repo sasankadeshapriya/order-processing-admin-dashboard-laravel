@@ -15,8 +15,9 @@ class ProductController extends Controller
 
     public function showData()
     {
+
         try {
-            $response = Http::get('https://api.gsutil.xyz/product');
+            $response = Http::get(env('API_URL') . '/product');
             $products = $response->json();
 
             // Check if the response was successful (status code 2xx)
@@ -59,7 +60,7 @@ class ProductController extends Controller
     public function deleteProduct($id)
     {
         try {
-            $response = Http::delete("https://api.gsutil.xyz/product/$id");
+            $response = Http::delete(env('API_URL') . "/product/$id");
 
             if ($response->successful()) {
                 return response()->json(['success' => true]);
@@ -104,11 +105,11 @@ class ProductController extends Controller
                     'image',
                     $image->get(),
                     $image->getClientOriginalName()
-                )->post('http://api.gsutil.xyz/images/upload');
+                )->post(env('API_URL') . '/images/upload');
 
                 if ($response->successful()) {
                     $image_path = $response->json()['url'];
-                    $product_image = 'http://api.gsutil.xyz/uploads/' . $image_path;
+                    $product_image = env('API_URL') . '/uploads/' . $image_path;
                 } else {
                     // If image upload fails, handle with default or log error message from API
                     return response()->json(['success' => false, 'message' => $response->json()['message'] ?? 'Failed to upload image']);
@@ -124,7 +125,7 @@ class ProductController extends Controller
                 'added_by_admin_id' => $added_by_admin_id,
             ];
 
-            $productResponse = Http::post('https://api.gsutil.xyz/product', $productData);
+            $productResponse = Http::post(env('API_URL') . '/product', $productData);
 
             if ($productResponse->successful()) {
                 return response()->json(['success' => true, 'message' => 'Product added successfully']);
@@ -141,8 +142,7 @@ class ProductController extends Controller
 
     public function editProductForm($id)
     {
-        // Replace 'https://api.gsutil.xyz/product/{id}' with your actual API URL
-        $response = Http::get("https://api.gsutil.xyz/product/{$id}");
+        $response = Http::get(env('API_URL') . "/product/{$id}");
 
         if ($response->successful()) {
             $product = $response->json();
@@ -170,16 +170,16 @@ class ProductController extends Controller
         $data = $request->except(['_token', '_method', 'product_image']);
         if ($request->hasFile('product_image')) {
             $image = $request->file('product_image');
-            $response = Http::attach('image', $image->get(), $image->getClientOriginalName())->post('http://api.gsutil.xyz/images/upload');
+            $response = Http::attach('image', $image->get(), $image->getClientOriginalName())->post(env('API_URL') . '/images/upload');
             if ($response->successful()) {
                 $image_path = $response->json()['url']; // Retrieve the image URL from the response
-                $data['product_image'] = 'http://api.gsutil.xyz/uploads/' . $image_path; // Assign the full image path to data array
+                $data['product_image'] = env('API_URL') . '/uploads/' . $image_path; // Assign the full image path to data array
             } else {
                 return response()->json(['success' => false, 'message' => 'Failed to upload image']);
             }
         }
 
-        $response = Http::put("https://api.gsutil.xyz/product/{$id}", $data);
+        $response = Http::put(env('API_URL') . "/product/{$id}", $data);
         if ($response->successful()) {
             return response()->json(['success' => true, 'message' => 'Product successfully updated']);
         } else {

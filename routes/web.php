@@ -60,7 +60,7 @@ Route::post('/login', function (Request $request) {
         'password' => 'required'
     ]);
 
-    $response = Http::post('https://api.gsutil.xyz/admin/login', [
+    $response = Http::post(env('API_URL') . '/admin/login', [
         'email' => $validatedData['email'],
         'password' => $validatedData['password'],
     ]);
@@ -95,7 +95,7 @@ Route::post('/api/proxy/verify-otp', function (Request $request) {
     $response = Http::withHeaders([
         'Content-Type' => 'application/json',
         'Accept' => 'application/json',
-    ])->post('http://api.gsutil.xyz/admin/verify-otp', $request->all());
+    ])->post(env('API_URL') . '/admin/verify-otp', $request->all());
 
     // Set CORS headers for the response to the frontend
     return response($response->body(), $response->status())
@@ -242,7 +242,7 @@ Route::post('/api/proxy/forgot-password', function (Request $request) {
     $response = Http::withHeaders([
         'Content-Type' => 'application/json',
         'Accept' => 'application/json',
-    ])->post('http://api.gsutil.xyz/admin/forgot-password', $request->all());
+    ])->post(env('API_URL') . '/admin/forgot-password', $request->all());
 
     \Log::info('Forgot password response', $response->json());
 
@@ -260,7 +260,7 @@ Route::post('/api/proxy/verify-otp', function (Request $request) {
     $response = Http::withHeaders([
         'Content-Type' => 'application/json',
         'Accept' => 'application/json',
-    ])->post('http://api.gsutil.xyz/admin/verify-otp', $request->all());
+    ])->post(env('API_URL') . '/admin/verify-otp', $request->all());
 
     \Log::info('Verify OTP response', $response->json());
 
@@ -278,7 +278,7 @@ Route::post('/api/proxy/change-password', function (Request $request) {
     $response = Http::withHeaders([
         'Content-Type' => 'application/json',
         'Accept' => 'application/json',
-    ])->post('http://api.gsutil.xyz/admin/password-change', $request->all());
+    ])->post(env('API_URL') . '/admin/password-change', $request->all());
 
     \Log::info('Change password response', $response->json());
 
@@ -296,7 +296,7 @@ Route::put('/api/proxy/vehicle-inventory/toggle-looked/{id}', function (Request 
     $response = Http::withHeaders([
         'Content-Type' => 'application/json',
         'Accept' => 'application/json',
-    ])->put('http://api.gsutil.xyz/vehicle-inventory/toggle-looked/' . $id, $request->all());
+    ])->put(env('API_URL') . '/vehicle-inventory/toggle-looked/' . $id, $request->all());
 
     \Log::info('Response from external API', ['response' => $response->json()]);
 

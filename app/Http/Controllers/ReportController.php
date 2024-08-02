@@ -24,7 +24,7 @@ class ReportController extends Controller
         $filter = $request->query('filter');
         $startDate = $request->query('start_date');
         $endDate = $request->query('end_date');
-        $url = 'http://api.gsutil.xyz/sales/report';
+        $url = env('API_URL') . '/sales/report';
 
         if ($startDate && $endDate) {
             $url .= '?start_date=' . $startDate . '&end_date=' . $endDate;
@@ -46,7 +46,7 @@ class ReportController extends Controller
         $filter = $request->query('filter', 'week');
         $startDate = $request->query('start_date');
         $endDate = $request->query('end_date');
-        $url = 'https://api.gsutil.xyz/outstanding';
+        $url = env('API_URL') . '/outstanding';
 
         if ($startDate && $endDate) {
             $url .= '?filter=custom&start_date=' . $startDate . '&end_date=' . $endDate;
@@ -83,7 +83,7 @@ class ReportController extends Controller
             'end_date' => $endDate
         ]);
 
-        $url = 'https://api.gsutil.xyz/commission/report';
+        $url = env('API_URL') . '/commission/report';
 
         if ($startDate && $endDate) {
             $url .= '?filter=custom&start_date=' . $startDate . '&end_date=' . $endDate;
@@ -118,7 +118,7 @@ class ReportController extends Controller
 
     public function getDayEndReport(Request $request)
     {
-        $url = 'https://api.gsutil.xyz/day-report'; // Assuming this is where the data comes from
+        $url = env('API_URL') . '/day-report';
         $response = Http::get($url);
 
         if ($response->successful()) {
@@ -138,7 +138,7 @@ class ReportController extends Controller
     // Fetch data for the MRP Report
     public function getMrpReportData(Request $request)
     {
-        $url = 'https://api.gsutil.xyz/batch'; // API endpoint
+        $url = env('API_URL') . '/batch';
         $response = Http::get($url);
 
         if ($response->successful()) {

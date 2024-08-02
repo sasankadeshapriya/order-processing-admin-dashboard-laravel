@@ -19,7 +19,7 @@ class VehicleInventoryController extends Controller
     public function showVehicleInventory()
     {
         try {
-            $response = Http::get('https://api.gsutil.xyz/vehicle-inventory');
+            $response = Http::get(env('API_URL') . '/vehicle-inventory');
             $vehicleInventories = collect($response->json('vehicleInventories'));
 
             // Group by Vehicle No.
@@ -45,7 +45,7 @@ class VehicleInventoryController extends Controller
     public function delete($id)
     {
         try {
-            $response = Http::delete("https://api.gsutil.xyz/vehicle-inventory/$id");
+            $response = Http::delete(env('API_URL') . "/vehicle-inventory/$id");
 
             if ($response->successful()) {
                 return response()->json(['success' => true]);
@@ -58,7 +58,11 @@ class VehicleInventoryController extends Controller
         }
     }
 
-    private $baseURL = 'https://api.gsutil.xyz';
+    private $baseURL;
+    public function __construct()
+    {
+        $this->baseURL = env('API_URL');
+    }
 
     public function addVehicleInventoryForm()
     {
@@ -126,13 +130,12 @@ class VehicleInventoryController extends Controller
         ];
 
         try {
-            \Log::info('Final Data:', $data);
 
-            $response = Http::post('http://api.gsutil.xyz/vehicle-inventory', $data);
+            $response = Http::post(env('API_URL') . '/vehicle-inventory', $data);
 
             if ($response->successful()) {
                 // Fetch updated batches to return
-                $updatedBatches = Http::get('https://api.gsutil.xyz/batch')->json();
+                $updatedBatches = Http::get(env('API_URL') . '/batch')->json();
                 $products = collect($updatedBatches)->map(function ($batch) {
                     return [
                         'id' => $batch['product_id'],
@@ -159,22 +162,18 @@ class VehicleInventoryController extends Controller
     {
         try {
             // Fetching specific inventory data
-            $response = Http::get("http://api.gsutil.xyz/vehicle-inventory/{$id}");
+            $response = Http::get(env('API_URL') . "/vehicle-inventory/{$id}");
             $responseData = $response->json();
-
-            // Logging for debugging
-            \Log::info('API Response:', $responseData);
 
             // Check if the response is successful and has the necessary data
             if (!$response->successful() || !isset($responseData['vehicleInventory'])) {
-                \Log::error('No inventory data found in the API response.');
                 return redirect()->route('vehicle.inventory')->with('error', 'No inventory data found.');
             }
 
             $inventory = $responseData['vehicleInventory'];
 
             // Fetching batch data for products from the API
-            $batches = Http::get('https://api.gsutil.xyz/batch')->json();
+            $batches = Http::get(env('API_URL') . '/batch')->json();
             $products = collect($batches)->map(function ($batch) {
                 return [
                     'id' => $batch['product_id'],
@@ -185,7 +184,6 @@ class VehicleInventoryController extends Controller
             })->unique('id');
 
         } catch (\Exception $e) {
-            \Log::error('Error fetching data: ' . $e->getMessage());
             return redirect()->route('vehicle.inventory')->with('error', 'Failed to fetch data for the specified inventory');
         }
 
@@ -215,13 +213,13 @@ class VehicleInventoryController extends Controller
         try {
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json'
-            ])->put("http://api.gsutil.xyz/vehicle-inventory/admin/{$id}", $data);
+            ])->put(env('API_URL') . "/vehicle-inventory/admin/{$id}", $data);
 
             if ($response->successful()) {
                 $responseBody = $response->json();
 
                 // Fetch the latest batch data for the specific product to compute max quantity correctly
-                $updatedBatches = Http::get('https://api.gsutil.xyz/batch')->json();
+                $updatedBatches = Http::get(env('API_URL') . '/batch')->json();
                 $updatedProduct = collect($updatedBatches)->firstWhere('product_id', $data['product_id']);
 
                 // Calculate the maximum available quantity: batch available quantity + current inventory quantity

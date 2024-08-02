@@ -11,7 +11,6 @@ class MapController extends Controller
 {
     public function submitRoute(Request $request)
     {
-        Log::info('Received route submission request.', $request->all()); // Log all request data
 
         $validator = Validator::make($request->all(), [
             'route_name' => 'required|string|max:100',
@@ -20,16 +19,14 @@ class MapController extends Controller
         ]);
 
         if ($validator->fails()) {
-            Log::error('Validation errors on route submission.', $validator->errors()->toArray());
             return response()->json(['success' => false, 'errors' => $validator->errors()]);
         }
 
-        // Prepare data for the external API
-        $apiUrl = 'https://api.gsutil.xyz/route'; // API endpoint
+        $apiUrl = env('API_URL') . '/route'; // API endpoint
         $apiData = [
-            'name' => $request->input('route_name'), // Change to 'name' to match API expectation
+            'name' => $request->input('route_name'),
             'waypoints' => $request->input('waypoints'),
-            'added_by_admin_id' => (int) $request->input('added_by_admin_id'), // Ensure it's an integer
+            'added_by_admin_id' => (int) $request->input('added_by_admin_id'),
         ];
 
         try {
@@ -40,7 +37,6 @@ class MapController extends Controller
                 return response()->json(['success' => true, 'message' => 'Map details added successfully', 'data' => $response->json()]);
             } else {
                 $responseBody = $response->json();
-                Log::error('Failed to add map details via external API.', ['response' => $responseBody]);
                 return response()->json([
                     'success' => false,
                     'message' => $responseBody['message'] ?? 'Failed to add map details',
@@ -55,51 +51,48 @@ class MapController extends Controller
     }
 
     public function showData()
-{
-    $routes = [];
-    
-    try {
-        $response = Http::get('http://api.gsutil.xyz/route');
+    {
+        $routes = [];
 
-        if ($response->successful()) {
-            $routes = $response->json();
+        try {
+            $response = Http::get(env('API_URL') . '/route');
 
-            foreach ($routes as &$route) {
-                $waypoints = json_decode($route['waypoints'], true);
+            if ($response->successful()) {
+                $routes = $response->json();
 
-                // Debugging output
-                Log::debug('Decoded waypoints:', $waypoints);
+                foreach ($routes as &$route) {
+                    $waypoints = json_decode($route['waypoints'], true);
 
-                if (!empty($waypoints) && is_array($waypoints)) {
-                    $firstPoint = $waypoints[0];
-                    $lastPoint = end($waypoints);
+                    if (!empty($waypoints) && is_array($waypoints)) {
+                        $firstPoint = $waypoints[0];
+                        $lastPoint = end($waypoints);
 
-                    // Check if the array keys exist
-                    if (isset($firstPoint['latitude'], $firstPoint['longitude'], $lastPoint['latitude'], $lastPoint['longitude'])) {
-                        $route['waypoints_summary'] = "Start: ({$firstPoint['latitude']}, {$firstPoint['longitude']}) - End: ({$lastPoint['latitude']}, {$lastPoint['longitude']})";
+                        // Check if the array keys exist
+                        if (isset($firstPoint['latitude'], $firstPoint['longitude'], $lastPoint['latitude'], $lastPoint['longitude'])) {
+                            $route['waypoints_summary'] = "Start: ({$firstPoint['latitude']}, {$firstPoint['longitude']}) - End: ({$lastPoint['latitude']}, {$lastPoint['longitude']})";
+                        } else {
+                            $route['waypoints_summary'] = 'Missing latitude or longitude in waypoints.';
+                        }
                     } else {
-                        $route['waypoints_summary'] = 'Missing latitude or longitude in waypoints.';
+                        $route['waypoints_summary'] = 'No waypoints defined';
                     }
-                } else {
-                    $route['waypoints_summary'] = 'No waypoints defined';
                 }
+            } else {
+                Log::error('API Error: ' . $response->status());
             }
-        } else {
-            Log::error('API Error: ' . $response->status());
+        } catch (RequestException $e) {
+            Log::error('Request Exception: ' . $e->getMessage());
+        } catch (\Exception $e) {
+            Log::error('General Exception: ' . $e->getMessage());
         }
-    } catch (RequestException $e) {
-        Log::error('Request Exception: ' . $e->getMessage());
-    } catch (\Exception $e) {
-        Log::error('General Exception: ' . $e->getMessage());
-    }
 
-    return view('pages.maps.manage', compact('routes'));
-}
+        return view('pages.maps.manage', compact('routes'));
+    }
 
 
     public function editRouteForm($id)
     {
-        $response = Http::get("https://api.gsutil.xyz/route/{$id}");
+        $response = Http::get(env('API_URL') . "/route/{$id}");
 
         if ($response->successful()) {
             $route = $response->json();
@@ -110,87 +103,73 @@ class MapController extends Controller
     }
 
     public function updateRoute(Request $request, $id)
-{
-    Log::info('Request Data:', $request->all());
+    {
 
-    $validator = Validator::make($request->all(), [
-        'route_name' => 'required|string|max:100',
-        'waypoints' => 'required|json',
-        'added_by_admin_id' => 'required|integer'
-    ]);
+        $validator = Validator::make($request->all(), [
+            'route_name' => 'required|string|max:100',
+            'waypoints' => 'required|json',
+            'added_by_admin_id' => 'required|integer'
+        ]);
 
-    if ($validator->fails()) {
-        Log::error('Validation errors on route submission.', $validator->errors()->toArray());
-        return response()->json(['success' => false, 'errors' => $validator->errors()]);
-    }
-
-    $data = [
-        'name' => $request->input('route_name'),
-        'waypoints' => $request->input('waypoints'),
-        'added_by_admin_id' => (int) $request->input('added_by_admin_id'),
-    ];
-
-    Log::info('Sending Data to API:', ['data' => $data]);
-
-    try {
-        $response = Http::put("https://api.gsutil.xyz/route/{$id}", $data);
-
-        Log::info('Response Status Code:', ['status' => $response->status()]);
-        Log::info('Response Body:', ['body' => $response->body()]);
-
-        if ($response->successful()) {
-            Log::info('Route updated successfully via external API.');
-            return response()->json(['success' => true, 'message' => 'Route successfully updated']);
-        } else {
-            $errorDetails = $response->json();
-            Log::error('Failed to update route:', ['response' => $errorDetails]);
-            return response()->json(['success' => false, 'message' => $errorDetails['message'] ?? 'Failed to update route']);
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()]);
         }
-    } catch (\Exception $e) {
-        Log::error('Exception:', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
-        return response()->json(['success' => false, 'message' => 'An unexpected error occurred: ' . $e->getMessage()]);
+
+        $data = [
+            'name' => $request->input('route_name'),
+            'waypoints' => $request->input('waypoints'),
+            'added_by_admin_id' => (int) $request->input('added_by_admin_id'),
+        ];
+
+        try {
+            $response = Http::put(env('API_URL') . "/route/{$id}", $data);
+
+            if ($response->successful()) {
+                Log::info('Route updated successfully via external API.');
+                return response()->json(['success' => true, 'message' => 'Route successfully updated']);
+            } else {
+                $errorDetails = $response->json();
+                Log::error('Failed to update route:', ['response' => $errorDetails]);
+                return response()->json(['success' => false, 'message' => $errorDetails['message'] ?? 'Failed to update route']);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'An unexpected error occurred: ' . $e->getMessage()]);
+        }
     }
-}
 
 
     public function deleteRoute($id)
-{
-    try {
-        $response = Http::delete("https://api.gsutil.xyz/route/$id");
+    {
+        try {
+            $response = Http::delete(env('API_URL') . "/route/$id");
 
-        if ($response->successful()) {
-            return response()->json(['success' => true, 'message' => 'Route deleted successfully']);
-        } else {
-            return response()->json(['success' => false, 'message' => 'Failed to delete route']);
+            if ($response->successful()) {
+                return response()->json(['success' => true, 'message' => 'Route deleted successfully']);
+            } else {
+                return response()->json(['success' => false, 'message' => 'Failed to delete route']);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Server error: Unable to delete route']);
         }
-    } catch (\Exception $e) {
-        \Log::error('General Exception: ' . $e->getMessage());
-        return response()->json(['success' => false, 'message' => 'Server error: Unable to delete route']);
     }
-}
 
-public function showClientLocations()
-{
-    try {
-        $response = Http::get('http://api.gsutil.xyz/client');
+    public function showClientLocations()
+    {
+        try {
+            $response = Http::get(env('API_URL') . '/client');
 
-        if ($response->successful()) {
-            $clients = $response->json();
+            if ($response->successful()) {
+                $clients = $response->json();
 
-            // Assuming you want to log or process the data further
-            Log::info('Retrieved client locations:', ['clients' => $clients]);
-
-            return response()->json(['success' => true, 'clients' => $clients]);
-        } else {
-            $errorDetails = $response->json();
-            Log::error('Failed to retrieve client locations:', ['error' => $errorDetails]);
-            return response()->json(['success' => false, 'message' => 'Failed to retrieve client locations', 'errorDetail' => $errorDetails]);
+                return response()->json(['success' => true, 'clients' => $clients]);
+            } else {
+                $errorDetails = $response->json();
+                return response()->json(['success' => false, 'message' => 'Failed to retrieve client locations', 'errorDetail' => $errorDetails]);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Server error: Unable to fetch client locations', 'errorDetail' => $e->getMessage()]);
         }
-    } catch (\Exception $e) {
-        Log::error('Exception while fetching client locations:', ['message' => $e->getMessage()]);
-        return response()->json(['success' => false, 'message' => 'Server error: Unable to fetch client locations', 'errorDetail' => $e->getMessage()]);
     }
-}
 
 
 }
